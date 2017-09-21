@@ -211,7 +211,7 @@ public class Ammo extends PersistenceObject
 		// No special handling needed
 	}
 
-	override public function save():Boolean {
+	override public function save( $validateGuid:Boolean = true ):Boolean {
 		if ( !changed || !Globals.online || doNotPersist ) {
 //			if ( Globals.online && !changed )
 //				Log.out( name + " save - Not saving data - guid: " + guid + " NOT changed" );
@@ -249,7 +249,7 @@ public class Ammo extends PersistenceObject
 		}
 		
 		if ( (impactSound == "" || Globals.isGuid(impactSound)) && (launchSound == "" || Globals.isGuid(launchSound)) )
-			save()
+			save( true )
 	}
 	/*
 	private function verifySoundData( $se:SoundEvent ):void {

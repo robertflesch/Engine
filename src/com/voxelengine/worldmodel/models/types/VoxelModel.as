@@ -1171,7 +1171,7 @@ public class VoxelModel {
 		Log.out( "VoxelModel.getDefaultSlotData - Loading default data into slots" , Log.WARN );
 		var slots:Vector.<ObjectInfo> = new Vector.<ObjectInfo>( Slots.ITEM_COUNT );
 		for ( var i:int = 0; i < Slots.ITEM_COUNT; i++ )
-			slots[i] = new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY );
+			slots[i] = new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY, ObjectInfo.DEFAULT_OBJECT_NAME );
 		
 		return slots;
 	}

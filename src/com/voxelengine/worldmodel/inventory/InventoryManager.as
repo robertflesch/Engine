@@ -36,6 +36,7 @@ public class InventoryManager
 		// This creates a inventory object for login.
 		InventoryEvent.addListener( InventoryEvent.UNLOAD_REQUEST, unloadInventory );
 		InventoryEvent.addListener( InventoryEvent.REQUEST, requestInventory );
+        InventoryEvent.addListener( InventoryEvent.REQUEST_NPC, requestInventoryNPC );
 		InventoryEvent.addListener( InventoryEvent.SAVE_REQUEST, save );
 		InventoryEvent.addListener( InventoryEvent.SAVE_FORCE, saveForce );
 		InventoryEvent.addListener( InventoryEvent.DELETE, deleteInventory );
@@ -105,9 +106,9 @@ public class InventoryManager
 				_s_inventoryByGuid[e.owner] = e.result as Inventory;
 
 			var inv:Inventory = _s_inventoryByGuid[e.owner];
-			if ( null != inv ) {
-				inv.save();
-			}
+//			if ( null != inv ) {
+//				inv.save();
+//			}
 
 //			for each ( var inventory:Inventory in _s_inventoryByGuid )
 //				if ( null != inventory && inventory.guid != "Player" )
@@ -121,10 +122,10 @@ public class InventoryManager
 				_s_inventoryByGuid[e.owner] = e.result as Inventory;
 
 			var inv:Inventory = _s_inventoryByGuid[e.owner];
-			if ( null != inv ) {
-				inv.changed = true;
-				inv.save();
-			}
+//			if ( null != inv ) {
+//				inv.changed = true;
+//				inv.save();
+//			}
 		}
 	}
 
@@ -133,14 +134,26 @@ public class InventoryManager
 		Log.out( "InventoryManager.requestInventory - OWNER: " + e.owner );
 		if ( e.owner == "Player" )
 			return;
-		var inv:Inventory = objectInventoryGet( e.owner );
+		var inv:Inventory = objectInventoryGet( e );
 		if ( inv && inv.loaded ) {
 			Log.out( "InventoryManager.requestInventory - InventoryEvent.RESPONSE - OWNER: " + e.owner );
 			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, e.owner, inv ) );
 		}
 	}
-	
-	static private function deleteInventory(e:InventoryEvent):void 
+
+	static private function requestInventoryNPC(e:InventoryEvent):void
+	{
+		Log.out( "InventoryManager.requestInventory - OWNER: " + e.owner );
+		if ( e.owner == "Player" )
+			return;
+		var inv:Inventory = objectInventoryGet( e );
+		if ( inv && inv.loaded ) {
+			Log.out( "InventoryManager.requestInventory - InventoryEvent.RESPONSE - OWNER: " + e.owner );
+			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, e.owner, inv ) );
+		}
+	}
+
+    static private function deleteInventory(e:InventoryEvent):void
 	{
 		var inv:Inventory = _s_inventoryByGuid[e.owner];
 		if ( inv ) {
@@ -157,7 +170,7 @@ public class InventoryManager
 			var tempArray:Array = [];
 			for each ( var inv:Inventory in _s_inventoryByGuid )
 			{
-				if ( e.owner == inv.guid ) {
+				if ( e.owner == inv.ownerGuid ) {
 					_s_inventoryByGuid[ e.owner ] = null;
 					inv.unload();
 					// could I just use a delete here, rather then creating new dictionary? See Dictionary class for details - RSF
@@ -165,7 +178,7 @@ public class InventoryManager
 				else
 				{
 					if ( inv )
-						tempArray[inv.guid] = inv;
+						tempArray[inv.ownerGuid] = inv;
 					else
 						Log.out( "InventoryManager.unloadInventory - Null found", Log.ERROR );
 				}
@@ -175,13 +188,13 @@ public class InventoryManager
 		}
 	}
 	
-	static private function objectInventoryGet( $ownerGuid:String ):Inventory {
-		var inventory:Inventory = _s_inventoryByGuid[$ownerGuid];
-		if ( null == inventory && null != $ownerGuid ) {
+	static private function objectInventoryGet( $ie:InventoryEvent):Inventory {
+		var inventory:Inventory = _s_inventoryByGuid[$ie.owner];
+		if ( null == inventory && null != $ie.owner ) {
 			//Log.out( "InventoryManager.objectInventoryGet building inventory object for: " + $ownerGuid , Log.WARN );
-			inventory = new Inventory( $ownerGuid );
-			_s_inventoryByGuid[$ownerGuid] = inventory;
-			inventory.load();
+			inventory = new Inventory( $ie );
+			_s_inventoryByGuid[$ie.owner] = inventory;
+			//inventory.load();
 		}
 		
 		return inventory;	

@@ -97,8 +97,7 @@ public class Player extends PersistenceObject
 	static private var _vm:Avatar;
 	static public function get pm():Avatar { return _vm; }
 
-    static private var _instanceID:String	;
-    static public function get instanceID():String { return _instanceID; }
+    public function get instanceGuid():String { return dbo ? dbo.instanceGuid: DEFAULT_PLAYER; }
 
 	public function Player() {
 		super( "local", "PlayerObjects" );
@@ -113,7 +112,6 @@ public class Player extends PersistenceObject
 			// request that the database load the player Object
 			Persistence.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
 		}
-        _instanceID = Globals.getUID();
 	}
 
 	static private function onRegionLoad( $re:RegionEvent ):void {
@@ -152,9 +150,11 @@ public class Player extends PersistenceObject
 		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 		dbo = $dbo;
 		if ( $dbo ) {
+			guid = dbo.key;
 			if ( null == $dbo.modelGuid ) {
 				// Assign the Avatar the default avatar
 				$dbo.modelGuid = DEFAULT_PLAYER;
+                $dbo.instanceID = Globals.getUID();
 
 //				var userName:String = $dbo.key.substring( 6 );
 //				var firstChar:String = userName.substr(0, 1);
@@ -168,18 +168,17 @@ public class Player extends PersistenceObject
 				$dbo.save();
 			}
 			// Don't modify the modelGuid, change it in the DB if needed
-			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, Network.userId, null ) );
-			var pi:PlayerInfo = new PlayerInfo( instanceID, null );
+			var pi:PlayerInfo = new PlayerInfo( instanceGuid, null );
 			pi.modelGuid = dbo.modelGuid;
-			PlayerInfoEvent.create( ModelBaseEvent.SAVE, instanceID, pi );
-			createPlayer( $dbo.modelGuid, Network.userId );
+			PlayerInfoEvent.create( ModelBaseEvent.SAVE, instanceGuid, pi );
+			createPlayer( $dbo.modelGuid, instanceGuid );
 		}
 		else {
 			Log.out( "Avatar.onPlayerLoadedAction - ERROR, failed to create new record for new players?" );
 		}
 	}
 
-	static public function createPlayer( $modelGuid:String, $userId:String ):void {
+	static public function createPlayer( $modelGuid:String, $instanceID:String ):void {
 
 		if ( null == _s_player ) {
 			_s_player = new Player();
@@ -187,7 +186,7 @@ public class Player extends PersistenceObject
 
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.modelGuid = $modelGuid;
-        ii.instanceGuid = instanceID;
+        ii.instanceGuid = $instanceID;
 		//ii.centerSetComp(7.5, 0, 7.5);
 		ii.centerSetComp(8, 0, 8);
 		ii.lockCenter = true;
@@ -207,13 +206,19 @@ public class Player extends PersistenceObject
 	}
 
 	static public function onPlayerLoadError(error:PlayerIOError):void {
-		Log.out("Avatar.onPlayerLoadError", Log.ERROR, error );
+		Log.out("Player.onPlayerLoadError", Log.ERROR, error );
 	}
 
 	static private function playerModelLoaded( $mle:ModelLoadingEvent ):void {
-		if ( $mle.vm && ( $mle.vm.instanceInfo.instanceGuid == instanceID || $mle.vm.instanceInfo.instanceGuid == Network.LOCAL ) ){
+		if ( $mle.vm && ( $mle.vm.instanceInfo.instanceGuid == Player.player.instanceGuid || $mle.vm.instanceInfo.instanceGuid == Network.LOCAL ) ){
 			Log.out( "Player.playerModelLoaded");
 			ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
+
+            if ( Player.player.dbo ) {
+                InventoryEvent.addListener( InventoryEvent.SAVE_REQUEST, savePlayerObject );
+				InventoryEvent.dispatch(new InventoryEvent(InventoryEvent.REQUEST, Network.userId, Player.player.dbo));
+            }
+
 			//_playerModel = $mle.vm as Avatar;
 			if ( null == Region.currentRegion.modelCache.instanceGet( $mle.vm.instanceInfo.instanceGuid ) ) {
 				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, $mle.vm );
@@ -227,9 +232,14 @@ public class Player extends PersistenceObject
 		}
 	}
 
+    static private function savePlayerObject ( $e:InventoryEvent ): void {
+		Player.player.save( false );
+	}
+
 	static private function defaultSlotDataRequest( $ise:InventorySlotEvent ):void {
 		// inventory is always on a instance guid.
-		if ( VoxelModel.controlledModel.instanceInfo.instanceGuid == $ise.instanceGuid ) {
+        //if ( VoxelModel.controlledModel.instanceInfo.instanceGuid == $ise.instanceGuid ) {
+        if ( Network.userId == $ise.instanceGuid ) {
 			InventorySlotEvent.removeListener( InventorySlotEvent.DEFAULT_REQUEST, defaultSlotDataRequest );
 			Log.out( "Player.getDefaultSlotData - Loading default data into slots" , Log.WARN );
 

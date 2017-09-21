@@ -92,9 +92,11 @@ public class BoxInventory extends VVBox
 
 		switch ( $item.objectType ) {
 		case ObjectInfo.OBJECTINFO_EMPTY:
+            var oi:ObjectInfo = $item as ObjectInfo;
 			reset();
 			backgroundTexture = $item.backgroundTexture( width );
-			break;
+            setHelp( oi.name );
+            break;
 		case ObjectInfo.OBJECTINFO_MODEL:
 			var om:ObjectModel = _objectInfo as ObjectModel;
 			if ( om.vmm ) {
@@ -228,7 +230,7 @@ public class BoxInventory extends VVBox
 			_editData = null
 		}
 
-		_objectInfo = new ObjectInfo( this, ObjectInfo.OBJECTINFO_EMPTY );
+		_objectInfo = new ObjectInfo( this, ObjectInfo.OBJECTINFO_EMPTY, ObjectInfo.DEFAULT_OBJECT_NAME );
 	}
 }
 }

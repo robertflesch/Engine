@@ -577,13 +577,13 @@ public class ModelInfo extends PersistenceObject
 	public function get biomes():Biomes 							{ return _biomes; }
 	public function set biomes(value:Biomes):void  					{ _biomes = value;  changed = true; }
 	
-	override public function save():Boolean {
+	override public function save( $validateGuid:Boolean = true ):Boolean {
 		if ( false == animationsLoaded || false == childrenLoaded) {
 			Log.out("ModelInfo.save - NOT Saving guid: " + guid + " NEED Animations or children to complete", Log.WARN);
 			return false;
 		}
 
-		if ( !super.save() )
+		if ( !super.save( $validateGuid ) )
 			return false;
 
 		if ( _animations && 0 < _animations.length )

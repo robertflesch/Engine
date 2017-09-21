@@ -486,8 +486,12 @@ public class ControllableVoxelModel extends VoxelModel
 
 	override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
 		super.takeControl( $modelLosingControl, $addAsChild );
-		if ( Network.userId != Network.LOCAL )
-			InventoryInterfaceEvent.dispatch( new InventoryInterfaceEvent( InventoryInterfaceEvent.DISPLAY, instanceInfo.instanceGuid, inventoryBitmap ) );
+		if ( Network.userId != Network.LOCAL ) {
+            if ( this is Avatar )
+               InventoryInterfaceEvent.dispatch(new InventoryInterfaceEvent(InventoryInterfaceEvent.DISPLAY, Network.userId, inventoryBitmap));
+			else
+                InventoryInterfaceEvent.dispatch(new InventoryInterfaceEvent(InventoryInterfaceEvent.DISPLAY, instanceInfo.instanceGuid, inventoryBitmap));
+        }
 
 		VVKeyboardEvent.addListener( KeyboardEvent.KEY_DOWN, keyDown );
 		VVKeyboardEvent.addListener( KeyboardEvent.KEY_UP, keyUp );

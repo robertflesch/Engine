@@ -32,7 +32,7 @@ public class ObjectModel extends ObjectInfo
 	public function set vmm(value:ModelMetadata):void 			{ _vmm = value }
 	
 	public function ObjectModel( $owner:BoxInventory, $guid:String ):void {
-		super( $owner, ObjectInfo.OBJECTINFO_MODEL );
+		super( $owner, ObjectInfo.OBJECTINFO_MODEL, "Left click to place model" );
 		modelGuid = $guid;
 	}
 	
@@ -71,7 +71,7 @@ public class ObjectModel extends ObjectInfo
 			if ( box )
 				box.reset();
 			Log.out( "ObjectModel.metadataFailed - guid: " + e.modelGuid, Log.WARN );
-			InventorySlotEvent.create( InventorySlotEvent.CHANGE, Network.userId, Network.userId, _slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) );
+			InventorySlotEvent.create( InventorySlotEvent.CHANGE, Network.userId, Network.userId, _slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY, ObjectInfo.DEFAULT_OBJECT_NAME ) );
 		}
 	}
 	
@@ -82,6 +82,7 @@ public class ObjectModel extends ObjectInfo
 			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, metadataAdded );
 			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
 			_vmm = e.modelMetadata;
+			_name = _vmm.name;
 			// a delay is needed since the metadata loads the thumbnail on a seperate thread.
 			delayedUpdate()
 		}

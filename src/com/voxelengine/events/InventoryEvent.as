@@ -18,6 +18,7 @@ public class InventoryEvent extends Event
 {
 	// Asks for the inventory
 	static public const REQUEST:String  		= "REQUEST";
+    static public const REQUEST_NPC:String  		= "REQUEST_NPC";
 	// Returns the inventory object
 	static public const RESPONSE:String  		= "RESPONSE";
 	

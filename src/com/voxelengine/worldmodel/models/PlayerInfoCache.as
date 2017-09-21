@@ -39,9 +39,9 @@ public class PlayerInfoCache
     //  PlayerInfoEvents
     /////////////////////////////////////////////////////////////////////////////////////////////
     static public function saveHandler( $pie:PlayerInfoEvent ):void {
-        PlayerInfoEvent.create( ModelBaseEvent.DELETE, $pie.guid, $pie.playerInfo );
-        var pi:PlayerInfo = $pie.playerInfo;
-        pi.save();
+//        PlayerInfoEvent.create( ModelBaseEvent.DELETE, $pie.guid, $pie.playerInfo );
+//        var pi:PlayerInfo = $pie.playerInfo;
+//        pi.save();
     }
 
     static public function deleteHandler( $pie:PlayerInfoEvent ):void {

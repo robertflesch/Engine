@@ -286,7 +286,7 @@ public class InventoryPanelModel extends VVContainer
 		_itemContainer.height = _itemContainer.numElements * MODEL_IMAGE_WIDTH;
 		for ( var i:int=0; i < $countMax; i++ ) {
 			var box:BoxInventory = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_HEIGHT, BorderStyle.NONE );
-			box.updateObjectInfo( new ObjectInfo( box, ObjectInfo.OBJECTINFO_EMPTY ) );
+			box.updateObjectInfo( new ObjectInfo( box, ObjectInfo.OBJECTINFO_EMPTY, ObjectInfo.DEFAULT_OBJECT_NAME ) );
 			box.x = i * MODEL_IMAGE_WIDTH;
 			_currentRow.addElement( box );
 		}
@@ -373,7 +373,7 @@ public class InventoryPanelModel extends VVContainer
 					continue;
 				var om:ObjectModel = bi.objectInfo as ObjectModel;
 				if ( om.modelGuid == $modelGuid ) {
-					var newOI:ObjectInfo = new ObjectInfo(null, ObjectInfo.OBJECTINFO_EMPTY);
+					var newOI:ObjectInfo = new ObjectInfo(null, ObjectInfo.OBJECTINFO_EMPTY, ObjectInfo.DEFAULT_OBJECT_NAME);
 					box.updateObjectInfo( newOI );
 					//Log.out( "InventoryPanelModels.removeModel found model: " + $modelGuid );
 					return;

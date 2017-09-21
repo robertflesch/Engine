@@ -281,12 +281,12 @@ import flash.geom.Vector3D;
 		// toPersistence
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		override public function save():Boolean {
+		override public function save( $validateGuid:Boolean = true ):Boolean {
 			// The null owner check makes it to we dont save local loaded regions to persistence
 			if ( null != owner && Globals.isGuid( guid ) ) {
 				if (changed) {
 					Log.out( "RegionManager.save saving region name: " + name, Log.WARN );
-					return super.save();
+					return super.save( $validateGuid );
 				}
 			}
 			return false;

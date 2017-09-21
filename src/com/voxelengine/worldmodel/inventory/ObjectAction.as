@@ -20,15 +20,13 @@ import com.voxelengine.worldmodel.weapons.Ammo;
 public class ObjectAction extends ObjectInfo 
 {
 	private var _thumbnail:String;
-	private var _name:String;
 	private var _callBackName:String;
 	//private var _callBack:Function;
 	private var _ammoName:String;
 	private var _instanceGuid:String;
 	public function get callBack():Function 				{ return FunctionRegistry.functionGet( _callBackName ); }
 	public function get thumbnail():String { return _thumbnail; }
-	public function get name():String  { return _name; }
-	
+
 	public function get instanceGuid():String { return _instanceGuid; }
 	public function set instanceGuid(value:String):void { _instanceGuid = value; }
 	
@@ -36,12 +34,11 @@ public class ObjectAction extends ObjectInfo
 	public function set ammoName(value:String):void { _ammoName = value; }
 
 	public function ObjectAction( $owner:BoxInventory, $callBackName:String, $thumbnail:String, $name:String ):void {
-		super( $owner, ObjectInfo.OBJECTINFO_ACTION );
+		super( $owner, ObjectInfo.OBJECTINFO_ACTION, $name );
 		_callBackName = $callBackName;
 		//if ( "" != $callBackName )
 		//	_callBack = FunctionRegistry.functionGet( $callBackName );
 		_thumbnail = $thumbnail;
-		_name = $name;
 	}
 	
 	override public function backgroundTexture( size:int = 64 ):String { 

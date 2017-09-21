@@ -101,8 +101,8 @@ public class Animation extends PersistenceObject
 		dbo.owner = Network.userId;
 	}
 
-	override public function save():Boolean {
-		var result:Boolean = super.save();
+	override public function save( $validateGuid:Boolean = true ):Boolean {
+		var result:Boolean = super.save( $validateGuid );
 		if ( _animationSound )
 			_animationSound.save();
 		return result;

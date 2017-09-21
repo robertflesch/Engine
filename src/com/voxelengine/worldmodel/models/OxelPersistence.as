@@ -188,14 +188,14 @@ public class OxelPersistence extends PersistenceObject
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// persistence operations
-	override public function save():Boolean {
+	override public function save( $validateGuid:Boolean = true ):Boolean {
 		if ( 0 == oxelCount ) {
 			//Log.out( "OxelPersistence.save - NOT Saving GUID: " + guid  + " oxel: " + (oxel?oxel:"No oxel") + " in table: " + table, Log.WARN );
 			return false;
 		}
 
 		version = Globals.VERSION;
-		var result:Boolean = super.save();
+		var result:Boolean = super.save( $validateGuid );
 		//Log.out( "OxelPersistence.save: " + ( result ? "Succeeded" : "Failed" ), Log.WARN );
 		return result;
 	}

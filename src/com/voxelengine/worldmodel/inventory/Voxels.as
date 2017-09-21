@@ -42,10 +42,10 @@ public class Voxels
 	// This returns an Array which holds the typeId and the count of those voxels
 	public function types(e:InventoryVoxelEvent):void 
 	{
-		if ( e.networkId == _owner.guid ) {
+		if ( e.networkId == _owner.ownerGuid ) {
 			const cat:String = (e.result as String).toUpperCase();
 			if ( cat == "ALL" ) {
-				InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.TYPES_RESULT, _owner.guid, -1, _items ) );
+				InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.TYPES_RESULT, _owner.ownerGuid, -1, _items ) );
 				return;
 			}
 				
@@ -66,7 +66,7 @@ public class Voxels
 				}
 			}
 
-			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.TYPES_RESULT, _owner.guid, -1, result ) );
+			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.TYPES_RESULT, _owner.ownerGuid, -1, result ) );
 		}
 	}
 	
@@ -74,10 +74,10 @@ public class Voxels
 	{
 		if ( null == _items )
 			return;
-		if ( e.networkId == _owner.guid ) {
+		if ( e.networkId == _owner.ownerGuid ) {
 			var typeId:int = e.typeId;
 			var voxelCount:int = _items[typeId].val;
-			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_RESULT, _owner.guid, typeId, voxelCount ) );
+			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_RESULT, _owner.ownerGuid, typeId, voxelCount ) );
 		}
 		//Log.out( "Voxels.voxelCount - Failed test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
 	}
@@ -87,12 +87,12 @@ public class Voxels
 			if ( _items[typeId] )
 				_items[typeId].val = Math.random() * 1000000;
 		}
-		_owner.changed = true;
+		_owner.dbo.changed = true;
 	}
 	
 	public function change(e:InventoryVoxelEvent):void {
 		//InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.CHANGE, Network.userId, typeIdToUse, amountInGrain0 ) );		
-		if ( e.networkId == _owner.guid ) {
+		if ( e.networkId == _owner.ownerGuid ) {
 			if ( null == _items ) {
 				Log.out( "Voxels.change - ITEMS NULL", Log.WARN );
 				return;
@@ -103,8 +103,8 @@ public class Voxels
 			voxelCount += changeAmount;
 			_items[typeId].val = voxelCount;
 			//Log.out( "Voxels.change - Succeeded test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
-			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_RESULT, _owner.guid, typeId, voxelCount ) );
-			_owner.changed = true;
+			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_RESULT, _owner.ownerGuid, typeId, voxelCount ) );
+			_owner.dbo.changed = true;
 		}
 		//Log.out( "Voxels.change - Failed test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
 	}

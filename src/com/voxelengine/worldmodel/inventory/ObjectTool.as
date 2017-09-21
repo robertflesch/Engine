@@ -19,22 +19,19 @@ import com.voxelengine.GUI.inventory.BoxInventory;
 public class ObjectTool extends ObjectInfo 
 {
 	private var _thumbnail:String;
-	private var _name:String;
 	private var _guid:String;
 	private var _callBackName:String;
 	//private var _callBack:Function 		= null;
 	public function get callBack():Function 				{ return FunctionRegistry.functionGet( _callBackName ); }
 	public function get thumbnail():String { return _thumbnail; }
-	public function get name():String  { return _name; }
 
 	public function ObjectTool( $owner:BoxInventory, $guid:String, $callBackName:String, $thumbnail:String, $name:String ):void {
-		super( $owner, ObjectInfo.OBJECTINFO_TOOL );
+		super( $owner, ObjectInfo.OBJECTINFO_TOOL, $name );
 		_guid = $guid;
 		_callBackName = $callBackName;
 		//if ( "" != $callBackName )
 		//	_callBack = FunctionRegistry.functionGet( $callBackName );
 		_thumbnail = $thumbnail;
-		_name = $name;
 	}
 	
 	override public function backgroundTexture( size:int = 64 ):String { 

@@ -108,7 +108,7 @@ public class PersistenceObject
 	
 	protected function toObject():void { }
 	
-	public function save():Boolean {
+	public function save( $validateGuid:Boolean = true ):Boolean {
 		if ( !changed || !Globals.online || doNotPersist ) {
 //			if ( Globals.online && !changed )
 //				Log.out( name + " save - Not saving data - guid: " + guid + " NOT changed" );
@@ -119,7 +119,7 @@ public class PersistenceObject
 			return false;
 		}
 
-		if ( !Globals.isGuid(guid)) {
+		if ( $validateGuid && !Globals.isGuid(guid)) {
 			changed = false;
 			return false;
 		}

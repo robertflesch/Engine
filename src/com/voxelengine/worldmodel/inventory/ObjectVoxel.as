@@ -30,7 +30,7 @@ public class ObjectVoxel extends ObjectInfo
 	public function get count():int { return _count; }
 
 	public function ObjectVoxel( $owner:BoxInventory, $typeId:int ):void {
-		super( $owner, ObjectInfo.OBJECTINFO_VOXEL );
+		super( $owner, ObjectInfo.OBJECTINFO_VOXEL, "Left click to place block" );
 		_typeId = $typeId;
 		if ( 0 < _typeId )
 			updateCount();

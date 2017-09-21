@@ -6,7 +6,9 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
-	
+
+import com.voxelengine.worldmodel.models.types.Player;
+
 import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;
@@ -21,23 +23,31 @@ import com.voxelengine.worldmodel.models.PersistenceObject;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 
-public class Inventory extends PersistenceObject {
+public class Inventory {
 	private var _loaded:Boolean;
+    public function get loaded():Boolean { return _loaded; }
+    public function set loaded($val:Boolean):void { _loaded = $val; }
 
+    private var _dbo:DatabaseObject;
+    public function get dbo():DatabaseObject { return _dbo; }
 	private var  _slots:Slots;
+    public function get slots():Slots  { return _slots; }
 	private var _voxels:Voxels;
-	private var _characterSlots:CharacterSlots;
-	public function get slots():Slots  { return _slots; }
-	public function get voxels():Voxels  { return _voxels; }
-	
-	public function get loaded():Boolean { return _loaded; }
-	public function set loaded($val:Boolean):void { _loaded = $val; }
+    public function get voxels():Voxels  { return _voxels; }
 
-	public function Inventory( $guid:String ) {
-		super( $guid, Globals.BIGDB_TABLE_INVENTORY );
+	private var _characterSlots:CharacterSlots;
+
+    private var _ownerGuid:String;
+    public function get ownerGuid() :String { return _ownerGuid; }
+
+
+	public function Inventory( $ie:InventoryEvent ) {
+        _ownerGuid = $ie.owner;
+		_dbo = $ie.result; // in this case I am passing the dbo of the the players PlayerObjects
 		_slots = new Slots( this );
 		_voxels = new Voxels( this );
 		_characterSlots = new CharacterSlots( this );
+		fromObject();
 	}
 
 	public function characterSlotGet( $slot:String ):String {
@@ -52,7 +62,7 @@ public class Inventory extends PersistenceObject {
 	}
 		
 	public function deleteInventory():void {
-		PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, guid, null ) );
+		PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, _ownerGuid, null ) );
 		_slots = null;
 		_voxels = null;
 		_characterSlots = null;
@@ -62,108 +72,50 @@ public class Inventory extends PersistenceObject {
 	// Persistence
 	//////////////////////////////////////////////////////////////////
 	
-	override public function save():Boolean {
-		if ( !loaded ) {
-			Log.out( "Inventory.save - Not LOADED - guid: " + guid, Log.DEBUG );
-			return false;
-		}
-
-		if ( !changed || !Globals.online || doNotPersist ) {
-	//			if ( Globals.online && !changed )
-	//				Log.out( name + " save - Not saving data - guid: " + guid + " NOT changed" );
-	//			else if ( !Globals.online && changed )
-	//				Log.out( name + " save - Not saving data - guid: " + guid + " NOT online" );
-	//			else
-	//				Log.out( name + " save - Not saving data - Offline and not changed" );
-			return false;
-		}
-
-		// Network names are not valid guids, but we need to save them anyways!
-		validatedSave();
-		return true;
-	}
-
-	override protected function toObject():void {
-		_slots.toObject( dbo );
-		dbo.modifiedData = new Date().toUTCString();
+	public function toObject():void {
+		_slots.toObject( _dbo.inventory );
+//        _dbo.modifiedData = new Date().toUTCString();
 		// voxels
 		var ba:ByteArray = new ByteArray(); 
-		ba.writeUTF( guid );
+		ba.writeUTF( _ownerGuid );
 		_voxels.toByteArray( ba );
 		ba.compress();
-		dbo.voxelData = ba;
-		_characterSlots.toObject( dbo );
+        _dbo.inventory.voxelData = ba;
+		_characterSlots.toObject( _dbo.inventory );
 	}
 
-	public function fromObject( $dbo:DatabaseObject ):void {
-		if ( $dbo ) {
-			dbo  = $dbo;
+	public function fromObject():void {
+		if ( _dbo.inventory ) {
 			// Slot data is stored as fields for easy analysis
 			// we can know what user carry around
-            _slots.fromObject( dbo );
-			_characterSlots.fromObject( dbo );
+            _slots.fromObject( _dbo.inventory );
+			_characterSlots.fromObject( _dbo.inventory );
 
-			var ba:ByteArray = dbo.voxelData;
+			var ba:ByteArray = _dbo.inventory.voxelData;
 			if ( ba && 0 < ba.bytesAvailable ) {
 				try { ba.uncompress(); }
 				catch (error:Error) {
-					Log.out( "Inventory.fromObject - Was expecting compressed oxelPersistence " + guid, Log.WARN ); }
+					Log.out( "Inventory.fromObject - Was expecting compressed oxelPersistence " + _ownerGuid, Log.WARN ); }
 				ba.position = 0;
 
 				// have to read it!
 				// TODO should version it!
 				var ownerId:String = ba.readUTF();
 				_voxels.fromObject( ba );
+				loaded = true;
 			}
 		}
 		else {
-			super.assignNewDatabaseObject();
-            _slots.addDefaultData();
-			var ownerModel:VoxelModel = Region.currentRegion.modelCache.instanceGet( guid );
-			if ( ownerModel && ownerModel == VoxelModel.controlledModel )
-				_voxels.addTestData();
+            _dbo.inventory = {};
+//			var ownerModel:VoxelModel = Region.currentRegion.modelCache.instanceGet( _ownerGuid );
+//			if ( ownerModel && ownerModel == VoxelModel.controlledModel )
+			_voxels.addTestData();
 			_characterSlots.addDefaultData();
-			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, guid, null ) );
+            _slots.addDefaultData();
+			toObject();
+            Player.player.changed = true;
+            InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, _ownerGuid, this ) );
 		}
-	}
-	
-	public function load():void {
-		if ( Globals.online ) {
-			addLoadEvents();
-			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, guid ) );
-		}
-	}
-	
-	override protected function notFound($pe:PersistenceEvent):void
-	{
-		if ( table != $pe.table )
-			return;
-		// this occurs on first time logging in.
-		removeLoadEvents();
-		Log.out( "Inventory.notFound - OWNER: " + guid, Log.WARN );
-		fromObject( null );
-		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, guid, this ) );
-	}
-	
-	override protected function loadSuccess( $pe:PersistenceEvent ):void
-	{
-		if ( table != $pe.table )
-			return;
-		if ( guid != $pe.guid )
-			return;
-		removeLoadEvents();
-		fromObject( $pe.dbo );
-		_loaded = true;
-		//Log.out( "Inventory.loadSuccess - OWNER: " + guid + "  guid: " + $pe.guid, Log.WARN );
-		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, guid, this ) );
-	}
-	
-	override protected function loadFailed( $pe:PersistenceEvent ):void
-	{
-		if ( table != $pe.table )
-			return;
-		removeLoadEvents();
-		(new Alert( "ERROR LOADING USER INVENTORY - Please post on forums" )).display();
 	}
 }
 }

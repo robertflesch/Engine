@@ -47,13 +47,13 @@ public class Slots
 	
 	public function slotChange(e:InventorySlotEvent):void {
 		Log.out( "Slots.slotChange slot: " + e.slotId + "  item: " + e.data );
-		if ( _owner.guid == e.ownerGuid ) {
+		if ( _owner.ownerGuid == e.ownerGuid ) {
 			if ( _items ) {
 				if ( null == e.data )
-					setItemData( e.slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) );
+					setItemData( e.slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY, ObjectInfo.DEFAULT_OBJECT_NAME ) );
 				else
 					setItemData( e.slotId, e.data );
-				_owner.changed = true;
+				_owner.dbo.changed = true;
 			}
 			else
 				Log.out( "Slots.slotChange _slots container not initialized", Log.WARN );
@@ -66,7 +66,7 @@ public class Slots
 		// find the first comma so we can get the substring with the object type
 		var type:int = int( $data.charAt(0) );
 		if ( type == 1 )
-			return new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY );		
+			return new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY, ObjectInfo.DEFAULT_OBJECT_NAME );
 		else if ( type == 2 )
 			return new ObjectVoxel( null, 0 ).fromInventoryString( $data, $slotId ); 
 		else if ( type == 3 )
@@ -80,7 +80,7 @@ public class Slots
 		else
 			Log.out( "Slots.createObjectFromInventoryString - type: " + type + "  NOT FOUND", Log.ERROR );
 		
-		return new ObjectInfo( null, ObjectInfo.OBJECTINFO_INVALID );
+		return new ObjectInfo( null, ObjectInfo.OBJECTINFO_INVALID, ObjectInfo.DEFAULT_OBJECT_NAME );
 	}
 
 	public function addDefaultData():void {
@@ -93,37 +93,39 @@ public class Slots
 		// might need to be a table driven event also.
 		// so the default oxelPersistence is in the "class inventory" table
 		_owner.loaded = true;
-		InventorySlotEvent.create( InventorySlotEvent.DEFAULT_REQUEST, _owner.guid, _owner.guid, 0, null );
+		InventorySlotEvent.create( InventorySlotEvent.DEFAULT_REQUEST, _owner.ownerGuid, _owner.ownerGuid, 0, null );
 	}
 
 	public function fromObject( $info:Object ):void {	
-		if ( $info && $info.slot0 ) {
+		if ( $info && $info.slots ) {
+			var slots:Object = $info.slots;
 			var index:int = 0;
-			setItemData( index, createObjectFromInventoryString( $info.slot0, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $info.slot1, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $info.slot2, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $info.slot3, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $info.slot4, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $info.slot5, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $info.slot6, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $info.slot7, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $info.slot8, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $info.slot9, index++ ) );
+			setItemData( index, createObjectFromInventoryString( slots.slot0, index++ ) );
+			setItemData( index, createObjectFromInventoryString( slots.slot1, index++ ) );
+			setItemData( index, createObjectFromInventoryString( slots.slot2, index++ ) );
+			setItemData( index, createObjectFromInventoryString( slots.slot3, index++ ) );
+			setItemData( index, createObjectFromInventoryString( slots.slot4, index++ ) );
+			setItemData( index, createObjectFromInventoryString( slots.slot5, index++ ) );
+			setItemData( index, createObjectFromInventoryString( slots.slot6, index++ ) );
+			setItemData( index, createObjectFromInventoryString( slots.slot7, index++ ) );
+			setItemData( index, createObjectFromInventoryString( slots.slot8, index++ ) );
+			setItemData( index, createObjectFromInventoryString( slots.slot9, index ) );
 		}
 	}
 
 
 	public function toObject( $info:Object ):void {
-		$info.slot0	= _items[0].asInventoryString();
-		$info.slot1	= _items[1].asInventoryString();
-		$info.slot2	= _items[2].asInventoryString();
-		$info.slot3	= _items[3].asInventoryString();
-		$info.slot4	= _items[4].asInventoryString();
-		$info.slot5	= _items[5].asInventoryString();
-		$info.slot6	= _items[6].asInventoryString();
-		$info.slot7	= _items[7].asInventoryString();
-		$info.slot8	= _items[8].asInventoryString();
-		$info.slot9	= _items[9].asInventoryString();
+        $info.slots = {};
+		$info.slots.slot0	= _items[0].asInventoryString();
+		$info.slots.slot1	= _items[1].asInventoryString();
+		$info.slots.slot2	= _items[2].asInventoryString();
+		$info.slots.slot3	= _items[3].asInventoryString();
+		$info.slots.slot4	= _items[4].asInventoryString();
+		$info.slots.slot5	= _items[5].asInventoryString();
+		$info.slots.slot6	= _items[6].asInventoryString();
+		$info.slots.slot7	= _items[7].asInventoryString();
+		$info.slots.slot8	= _items[8].asInventoryString();
+		$info.slots.slot9	= _items[9].asInventoryString();
 	}
 	
 	private function setItemData( $slot:int, $data:ObjectInfo ):void {
@@ -165,7 +167,7 @@ public class Slots
 
 	private function initializeSlots():void {
 		for ( var i:int=0; i < ITEM_COUNT; i++ ) {
-			setItemData( i, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) );
+			setItemData( i, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY, ObjectInfo.DEFAULT_OBJECT_NAME ) );
 		}
 	}
 }

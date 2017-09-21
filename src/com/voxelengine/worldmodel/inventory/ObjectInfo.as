@@ -18,6 +18,7 @@ import com.voxelengine.GUI.inventory.BoxInventory;
  */
 public class ObjectInfo 
 {
+	static public const DEFAULT_OBJECT_NAME:String = "Drag an item here to use it";
 	static public const OBJECTINFO_INVALID:int = 0;
 	static public const OBJECTINFO_EMPTY:int = 1;
 	static public const OBJECTINFO_VOXEL:int = 2;
@@ -30,6 +31,9 @@ public class ObjectInfo
 	protected var _box:BoxInventory;
 	protected var _slotId:int;
 	private var _backgroundTexture:String;
+    protected var _name:String;
+    public function get name():String  { return _name; }
+
 	
 	public function get objectType():int 					{ return _objectType; }
 	
@@ -43,10 +47,11 @@ public class ObjectInfo
 		return "blank128.png";
 	}
 	
-	public function ObjectInfo( $owner:BoxInventory, $objectType:int ):void 
+	public function ObjectInfo( $owner:BoxInventory, $objectType:int, $name:String ):void
 	{ 
 		_box = $owner;
-		_objectType = $objectType; 
+		_objectType = $objectType;
+		_name = $name;
 	}
 	
 	public function toByteArray( $ba:ByteArray ):ByteArray 	{ return $ba; }

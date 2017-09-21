@@ -34,12 +34,12 @@ public class CharacterSlots {
 
     public function slotChange($cse:CharacterSlotEvent):void {
         Log.out("CharacterSlots.slotChange slot: " + $cse.slot + "  item: " + $cse.guid);
-        if (_owner.guid == $cse.owner) {
+        if (_owner.ownerGuid == $cse.owner) {
             if (null == $cse.guid)
                 setItemData($cse.slot, "");
             else
                 setItemData($cse.slot, $cse.guid);
-            _owner.changed = true;
+            _owner.dbo.changed = true;
         }
     }
 
@@ -51,7 +51,7 @@ public class CharacterSlots {
         // find the first comma so we can get the substring with the object type
         var type:int = int($data.charAt(0));
         if (type == 1)
-            return new ObjectInfo(null, ObjectInfo.OBJECTINFO_EMPTY);
+            return new ObjectInfo(null, ObjectInfo.OBJECTINFO_EMPTY, ObjectInfo.DEFAULT_OBJECT_NAME);
         else if (type == 2)
             return new ObjectVoxel(null, 0).fromInventoryString($data, $slotId);
         else if (type == 3)
@@ -65,7 +65,7 @@ public class CharacterSlots {
         else
             Log.out("CharacterSlots.createObjectFromInventoryString - type: " + type + "  NOT FOUND", Log.ERROR);
 
-        return new ObjectInfo(null, ObjectInfo.OBJECTINFO_INVALID);
+        return new ObjectInfo(null, ObjectInfo.OBJECTINFO_INVALID, ObjectInfo.DEFAULT_OBJECT_NAME);
     }
 
     /*
@@ -121,7 +121,7 @@ public class CharacterSlots {
         for ( var slotName:String in _items ) {
             if (null != _items[slotName]) {
                 if ($metaDataName == slotName) {
-                    InventoryManager.addModelToInstance(_owner.guid, slotName, _items[slotName]);
+                    InventoryManager.addModelToInstance(_owner.ownerGuid, slotName, _items[slotName]);
                     _itemCount--;
                     return true;
                 }

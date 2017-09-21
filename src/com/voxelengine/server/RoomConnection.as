@@ -99,7 +99,7 @@ public class RoomConnection
 	static private function sourceMovementEvent( event:ModelEvent ):void {
 		//trace("RoomConnection.sourceMovementEvent - Send move event: " + event)
 		var msg:Message = _connection.createMessage( MOVE_MESSAGE );
-		msg.add( Player.instanceID );
+		msg.add( Player.player.instanceGuid );
 		msg.add( event.position.x, event.position.y, event.position.z );
 		msg.add( event.rotation.x, event.rotation.y, event.rotation.z );
 		_connection.sendMessage( msg );
@@ -110,7 +110,7 @@ public class RoomConnection
     static private function handleMoveMessage(m:Message):void {
         const userGuid:String = m.getString(0);
         // ignore move message for self
-        if ( userGuid == Player.instanceID )
+        if ( userGuid == Player.player.instanceGuid )
             return;
 
         trace("RoomConnection.handleMoveMessage from someone else - Received move message", m);
@@ -158,7 +158,7 @@ public class RoomConnection
 	static private function sourceProjectileEvent( event:ProjectileEvent ):void {
 		if ( Globals.online ) {
 			var msg:Message = _connection.createMessage( PROJECTILE_SHOT_MESSAGE );
-			msg.add( Player.instanceID );
+			msg.add( Player.player.instanceGuid );
 			msg.add( event.owner );
 			msg.add( event.position.x, event.position.y, event.position.z );
 			msg.add( event.direction.x, event.direction.y, event.direction.z );
