@@ -223,31 +223,33 @@ public class TypeInfo
 		return "TypeInfo - TYPE: " + _typeId + " CLASS: " + _category + " NAME: " + _name + " color:" + color + " Solid: " + solid + " MAXPIX: " + _maxpix + " UT: " + _ut + " VT: " + _vt + " Image: " + image;
 	}
 
-	static private var _fileName:String;
 	static public function load( $fileName:String ):void {
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, loadSucceed );
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, loadFail );
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
 
-		_fileName = $fileName;
 		PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, 0, Globals.APP_EXT, $fileName, null, null ) );
 
 		function loadSucceed(e:PersistenceEvent):void {
-			PersistenceEvent.removeListener( PersistenceEvent.LOAD_SUCCEED, loadSucceed );
-			PersistenceEvent.removeListener( PersistenceEvent.LOAD_FAILED, loadFail );
-			PersistenceEvent.removeListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
-
-			Log.out( "TypeInfo.loadSucceed: " + Globals.appPath + $fileName + Globals.APP_EXT, Log.INFO );
-
-			loadTypeDataFromJSON( e.data as String );
+			if ( e.table == Globals.APP_EXT && e.guid == $fileName ) {
+                removePersistenceListeners();
+                Log.out("TypeInfo.load.loadSucceed: " + Globals.appPath + $fileName + Globals.APP_EXT, Log.INFO);
+                loadTypeDataFromJSON(e.data as String);
+            }
 		}
 
 		function loadFail(e:PersistenceEvent):void {
-			PersistenceEvent.removeListener( PersistenceEvent.LOAD_SUCCEED, loadSucceed );
-			PersistenceEvent.removeListener( PersistenceEvent.LOAD_FAILED, loadFail );
-			PersistenceEvent.removeListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
-			Log.out("TypeInfo.load.loadFail: " + e.toString(), Log.ERROR);
+            if ( e.table == Globals.APP_EXT && e.guid == $fileName ) {
+                removePersistenceListeners();
+                Log.out("TypeInfo.load.loadFail: " + e.toString(), Log.ERROR);
+            }
 		}
+
+        function removePersistenceListeners():void {
+            PersistenceEvent.removeListener(PersistenceEvent.LOAD_SUCCEED, loadSucceed);
+            PersistenceEvent.removeListener(PersistenceEvent.LOAD_FAILED, loadFail);
+            PersistenceEvent.removeListener(PersistenceEvent.LOAD_NOT_FOUND, loadFail);
+        }
 	}
 
 	static public function errorAction(e:IOErrorEvent):void
@@ -255,8 +257,7 @@ public class TypeInfo
 		Log.out("TypeInfo.errorAction: " + e.toString(), Log.ERROR);
 	}
 
-	static private function onTypesLoadedAction(event:Event):void
-	{
+	static private function onTypesLoadedAction(event:Event):void {
 		var jsonString:String = StringUtils.trim(String(event.target.data));
 		loadTypeDataFromJSON( jsonString );
 	}
@@ -290,7 +291,7 @@ public class TypeInfo
 		}
 		catch ( error:Error )
 		{
-			throw new Error( "TypeInfo.onTypesLoadedAction - - unable to PARSE types.json" );
+			throw new Error( "TypeInfo.loadTypeDataFromJSON - - unable to PARSE types.json" );
 		}
 		//Log.out( "TypeInfo.loadTypeDataFromJSON - took: " + (getTimer() - timer), Log.WARN );
 	}

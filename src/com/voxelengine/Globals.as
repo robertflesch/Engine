@@ -33,6 +33,7 @@ public class Globals  {
 
 	// Local file names for import
 	static public const REGION_EXT:String = ".rjson";
+    static public const LANG_EXT:String = ".xml";
 	static public const APP_EXT:String = ".json";
 	static public const IVM_EXT:String = ".ivm";
 	static public const MODEL_INFO_EXT:String = ".mjson";

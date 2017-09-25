@@ -40,8 +40,6 @@ public class PersistURL
 	}
 
 	static private function isSupportedTable( $pe:PersistenceEvent ):Boolean {
-		//if ( true == Globals.online )
-		//	return;
 
 		if ( Globals.REGION_EXT == $pe.table )
 			_filePath = Globals.regionPath + $pe.guid + $pe.table;
@@ -49,6 +47,8 @@ public class PersistURL
 			_filePath = Globals.modelPath + $pe.guid + $pe.table;
 		else if ( Globals.MODEL_INFO_EXT == $pe.table )
 			_filePath = Globals.modelPath + $pe.guid + $pe.table;
+        else if ( Globals.LANG_EXT == $pe.table )
+            _filePath = $pe.guid;
 		else if ( Globals.APP_EXT == $pe.table )
 			_filePath = Globals.appPath + $pe.guid + $pe.table;
 		else if ( Globals.ANI_EXT == $pe.table )
@@ -73,7 +73,7 @@ public class PersistURL
 			return;
 		}
 
-		//Log.out( "PersistURL.load - file: " + _filePath );
+		Log.out( "PersistURL.load - file: " + _filePath );
 
 		// You can also save the returned gamefs object and reuse it.
 
@@ -99,7 +99,7 @@ public class PersistURL
 
 		function loadSuccess(event:Event):void {
 
-			//Log.out( "PersistURL.loadSuccess - guid: " + $pe.guid + $pe.table, Log.DEBUG );
+			Log.out( "PersistURL.loadSuccess - guid: " + $pe.guid + $pe.table, Log.DEBUG );
 			if ( URLLoaderDataFormat.BINARY == $pe.format ) {
 				var ba:ByteArray = event.target.data;
 				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $pe.guid, null, ba, $pe.format, $pe.other ) );

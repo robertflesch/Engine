@@ -62,7 +62,8 @@ package com.voxelengine.worldmodel
 			PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, loadSucceed );
 			PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, loadFail );
 			PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
-			
+
+            Log.out( "ConfigManager requesting: " + Globals.appPath + "config" + Globals.APP_EXT, Log.INFO );
 			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, 0, Globals.APP_EXT, "config", null, null ) );
 		}
 		

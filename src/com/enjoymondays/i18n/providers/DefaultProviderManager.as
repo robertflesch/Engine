@@ -22,7 +22,6 @@
 package com.enjoymondays.i18n.providers {
 
 import com.enjoymondays.i18n.LocalizationManager;
-import com.enjoymondays.i18n.ResourceBundle;
 import com.enjoymondays.i18n.core.ILocale;
 import com.enjoymondays.i18n.core.ILocalizationManager;
 import com.enjoymondays.i18n.core.IResourceBundle;
@@ -37,18 +36,7 @@ import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.PersistenceEvent;
 
-import flash.display.Loader;
-import flash.display.LoaderInfo;
-import flash.events.Event;
-
 import flash.events.EventDispatcher;
-import flash.events.IOErrorEvent;
-import flash.net.URLLoader;
-import flash.net.URLRequest;
-
-import playerio.GameFS;
-
-import playerio.PlayerIO;
 
 
 /**
@@ -99,32 +87,36 @@ import playerio.PlayerIO;
 			_provider = _factory.buildProvider( locale ) as AbstractProviderStrategy;
 			
 			var vo:ResourceBundleVO = _factory.buildBundleVO( locale, _baseUrl );
-			Log.out( "DefaultProviderManager.loadResourceBundle Globals.appPath: " + Globals.appPath , Log.WARN);
-//			if ( "/" == Globals.appPath ) {
-				var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
-				var resolvedFilePath:String = fs.getUrl( vo.url );
-				var loader:URLLoader = new URLLoader();
-				loader.addEventListener(Event.COMPLETE, onResourceLoadComplete );
-				loader.addEventListener(IOErrorEvent.IO_ERROR, onResourceLoadError);
-				loader.load(new URLRequest(resolvedFilePath));
-//			}
-//			else {
-//                _provider.addEventListener(ResourceBundleLoaderEvent.LOADED, _handleProvider);
-//                _provider.addEventListener(ResourceBundleLoaderEvent.ERROR, _handleProvider);
-//
-//                _provider.load(vo);
-//            }
+			Log.out( "DefaultProviderManager.loadResourceBundle language definitions: " + Globals.appPath + vo.url , Log.WARN);
 
-            function onResourceLoadComplete (event:Event):void {
-				var externalXML:XML = new XML(loader.data);
-                var rb:IResourceBundle = _provider.parse(externalXML );
-                _owner.addBundle( vo.locale.code, rb );
+            PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, loadSucceed );
+            PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, loadFail );
+            PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
+
+            PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, 0, Globals.LANG_EXT, vo.url, null, null ) );
+
+            function loadSucceed (event:PersistenceEvent):void {
+				if ( event.table == Globals.LANG_EXT && event.guid == vo.url ) {
+                    removePersistenceListeners();
+                    var externalXML:XML = new XML(event.data);
+                    var rb:IResourceBundle = _provider.parse(externalXML);
+                    _owner.addBundle(vo.locale.code, rb);
+                }
             }
 
-            function onResourceLoadError (event:Event):void {
-				Log.out( "DefaultProviderManager.onResourceLoadError - unable to load language", Log.WARN );
+            function loadFail (event:PersistenceEvent):void {
+                if ( event.table == Globals.LANG_EXT ) {
+                    removePersistenceListeners();
+                    Log.out("DefaultProviderManager.onResourceLoadError - unable to load language", Log.WARN);
+                }
             }
-		}
+
+			function removePersistenceListeners():void {
+                PersistenceEvent.removeListener(PersistenceEvent.LOAD_SUCCEED, loadSucceed);
+                PersistenceEvent.removeListener(PersistenceEvent.LOAD_FAILED, loadFail);
+                PersistenceEvent.removeListener(PersistenceEvent.LOAD_NOT_FOUND, loadFail);
+            }
+        }
 
 
 		
