@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.inventory
 {
 import com.voxelengine.Log;
+import com.voxelengine.worldmodel.TextureBank;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
 import com.voxelengine.GUI.inventory.BoxInventory;
 
@@ -20,24 +21,16 @@ public class ObjectTool extends ObjectInfo
 {
 	private var _guid:String;
 	private var _callBackName:String;
-	//private var _callBack:Function 		= null;
 	public function get callBack():Function 				{ return FunctionRegistry.functionGet( _callBackName ); }
 
 	public function ObjectTool( $owner:BoxInventory, $guid:String, $callBackName:String, $backgroundTexture:String, $name:String ):void {
 		super( $owner, ObjectInfo.OBJECTINFO_TOOL, $name );
 		_guid = $guid;
 		_callBackName = $callBackName;
-		//if ( "" != $callBackName )
-		//	_callBack = FunctionRegistry.functionGet( $callBackName );
         _backgroundTexture = $backgroundTexture;
 	}
 	
-	override public function backgroundTexture( size:int = 64 ):String { 
-		return _backgroundTexture;
-	}
-	
 	override public function asInventoryString():String {
-		
 		return String( _objectType + ";" + _backgroundTexture + ";" + _name + ";" + _callBackName + ";" + _guid );
 	}
 	
@@ -50,21 +43,19 @@ public class ObjectTool extends ObjectInfo
 			return this;
 		}
 		_objectType = values[0];
-//        _backgroundTexture = values[1];
+        _backgroundTexture = values[1];
 		_name = values[2];
 		_callBackName = values[3];
 		_guid = values[4];
-		//_callBack = FunctionRegistry.functionGet( _callBackName );
 		return this;
 	}
 
 	override public function reset():void {
 		_objectType = ObjectInfo.OBJECTINFO_EMPTY;
-        _backgroundTexture	= "";
+        _backgroundTexture	= TextureBank.BLANK_IMAGE;
 		_name	= "";
 		_guid 	= "";
 		_callBackName = null;
-		//_callBack = null
 	}
 }
 }

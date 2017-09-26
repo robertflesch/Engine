@@ -42,9 +42,11 @@ public class TextureBank
 	private var _textures:Dictionary = new Dictionary(true);
 	private var _texturesLoading:Dictionary = new Dictionary(true);
 
+    static public const BLANK_IMAGE:String = "blank.png";
     [Embed(source='../../../../embed/textures/blank.png')]
     private var _blankImage:Class;
 
+    static public const NO_IMAGE_128:String = "NoImage128.png";
     [Embed(source='../../../../embed/textures/NoImage128.png')]
     private var _noImage128Image:Class;
 
@@ -54,11 +56,11 @@ public class TextureBank
 
         TextureLoadingEvent.addListener( TextureLoadingEvent.REQUEST, request );
 
-        _bitmap["blank.png"] = (new _blankImage() as Bitmap);
-        _texturesLoading["blank.png"] = false;
+        _bitmap[BLANK_IMAGE] = (new _blankImage() as Bitmap);
+        _texturesLoading[BLANK_IMAGE] = false;
 
-        _bitmap["NoImage128.png"] = (new _noImage128Image() as Bitmap);
-        _texturesLoading["NoImage128.png"] = false;
+        _bitmap[NO_IMAGE_128] = (new _noImage128Image() as Bitmap);
+        _texturesLoading[NO_IMAGE_128] = false;
 	}
 
     private function disposeContext( $ce:ContextEvent ):void {
@@ -81,8 +83,9 @@ public class TextureBank
     private function request( $tle:TextureLoadingEvent ):void {
         var tex:Bitmap = _bitmap[$tle.name];
         if ( tex ) {
-            Log.out("TextureBank.request.FOUND: " + $tle.name );
+            //Log.out("TextureBank.request.FOUND: " + $tle.name );
             TextureLoadingEvent.create( TextureLoadingEvent.LOAD_SUCCEED, $tle.name, tex );
+            return;
         }
 
         var result:Boolean = _texturesLoading[ $tle.name ];
@@ -102,7 +105,7 @@ public class TextureBank
         if ( "/" == Globals.appPath ) {
             var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
             var resolvedFilePath:String = fs.getUrl(Globals.texturePath + $textureName);
-            //Log.out( "TextureBank.loadGUITexture: " + $textureName );
+            Log.out( "TextureBank.loadGUITexture - resolvedFilePath: " + resolvedFilePath );
             loader.load(new URLRequest(resolvedFilePath) );
         } else {
             Log.out( "TextureBank.loadGUITexture: " + Globals.texturePath + $textureName );
@@ -110,37 +113,24 @@ public class TextureBank
         }
 
         function loadComplete (event:Event):void {
-            loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, loadComplete );
-            loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, loadError );
+            removeListeners();
 
-            var textureBitmap:Bitmap = Bitmap(LoaderInfo(event.target).content);// .bitmapData;
-            var fileNameAndPath:String = event.target.url;
-            var $textureName:String = removeGlobalTexturePath(fileNameAndPath);
-            Log.out( "TextureBank.onGUITextureLoadComplete: " + $textureName );
-
-            _bitmap[$textureName] = textureBitmap;
-            _texturesLoading[$textureName] = false;
+            var textureBitmap:Bitmap = Bitmap(LoaderInfo(event.target).content);
+            _bitmap[ $textureName ] = textureBitmap;
 
             TextureLoadingEvent.create( TextureLoadingEvent.LOAD_SUCCEED, $textureName, textureBitmap );
         }
 
         function loadError(event:IOErrorEvent):void {
-            loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, loadComplete );
-            loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, loadError );
+            removeListeners();
 
             Log.out("TextureBank.onFileLoadError - FILE LOAD ERROR, DIDN'T FIND: " + Globals.texturePath + $textureName, Log.ERROR );
             TextureLoadingEvent.create( TextureLoadingEvent.LOAD_FAILED, $textureName, null );
         }
 
-        function removeGlobalTexturePath( completePath:String ):String {
-            var lastIndex:int = completePath.lastIndexOf( "assets/textures/" );
-            var fileName:String = completePath;
-            if ( -1 != lastIndex ) {
-                lastIndex += 16; // sizeOf("assets/textures/")
-                fileName = completePath.substr(lastIndex);
-            }
-
-            return fileName;
+        function removeListeners():void {
+            loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, loadComplete);
+            loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, loadError);
         }
     }
 

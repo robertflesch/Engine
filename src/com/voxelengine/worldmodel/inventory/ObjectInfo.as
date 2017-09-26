@@ -7,6 +7,8 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory
 {
+import com.voxelengine.worldmodel.TextureBank;
+
 import flash.utils.ByteArray;
 import com.voxelengine.Log;
 import com.voxelengine.GUI.inventory.BoxInventory;
@@ -30,7 +32,7 @@ public class ObjectInfo
 	protected var _objectType:int 			= OBJECTINFO_INVALID;
 	protected var _box:BoxInventory;
 	protected var _slotId:int;
-	protected var _backgroundTexture:String;
+	protected var _backgroundTexture:String = TextureBank.BLANK_IMAGE;
     protected var _name:String;
     public function get name():String  { return _name; }
 
@@ -42,9 +44,9 @@ public class ObjectInfo
 	
 	public function backgroundTexture( size:int = 64 ):String { 
 		if ( 64 == size )
-			return "blank.png";
+			return _backgroundTexture;
 			
-		return "blank128.png";
+		return _backgroundTexture;
 	}
 	
 	public function ObjectInfo( $owner:BoxInventory, $objectType:int, $name:String ):void

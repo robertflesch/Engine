@@ -14,6 +14,7 @@ import com.voxelengine.events.InventoryModelEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.VVKeyboardEvent;
 import com.voxelengine.events.VVMouseEvent;
+import com.voxelengine.worldmodel.TextureBank;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
 import com.voxelengine.worldmodel.models.ModelPlacementType;
 import flash.display.DisplayObject;
@@ -278,7 +279,7 @@ public class  UserInventory extends QuickInventory
 		else
 		{
 			box.data = null;
-			box.backgroundTexture = "blank.png";
+			box.backgroundTexture = TextureBank.BLANK_IMAGE;
 			box.dropEnabled = true;
 		}
 		addElement( box );

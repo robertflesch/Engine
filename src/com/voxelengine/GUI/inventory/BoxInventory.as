@@ -11,6 +11,8 @@ package com.voxelengine.GUI.inventory {
 import com.voxelengine.GUI.voxelModels.PopupMetadataAndModelInfo;
 import com.voxelengine.GUI.voxelModels.WindowModelDetail;
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.worldmodel.TextureBank;
+
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.events.MouseEvent;
@@ -221,7 +223,7 @@ public class BoxInventory extends VVBox
 	public function reset():void {
 		setHelp( "Empty" );
 		_count.text = "";
-		backgroundTexture = "blank.png";
+		backgroundTexture = TextureBank.BLANK_IMAGE
 		data = null;
 		if ( _bpValue ) {
 			removeElement( _bpValue );

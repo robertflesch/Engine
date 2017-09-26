@@ -13,14 +13,9 @@ import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;
 
-import org.flashapi.swing.Alert;
-	
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.*;
-import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.models.PersistenceObject;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 
 public class Inventory {

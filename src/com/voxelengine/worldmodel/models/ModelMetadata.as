@@ -143,13 +143,13 @@ public class ModelMetadata extends PersistenceObject
 
             function loadNoImage():void {
                 TextureLoadingEvent.addListener( TextureLoadingEvent.LOAD_SUCCEED, imageLoaded );
-				TextureLoadingEvent.create( TextureLoadingEvent.REQUEST, "NoImage128.png" );
+				TextureLoadingEvent.create( TextureLoadingEvent.REQUEST, TextureBank.NO_IMAGE_128 );
             }
 
             function imageLoaded( $tle:TextureLoadingEvent ):void {
-				if ( "NoImage128.png" == $tle.name ) {
+				if ( TextureBank.NO_IMAGE_128 == $tle.name ) {
                     TextureLoadingEvent.removeListener( TextureLoadingEvent.LOAD_SUCCEED, imageLoaded );
-                    Log.out("ModelMetadata.init.imageLoaded for guid: " + guid, Log.WARN);
+                    Log.out("ModelMetadata.init.imageLoaded: " + TextureBank.NO_IMAGE_128 + "  for guid: " + guid, Log.WARN);
                     _thumbnail = ($tle.data as Bitmap).bitmapData;
                     thumbnailLoaded = true;
 					changed = true;
