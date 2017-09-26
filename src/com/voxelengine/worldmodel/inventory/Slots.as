@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.inventory {
 
 import com.voxelengine.Log;
 import com.voxelengine.events.CursorOperationEvent;
+import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.InventorySlotEvent;
 
 public class Slots
@@ -53,12 +54,11 @@ public class Slots
 					setItemData( e.slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY, ObjectInfo.DEFAULT_OBJECT_NAME ) );
 				else
 					setItemData( e.slotId, e.data );
-				_owner.dbo.changed = true;
+				_owner.changed = true;
+                InventoryEvent.create( InventoryEvent.SAVE_REQUEST, _owner.ownerGuid, null );
 			}
 			else
 				Log.out( "Slots.slotChange _slots container not initialized", Log.WARN );
-
-			//_owner.save();
 		}
 	}
 	

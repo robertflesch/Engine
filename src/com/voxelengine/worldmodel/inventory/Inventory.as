@@ -7,7 +7,10 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.models.ModelCache;
 import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 import flash.utils.ByteArray;
 
@@ -24,7 +27,6 @@ public class Inventory {
     public function set loaded($val:Boolean):void { _loaded = $val; }
 
     private var _dbo:DatabaseObject;
-    public function get dbo():DatabaseObject { return _dbo; }
 	private var  _slots:Slots;
     public function get slots():Slots  { return _slots; }
 	private var _voxels:Voxels;
@@ -43,6 +45,12 @@ public class Inventory {
 		_voxels = new Voxels( this );
 		_characterSlots = new CharacterSlots( this );
 		fromObject();
+	}
+
+	public function set changed($val:Boolean):void {
+		toObject();
+		var p:Player = Player.player;
+		p.changed = $val;
 	}
 
 	public function characterSlotGet( $slot:String ):String {

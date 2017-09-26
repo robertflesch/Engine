@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.inventory {
 import com.voxelengine.Log;
 import com.voxelengine.events.CharacterSlotEvent;
+import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.worldmodel.inventory.Inventory;
 import com.voxelengine.worldmodel.inventory.ObjectAction;
@@ -39,7 +40,8 @@ public class CharacterSlots {
                 setItemData($cse.slot, "");
             else
                 setItemData($cse.slot, $cse.guid);
-            _owner.dbo.changed = true;
+            _owner.changed = true;
+            InventoryEvent.create( InventoryEvent.SAVE_REQUEST, _owner.ownerGuid, null );
         }
     }
 

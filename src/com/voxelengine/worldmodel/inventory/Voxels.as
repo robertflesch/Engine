@@ -6,7 +6,9 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
-	
+
+import com.voxelengine.events.InventoryEvent;
+
 import flash.utils.ByteArray;
 
 import com.voxelengine.Log;
@@ -87,7 +89,8 @@ public class Voxels
 			if ( _items[typeId] )
 				_items[typeId].val = Math.random() * 1000000;
 		}
-		_owner.dbo.changed = true;
+        _owner.changed = true;
+        InventoryEvent.create( InventoryEvent.SAVE_REQUEST, _owner.ownerGuid, null );
 	}
 	
 	public function change(e:InventoryVoxelEvent):void {
@@ -104,7 +107,8 @@ public class Voxels
 			_items[typeId].val = voxelCount;
 			//Log.out( "Voxels.change - Succeeded test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
 			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_RESULT, _owner.ownerGuid, typeId, voxelCount ) );
-			_owner.dbo.changed = true;
+            _owner.changed = true;
+            InventoryEvent.create( InventoryEvent.SAVE_REQUEST, _owner.ownerGuid, null );
 		}
 		//Log.out( "Voxels.change - Failed test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
 	}

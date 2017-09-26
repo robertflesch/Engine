@@ -500,7 +500,7 @@ public class ControllableVoxelModel extends VoxelModel
 	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {
 		super.loseControl( $modelDetaching, $detachChild );
 		// save inventory
-		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, instanceInfo.instanceGuid, null ) );
+		InventoryEvent.create( InventoryEvent.SAVE_REQUEST, instanceInfo.instanceGuid, null );
 		// no longer controlling this model
 		// shut down the toolbar
 		InventoryInterfaceEvent.dispatch( new InventoryInterfaceEvent( InventoryInterfaceEvent.CLOSE, instanceInfo.instanceGuid, null ) );
