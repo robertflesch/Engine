@@ -9,7 +9,11 @@ package com.voxelengine.worldmodel
 {
 import com.voxelengine.events.ContextEvent;
 import com.voxelengine.Log;
+import com.voxelengine.events.TextureLoadingEvent;
+
 import flash.events.Event;
+import flash.system.LoaderContext;
+
 import playerio.GameFS;
 import playerio.PlayerIO;
 import flash.display3D.Context3D;
@@ -38,124 +42,94 @@ public class TextureBank
 	private var _textures:Dictionary = new Dictionary(true);
 	private var _texturesLoading:Dictionary = new Dictionary(true);
 
+    [Embed(source='../../../../embed/textures/blank.png')]
+    private var _blankImage:Class;
+
+    [Embed(source='../../../../embed/textures/NoImage128.png')]
+    private var _noImage128Image:Class;
+
 	public function TextureBank( ):void {
 		ContextEvent.addListener( ContextEvent.DISPOSED, disposeContext );
 		ContextEvent.addListener( ContextEvent.ACQUIRED, acquiredContext );
+
+        TextureLoadingEvent.addListener( TextureLoadingEvent.REQUEST, request );
+
+        _bitmap["blank.png"] = (new _blankImage() as Bitmap);
+        _texturesLoading["blank.png"] = false;
+
+        _bitmap["NoImage128.png"] = (new _noImage128Image() as Bitmap);
+        _texturesLoading["NoImage128.png"] = false;
 	}
 
-	public function disposeContext( $ce:ContextEvent ):void {
-		// TODO RSF
-		// Dont I need to release texture from a when a context is lost?
-		// doesnt appear so.
-	}
-
-	public function acquiredContext( $ce:ContextEvent ):void {
-		//Log.out("TextureBank.reinitialize" );
-		for ( var key:String in _bitmap )
-		{
-			_textures[key] = null;
-			var bmp:Bitmap = _bitmap[key];
-			var tex:Texture = uploadTexture( $ce.context3D, bmp, true );
-			_textures[key] = tex;
-		}
-	}
-
-	public function getTexture( $context:Context3D, textureNameAndPath:String ):Texture {
-		// is this texture loaded already?
-		var tex:Texture = _textures[textureNameAndPath];
-		if ( tex )
-			return tex;
-
-		var result:Boolean = _texturesLoading[ textureNameAndPath ];
-		if ( false == result )
-			loadTexture( $context, textureNameAndPath );
-
-		//Log.out("TextureBank.getTexture - texture not found: " + textureNameAndPath, Log.ERROR );
-
-		return null;
-	}
-
-	private function loadTexture( $context:Context3D, textureNameAndPath:String ):void {
-		_tempContext = $context;
-		var loader:Loader = new Loader();
-		loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onTextureLoadComplete);
-		loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
-		//Log.out( "TextureBank.loadTexture - loading: " + Globals.appPath + textureNameAndPath );
-
-		if ( "/" == Globals.appPath ) {
-			var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
-			var resolvedFilePath:String = fs.getUrl(Globals.appPath + textureNameAndPath);
-			loader.load(new URLRequest(resolvedFilePath));
-		} else {
-			loader.load(new URLRequest( Globals.appPath + textureNameAndPath ));
-
-		}
-
-
-		_texturesLoading[textureNameAndPath] = true;
-        function onFileLoadError(event:IOErrorEvent):void {
-            Log.out("TextureBank.onFileLoadError - FILE LOAD ERROR, DIDN'T FIND: " + Globals.appPath + textureNameAndPath, Log.ERROR );
-        }
-
+    private function disposeContext( $ce:ContextEvent ):void {
+        // TODO RSF
+        // Dont I need to release texture from a when a context is lost?
+        // doesnt appear so.
     }
 
-    public function getGUITexture( $textureName:String, $successFunction:Function, $errorFunction:Function = null ):Bitmap {
-        // is this texture loaded already?
-        //Log.out( "TextureBank.getGUITexture: " + $textureName );
+    private function acquiredContext( $ce:ContextEvent ):void {
+        //Log.out("TextureBank.reinitialize" );
+        for ( var key:String in _bitmap )
+        {
+            _textures[key] = null;
+            var bmp:Bitmap = _bitmap[key];
+            var tex:Texture = uploadTexture( $ce.context3D, bmp, true );
+            _textures[key] = tex;
+        }
+    }
 
-        var tex:Bitmap = _bitmap[$textureName];
+    private function request( $tle:TextureLoadingEvent ):void {
+        var tex:Bitmap = _bitmap[$tle.name];
         if ( tex ) {
-//            Log.out("TextureBank.getGUITexture.FOUND: " + $textureName);
-            return tex;
+            Log.out("TextureBank.request.FOUND: " + $tle.name );
+            TextureLoadingEvent.create( TextureLoadingEvent.LOAD_SUCCEED, $tle.name, tex );
         }
 
-        var result:Boolean = _texturesLoading[ $textureName ];
+        var result:Boolean = _texturesLoading[ $tle.name ];
         if ( false == result ) {
-            _texturesLoading[$textureName] = true;
-            loadGUITexture($textureName, $successFunction, $errorFunction);
+            _texturesLoading[$tle.name] = true;
+            Log.out( "TextureBank.getGUITexture NEED TO LOAD TEXTURE : " + $tle.name );
+            loadGUITexture( $tle.name );
         }
-
-        return null;
     }
 
-    private function loadGUITexture( $textureName:String, $successFunction:Function, $errorFunction:Function ):void {
-        var loader:Loader = new Loader();
-        loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onGUITextureLoadComplete );
-        loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onFileLoadError );
-
+    private function loadGUITexture( $textureName:String ):void {
         //Log.out( "TextureBank.loadTexture - loading: " + Globals.appPath + $textureName );
+        var loader:Loader = new Loader();
+        loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loadComplete );
+        loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, loadError );
 
         if ( "/" == Globals.appPath ) {
             var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
             var resolvedFilePath:String = fs.getUrl(Globals.texturePath + $textureName);
             //Log.out( "TextureBank.loadGUITexture: " + $textureName );
-            loader.load(new URLRequest(resolvedFilePath));
+            loader.load(new URLRequest(resolvedFilePath) );
         } else {
             Log.out( "TextureBank.loadGUITexture: " + Globals.texturePath + $textureName );
             loader.load(new URLRequest( Globals.texturePath + $textureName ));
-
         }
 
-        function onFileLoadError(event:IOErrorEvent):void {
-            loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, $successFunction );
-			if ( $errorFunction )
-            	loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, $errorFunction );
-            Log.out("TextureBank.onFileLoadError - FILE LOAD ERROR, DIDN'T FIND: " + Globals.texturePath + $textureName, Log.ERROR );
-			if ( $errorFunction )
-            	$errorFunction( event );
-        }
+        function loadComplete (event:Event):void {
+            loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, loadComplete );
+            loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, loadError );
 
-        function onGUITextureLoadComplete (event:Event):void {
             var textureBitmap:Bitmap = Bitmap(LoaderInfo(event.target).content);// .bitmapData;
             var fileNameAndPath:String = event.target.url;
             var $textureName:String = removeGlobalTexturePath(fileNameAndPath);
-            //Log.out( "TextureBank.onGUITextureLoadComplete: " + $textureName );
+            Log.out( "TextureBank.onGUITextureLoadComplete: " + $textureName );
 
             _bitmap[$textureName] = textureBitmap;
             _texturesLoading[$textureName] = false;
-            //_tempContext = null;
 
-			$successFunction( event );
+            TextureLoadingEvent.create( TextureLoadingEvent.LOAD_SUCCEED, $textureName, textureBitmap );
+        }
+
+        function loadError(event:IOErrorEvent):void {
+            loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, loadComplete );
+            loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, loadError );
+
+            Log.out("TextureBank.onFileLoadError - FILE LOAD ERROR, DIDN'T FIND: " + Globals.texturePath + $textureName, Log.ERROR );
+            TextureLoadingEvent.create( TextureLoadingEvent.LOAD_FAILED, $textureName, null );
         }
 
         function removeGlobalTexturePath( completePath:String ):String {
@@ -170,7 +144,50 @@ public class TextureBank
         }
     }
 
-	private var _tempContext:Context3D;
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// SHADER TEXTURES
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // My one public event since I want shader to have immediate access.
+    public function getTexture( $context:Context3D, textureNameAndPath:String ):Texture {
+        // is this texture loaded already?
+        var tex:Texture = _textures[textureNameAndPath];
+        if ( tex )
+            return tex;
+
+        var result:Boolean = _texturesLoading[ textureNameAndPath ];
+        if ( false == result )
+            loadTexture( $context, textureNameAndPath );
+
+        //Log.out("TextureBank.getTexture - texture not found: " + textureNameAndPath, Log.ERROR );
+
+        return null;
+    }
+
+    private function loadTexture( $context:Context3D, textureNameAndPath:String ):void {
+        _tempContext = $context;
+        var loader:Loader = new Loader();
+        loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onTextureLoadComplete);
+        loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
+        //Log.out( "TextureBank.loadTexture - loading: " + Globals.appPath + textureNameAndPath );
+
+        if ( "/" == Globals.appPath ) {
+            var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
+            var resolvedFilePath:String = fs.getUrl(Globals.appPath + textureNameAndPath);
+            loader.load(new URLRequest(resolvedFilePath));
+        } else {
+            loader.load(new URLRequest( Globals.appPath + textureNameAndPath ));
+
+        }
+
+        _texturesLoading[textureNameAndPath] = true;
+        function onFileLoadError(event:IOErrorEvent):void {
+            Log.out("TextureBank.onFileLoadError - FILE LOAD ERROR, DIDN'T FIND: " + Globals.appPath + textureNameAndPath, Log.ERROR );
+        }
+
+    }
+
+    private var _tempContext:Context3D;
 	public function onTextureLoadComplete (event:Event):void {
 		var textureBitmap:Bitmap = Bitmap(LoaderInfo(event.target).content);// .bitmapData;
 		var fileNameAndPath:String = event.target.url;

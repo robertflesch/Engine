@@ -30,7 +30,7 @@ public class ObjectInfo
 	protected var _objectType:int 			= OBJECTINFO_INVALID;
 	protected var _box:BoxInventory;
 	protected var _slotId:int;
-	private var _backgroundTexture:String;
+	protected var _backgroundTexture:String;
     protected var _name:String;
     public function get name():String  { return _name; }
 

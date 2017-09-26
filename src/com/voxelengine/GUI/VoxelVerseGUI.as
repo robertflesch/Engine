@@ -9,6 +9,8 @@
 package com.voxelengine.GUI
 {
 
+import com.voxelengine.worldmodel.TextureBank;
+
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.EventDispatcher;

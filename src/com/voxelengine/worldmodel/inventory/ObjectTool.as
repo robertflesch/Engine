@@ -18,32 +18,27 @@ import com.voxelengine.GUI.inventory.BoxInventory;
  */
 public class ObjectTool extends ObjectInfo 
 {
-	private var _thumbnail:String;
 	private var _guid:String;
 	private var _callBackName:String;
 	//private var _callBack:Function 		= null;
 	public function get callBack():Function 				{ return FunctionRegistry.functionGet( _callBackName ); }
-	public function get thumbnail():String { return _thumbnail; }
 
-	public function ObjectTool( $owner:BoxInventory, $guid:String, $callBackName:String, $thumbnail:String, $name:String ):void {
+	public function ObjectTool( $owner:BoxInventory, $guid:String, $callBackName:String, $backgroundTexture:String, $name:String ):void {
 		super( $owner, ObjectInfo.OBJECTINFO_TOOL, $name );
 		_guid = $guid;
 		_callBackName = $callBackName;
 		//if ( "" != $callBackName )
 		//	_callBack = FunctionRegistry.functionGet( $callBackName );
-		_thumbnail = $thumbnail;
+        _backgroundTexture = $backgroundTexture;
 	}
 	
 	override public function backgroundTexture( size:int = 64 ):String { 
-		if ( 64 == size )
-			return thumbnail;
-			
-		return thumbnail;
+		return _backgroundTexture;
 	}
 	
 	override public function asInventoryString():String {
 		
-		return String( _objectType + ";" + _thumbnail + ";" + _name + ";" + _callBackName + ";" + _guid );
+		return String( _objectType + ";" + _backgroundTexture + ";" + _name + ";" + _callBackName + ";" + _guid );
 	}
 	
 	override public function fromInventoryString( $data:String, $slotId:int ): ObjectInfo {
@@ -55,7 +50,7 @@ public class ObjectTool extends ObjectInfo
 			return this;
 		}
 		_objectType = values[0];
-		_thumbnail = values[1];
+//        _backgroundTexture = values[1];
 		_name = values[2];
 		_callBackName = values[3];
 		_guid = values[4];
@@ -65,7 +60,7 @@ public class ObjectTool extends ObjectInfo
 
 	override public function reset():void {
 		_objectType = ObjectInfo.OBJECTINFO_EMPTY;
-		_thumbnail	= "";
+        _backgroundTexture	= "";
 		_name	= "";
 		_guid 	= "";
 		_callBackName = null;

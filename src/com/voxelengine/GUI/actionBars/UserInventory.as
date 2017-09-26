@@ -204,7 +204,7 @@ public class  UserInventory extends QuickInventory
 			for ( var i:int = 0; i < Slots.ITEM_COUNT; i++ ) {
 				var item:ObjectInfo = items[i];
 				item.box = (boxes[i] as BoxInventory);
-				(boxes[i] as BoxInventory).updateObjectInfo( item, false );
+                item.box.updateObjectInfo( item, false );
 			}
 		}
 //		else

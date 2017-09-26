@@ -11,22 +11,17 @@ package com.voxelengine.worldmodel.models
 import com.voxelengine.Log;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.events.TextureLoadingEvent;
 import com.voxelengine.worldmodel.TextureBank;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 
 import flash.display.Bitmap;
 import flash.display.BitmapData;
-import flash.display.JPEGEncoderOptions;
 import flash.display.Loader;
-import flash.display.LoaderInfo;
-import flash.display.LoaderInfo
 import flash.events.Event;
 import flash.geom.Rectangle;
 import flash.geom.Vector3D;
-import flash.net.URLRequest;
 import flash.net.URLLoaderDataFormat;
-import flash.system.Capabilities;
-import flash.system.ImageDecodingPolicy;
 
 import playerio.DatabaseObject;
 
@@ -36,9 +31,6 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.worldmodel.PermissionsModel;
 
-import playerio.GameFS;
-
-import playerio.PlayerIO;
 
 
 public class ModelMetadata extends PersistenceObject
@@ -111,20 +103,24 @@ public class ModelMetadata extends PersistenceObject
 			dbo = $dbo;
 		}
 
-		init( this, $newData );
+        // Need this temp so that I can pass "this" in imageLoad function
+        var myMetaInfo:ModelMetadata = this;
+
+		init( $newData );
 
 		if ( "EditCursor" != guid ) {
 			ModelMetadataEvent.addListener(ModelBaseEvent.SAVE, saveEvent);
 			ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
 		}
 
-		function init( $modelMetadata:ModelMetadata, $newData:Object = null ):void {
+		function init( $newData:Object = null ):void {
 
 			if ( $newData )
 				mergeOverwrite( $newData );
 
 			// the permission object is just an encapsulation of the permissions section of the object
 			_permissions = new PermissionsModel( dbo );
+
 
 			if ( dbo.thumbnail ) {
                 //Log.out( "ModelMetadata.init - loading thumbnail", Log.WARN);
@@ -135,7 +131,7 @@ public class ModelMetadata extends PersistenceObject
                     bmd.setPixels(new Rectangle(0, 0, 128, 128), dbo.thumbnail);
                     _thumbnail = bmd;
                     thumbnailLoaded = true;
-                    ModelMetadataEvent.create( ModelMetadataEvent.BITMAP_LOADED, 0, guid, $modelMetadata );
+                    ModelMetadataEvent.create( ModelMetadataEvent.BITMAP_LOADED, 0, guid, myMetaInfo );
                 }
 				catch (e:Error) {
                     loadNoImage();
@@ -146,27 +142,23 @@ public class ModelMetadata extends PersistenceObject
 			}
 
             function loadNoImage():void {
-                var loader:Loader = new Loader();
-                loader.contentLoaderInfo.addEventListener(Event.INIT, imageLoaded );
-				var bitmap:Bitmap = TextureBank.instance.getGUITexture( "NoImage128.png", imageLoaded );
-				if ( bitmap ) {
-					_thumbnail = bitmap.bitmapData;
-					thumbnailLoaded = true;
-				}
+                TextureLoadingEvent.addListener( TextureLoadingEvent.LOAD_SUCCEED, imageLoaded );
+				TextureLoadingEvent.create( TextureLoadingEvent.REQUEST, "NoImage128.png" );
+            }
 
-                changed = true;
+            function imageLoaded( $tle:TextureLoadingEvent ):void {
+				if ( "NoImage128.png" == $tle.name ) {
+                    TextureLoadingEvent.removeListener( TextureLoadingEvent.LOAD_SUCCEED, imageLoaded );
+                    Log.out("ModelMetadata.init.imageLoaded for guid: " + guid, Log.WARN);
+                    _thumbnail = ($tle.data as Bitmap).bitmapData;
+                    thumbnailLoaded = true;
+					changed = true;
+                    ModelMetadataEvent.create(ModelMetadataEvent.BITMAP_LOADED, 0, guid, myMetaInfo );
+                    //      Log.out( "ModelMetadata.init.imageLoaded complete isDebug: " + Globals.isDebug + " + Capabilities.isDebugger: " + Capabilities.isDebugger, Log.WARN );
+                }
             }
 		}
 	}
-
-    private function imageLoaded(event:Event):void {
-//        Log.out( "ModelMetadata.init.imageLoaded for guid: " + guid, Log.WARN );
-        event.target.loader.contentLoaderInfo.removeEventListener(Event.INIT, imageLoaded );
-        _thumbnail = event.target.content.bitmapData;
-        thumbnailLoaded = true;
-        ModelMetadataEvent.create( ModelMetadataEvent.BITMAP_LOADED, 0, guid, this );
-  //      Log.out( "ModelMetadata.init.imageLoaded complete isDebug: " + Globals.isDebug + " + Capabilities.isDebugger: " + Capabilities.isDebugger, Log.WARN );
-    }
 
 	private function metadataChanged( $mme:ModelMetadataEvent ):void {
 		Log.out( "PanelModels.metaDataChanged - IS THIS NEEDED?", Log.WARN);

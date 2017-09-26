@@ -30,31 +30,25 @@ package org.flashapi.swing.draw {
 	* @see http://www.flashapi.org/
 	*/
 
-import com.voxelengine.Globals;
-import com.voxelengine.Log;
-import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.worldmodel.TextureBank;
+
+import com.voxelengine.events.TextureLoadingEvent;
 
 import flash.display.Bitmap;
-	import flash.display.BitmapData;
-	import flash.display.DisplayObject;
-import flash.display.Loader;
+import flash.display.BitmapData;
+import flash.display.DisplayObject;
 import flash.display.Shape;
-	import flash.display.Sprite;
+import flash.display.Sprite;
 import flash.events.Event;
 import flash.geom.ColorTransform;
-	import flash.geom.Rectangle;
-import flash.net.URLRequest;
+import flash.geom.Rectangle;
 
 import org.flashapi.collector.EventCollector;
-	import org.flashapi.swing.constants.PrimitiveType;
-	import org.flashapi.swing.draw.Figure;
-	import org.flashapi.swing.event.LoaderEvent;
-	import org.flashapi.swing.net.UILoader;
+import org.flashapi.swing.constants.PrimitiveType;
+import org.flashapi.swing.event.LoaderEvent;
+import org.flashapi.swing.net.UILoader;
 
-import playerio.GameFS;
-
-import playerio.PlayerIO;
+import com.voxelengine.Log;
+import com.voxelengine.worldmodel.TextureBank;
 
 /**
 	 * 	A convenient class that allows to create and manage a pattern image from a
@@ -291,14 +285,27 @@ import playerio.PlayerIO;
 				} else {
 					switch(typeof _texture) {
 						case PrimitiveType.STRING :
-//                            var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
-//                            var resolvedFilePath:String = fs.getUrl(Globals.appPath + texture);
+							if ( texture == "" || texture == null )
+									return;
+                            TextureLoadingEvent.addListener( TextureLoadingEvent.LOAD_SUCCEED, loadSucceed );
+                            TextureLoadingEvent.addListener( TextureLoadingEvent.LOAD_FAILED, loadFailed );
+							TextureLoadingEvent.create( TextureLoadingEvent.REQUEST, texture );
 
-							TextureBank.instance.getGUITexture( texture, imageLoaded );
-
-                        	function imageLoaded(event:Event):void {
-                                //Log.out( "Pattern.createPattern LOADED data from texture name: " + texture );
-								setPattern( Bitmap( event.target.content ) );
+                        	function loadSucceed( $tle:TextureLoadingEvent ):void {
+								if ( $tle.name == texture ) {
+                                    TextureLoadingEvent.removeListener(TextureLoadingEvent.LOAD_SUCCEED, loadSucceed);
+                                    TextureLoadingEvent.removeListener(TextureLoadingEvent.LOAD_FAILED, loadFailed);
+                                    setPattern($tle.data as Bitmap);
+                                }
+                            }
+							function loadFailed( $tle:TextureLoadingEvent ):void {
+								if ( $tle.name == texture ) {
+									TextureLoadingEvent.removeListener(TextureLoadingEvent.LOAD_SUCCEED, loadSucceed);
+									TextureLoadingEvent.removeListener(TextureLoadingEvent.LOAD_FAILED, loadFailed);
+									// Set to ERROR PATTERN?
+									throw new Error( "Pattern.createPattern.loadFailed unable to load texture: " + $tle.name );
+									//setPattern($tle.data as Bitmap);
+								}
 							}
                             break;
 						case PrimitiveType.OBJECT :

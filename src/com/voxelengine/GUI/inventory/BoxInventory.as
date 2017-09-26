@@ -92,10 +92,12 @@ public class BoxInventory extends VVBox
 
 		switch ( $item.objectType ) {
 		case ObjectInfo.OBJECTINFO_EMPTY:
-            var oi:ObjectInfo = $item as ObjectInfo;
-			reset();
-			backgroundTexture = $item.backgroundTexture( width );
-            setHelp( oi.name );
+			if ( !($item is ObjectInfo ) ) {
+                var oi:ObjectInfo = $item as ObjectInfo;
+                reset();
+                backgroundTexture = $item.backgroundTexture(width);
+                setHelp(oi.name);
+            }
             break;
 		case ObjectInfo.OBJECTINFO_MODEL:
 			var om:ObjectModel = _objectInfo as ObjectModel;

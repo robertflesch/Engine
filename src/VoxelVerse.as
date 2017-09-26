@@ -168,15 +168,17 @@ public class VoxelVerse extends Sprite
 		// These two should be the same
 		// https://gamesnet.yahoo.net/forum/viewtopic.php?f=33&t=35896&sid=1f0b0c5bef7f97c6961760b6a3418c69
 		// for reference
-		//Security.loadPolicyFile( "http://cdn.playerio.com/crossdomain.xml" );
-		//Security.loadPolicyFile( "https://content.playerio.com/crossdomain.xml" );
+//		Security.loadPolicyFile( "http://r.playerio.com/crossdomain.xml" );
+//        Security.allowDomain( "http://playerio-a.akamaihd.net/" );
+//        Security.allowDomain( "http://playerio-a.akamaihd.net/voxelverse-lpeje46xj0krryqaxq0vog/assets/textures/" );
+//        Security.allowDomain( "*" );
 
-		VoxelVerseGUI.currentInstance.buildGUI();
 
 		stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);
 		stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
 		mouseUp( null );
 		Log.out("<===============VoxelVerse.readyToGo: " + (getTimer() - _s_timeEntered) );
+        VoxelVerseGUI.currentInstance.buildGUI();
 	}
 
 	private var _fpsStat:int;
