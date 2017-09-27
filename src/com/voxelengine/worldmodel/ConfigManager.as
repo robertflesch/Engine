@@ -57,46 +57,53 @@ package com.voxelengine.worldmodel
 			}
 		}
 		
-		public function ConfigManager( ):void 
+		static private const CONFIG:String = "config";
+		public function ConfigManager( ):void
 		{
 			PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, loadSucceed );
 			PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, loadFail );
 			PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
 
-            Log.out( "ConfigManager requesting: " + Globals.appPath + "config" + Globals.APP_EXT, Log.INFO );
-			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, 0, Globals.APP_EXT, "config", null, null ) );
-		}
-		
-		private function loadSucceed(e:PersistenceEvent):void {
-			PersistenceEvent.removeListener( PersistenceEvent.LOAD_SUCCEED, loadSucceed );
-			PersistenceEvent.removeListener( PersistenceEvent.LOAD_FAILED, loadFail );
-			PersistenceEvent.removeListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
-			
-			Log.out( "ConfigManager.loadSucceed: " + Globals.appPath + "config" + Globals.APP_EXT, Log.INFO );
-			
-			_defaultRegionJson = JSONUtil.parse( e.data, Globals.appPath + "config" + Globals.APP_EXT, "ConfigManager.loadSucceed" );
-			if ( null == _defaultRegionJson ) {
-				Log.out( "ConfigManager.loadSucceed - error parsing config: " + Globals.appPath + "config" + Globals.APP_EXT, Log.ERROR );
-				return;
-			}
-			
-			_showHelp = _defaultRegionJson.config.showHelp;
-			_showEditMenu = _defaultRegionJson.config.showEditMenu;
-			_showButtons = _defaultRegionJson.config.showButtons;
-			
-			LoadingEvent.addListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
-			var typeInfoFile:String = _defaultRegionJson.config.typeName;
-			//TypeInfo.loadTypeData( typeInfoFile );
-			TypeInfo.load( typeInfoFile );
-		}
-		
-		private function loadFail(e:PersistenceEvent):void {
-			PersistenceEvent.removeListener( PersistenceEvent.LOAD_SUCCEED, loadSucceed );
-			PersistenceEvent.removeListener( PersistenceEvent.LOAD_FAILED, loadFail );
-			PersistenceEvent.removeListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
-			var errorMsg:String = (e.data as String);
-			Log.out( "ConfigManager.loadFail - error: " + errorMsg + " file name and path: " + Globals.appPath + "config" + Globals.APP_EXT, Log.ERROR )
-		}
+            Log.out( "ConfigManager requesting: " + Globals.appPath + CONFIG + Globals.APP_EXT, Log.INFO );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, 0, Globals.APP_EXT, CONFIG, null, null ) );
+
+            function loadSucceed(e:PersistenceEvent):void {
+				if ( e.guid == CONFIG ) {
+                    PersistenceEvent.removeListener(PersistenceEvent.LOAD_SUCCEED, loadSucceed);
+                    PersistenceEvent.removeListener(PersistenceEvent.LOAD_FAILED, loadFail);
+                    PersistenceEvent.removeListener(PersistenceEvent.LOAD_NOT_FOUND, loadFail);
+
+                    Log.out("ConfigManager.loadSucceed: " + Globals.appPath + CONFIG + Globals.APP_EXT, Log.INFO);
+
+                    _defaultRegionJson = JSONUtil.parse(e.data, Globals.appPath + CONFIG + Globals.APP_EXT, "ConfigManager.loadSucceed");
+                    if (null == _defaultRegionJson) {
+                        Log.out("ConfigManager.loadSucceed - error parsing config: " + Globals.appPath + CONFIG + Globals.APP_EXT, Log.ERROR);
+                        return;
+                    }
+
+                    _showHelp = _defaultRegionJson.config.showHelp;
+                    _showEditMenu = _defaultRegionJson.config.showEditMenu;
+                    _showButtons = _defaultRegionJson.config.showButtons;
+
+                    LoadingEvent.addListener(LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded);
+                    var typeInfoFile:String = _defaultRegionJson.config.typeName;
+                    //TypeInfo.loadTypeData( typeInfoFile );
+                    TypeInfo.load(typeInfoFile);
+                }
+            }
+
+            function loadFail(e:PersistenceEvent):void {
+                if ( e.guid == CONFIG ) {
+                    PersistenceEvent.removeListener(PersistenceEvent.LOAD_SUCCEED, loadSucceed);
+                    PersistenceEvent.removeListener(PersistenceEvent.LOAD_FAILED, loadFail);
+                    PersistenceEvent.removeListener(PersistenceEvent.LOAD_NOT_FOUND, loadFail);
+                    var errorMsg:String = (e.data as String);
+                    Log.out("ConfigManager.loadFail - error: " + errorMsg + " file name and path: " + Globals.appPath + CONFIG + Globals.APP_EXT, Log.ERROR) ;
+                }
+            }
+
+
+        }
 		
 		private function onTypesLoaded( $e:LoadingEvent ):void
 		{
