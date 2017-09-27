@@ -365,7 +365,10 @@ public class VoxelVerseGUI extends EventDispatcher
 			if ( Keyboard.I == e.keyCode && false == Globals.g_textInput ) {
 				//var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );
 				var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_LAST, WindowInventoryNew.INVENTORY_CAT_LAST );
-				WindowInventoryNew.toggle( startingTab )
+                var title:String = "All items";
+                if ( VoxelModel.selectedModel )
+                    title = "Showing possible children of " + VoxelModel.selectedModel.metadata.name;
+                WindowInventoryNew.toggle( startingTab, title );
 			}
 
 			if ( Keyboard.N == e.keyCode && false == Globals.g_textInput )

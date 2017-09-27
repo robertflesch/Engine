@@ -10,6 +10,7 @@ package com.voxelengine.GUI.actionBars
 {
 import com.voxelengine.GUI.inventory.WindowInventoryNew;
 import com.voxelengine.renderer.Renderer;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 import flash.events.MouseEvent;
 import flash.events.KeyboardEvent;
@@ -66,8 +67,10 @@ public class InventoryIcon extends VVCanvas
 	
 	private function pressShape( $e:UIMouseEvent ):void {
 		var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_LAST, WindowInventoryNew.INVENTORY_CAT_LAST );
-		WindowInventoryNew.toggle( startingTab )
-		
+        var title:String = "All items";
+        if ( VoxelModel.selectedModel )
+            title = "Showing possible children of " + VoxelModel.selectedModel.metadata.name;
+        WindowInventoryNew.toggle( startingTab, title );
 	}
 	
 	

@@ -54,18 +54,18 @@ import org.flashapi.swing.*
 		static public var _s_hackSupportClick:Boolean;
 		static public var _s_instance:WindowInventoryNew;
 		
-		static public function toggle( $startingTab:String ):void {
+		static public function toggle( $startingTab:String, $label:String ):void {
 			if ( null == _s_instance )
-				_s_instance = new WindowInventoryNew( $startingTab );
+				_s_instance = new WindowInventoryNew( $startingTab, $label );
 			else {
 				_s_instance.remove();
 				_s_instance = null
 			}
 		}
 		
-		public function WindowInventoryNew( $startingTab:String )
+		public function WindowInventoryNew( $startingTab:String, $label:String )
 		{
-			super( LanguageManager.localizedStringGet( ALL_ITEMS ));
+			super( $label );
 			autoSize = true;
 			layout.orientation = LayoutOrientation.VERTICAL;
 			

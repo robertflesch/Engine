@@ -121,7 +121,10 @@ public class PanelModels extends PanelBase
 		//Log.out( "PanelModels.populateModels - parentModel:" + $parentModel, Log.WARN )
 		_dictionarySource = $source;
 		_parentModel = $parentModel;
-		_selectedText.text = "Nothing Selected";
+        if ( VoxelModel.selectedModel )
+            _selectedText.text = VoxelModel.selectedModel.metadata.name;
+        else
+            _selectedText.text = "Nothing Selected";
 		if ( _listModels )
 			_listModels.removeAll();
 
@@ -180,11 +183,11 @@ public class PanelModels extends PanelBase
 		var currentY:int = 5;
 
 		_selectedText = new Text( width, 30 );
-		_selectedText.text = "Nothing Selected";
-		_selectedText.textAlign = TextAlign.CENTER;
+        _selectedText.textAlign = TextAlign.CENTER;
 		container.addElement( _selectedText );
 		_selectedText.y = currentY;
 		_selectedText.x = 5;
+        _selectedText.text = "-------";
 
 		var addButton:Button = new Button( LanguageManager.localizedStringGet( "Model_Add" )  );
 		//addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowModelList(); } );
@@ -286,7 +289,10 @@ public class PanelModels extends PanelBase
 				WindowInventoryNew._s_hackShowChildren = false;
 			WindowInventoryNew._s_hackSupportClick = true;
 			var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );
-			WindowInventoryNew.toggle( startingTab )
+			var title:String = "All items";
+            if ( VoxelModel.selectedModel )
+                title = "Showing possible children of " + VoxelModel.selectedModel.metadata.name;
+			WindowInventoryNew.toggle( startingTab, title );
 		}
 	}
 
