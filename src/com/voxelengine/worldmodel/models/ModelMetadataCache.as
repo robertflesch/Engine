@@ -26,8 +26,10 @@ public class ModelMetadataCache
 	// this acts as a cache for all model metadata objects loaded from persistence
 	// don't use weak keys since this is THE spot that holds things.
 	static private var _metadata:Dictionary = new Dictionary(false);
+	// blocks show that a request for that guid is already in progress
 	static private var _block:Block = new Block();
 	
+	// This is a static object, would hide this if possible.
 	public function ModelMetadataCache() {}
 	
 	static public function init():void {
@@ -49,7 +51,7 @@ public class ModelMetadataCache
 	//  ModelMetadataEvent
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	// This loads the first 100 objects from the users inventory OR the public inventory
-	// TODO NEED TO ADDED HANDLER WHEN MORE ARE NEEDED - RSF 9.14.2017
+	// TODO - NEED TO ADD HANDLER WHEN MORE THAN 100 ARE NEEDED - RSF 9.14.2017
 	static private function requestType( $mme:ModelMetadataEvent ):void {
 		
 		//Log.out( "ModelMetadataCache.requestType  owner: " + $mme.modelGuid, Log.WARN );
@@ -71,11 +73,15 @@ public class ModelMetadataCache
 		// This will return models already loaded.
 		for each ( var vmm:ModelMetadata in _metadata ) {
 			if ( vmm && vmm.owner == $mme.modelGuid ) {
-				//Log.out( "ModelMetadataCache.requestType returning guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
+				Log.out( "ModelMetadataCache.requestType returning guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
 				ModelMetadataEvent.create( ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm );
 			}
-			//else 
-			//	Log.out( "ModelMetadataCache.requestType REJECTING guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
+			else {
+				if ( vmm )
+                    Log.out( "ModelMetadataCache.requestType REJECTING guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
+				else
+                    Log.out( "ModelMetadataCache.requestType REJECTING null object: ", Log.WARN );
+			}
 		}
 	}
 	
@@ -129,6 +135,8 @@ public class ModelMetadataCache
 		}
 	}
 	
+	// TODO - So anyone who stores the guid should also handle this message? - RSF 9.27.17
+	// TODO - Would probably be better to remove an object and add a new one.
 	static private function updateGuid( $mme:ModelMetadataEvent ):void {
 		var guidArray:Array = $mme.modelGuid.split( ":" );
 		var oldGuid:String = guidArray[0];
@@ -151,8 +159,9 @@ public class ModelMetadataCache
 	static private function add( $series:int, $vmm:ModelMetadata ):void {
 		if ( null == $vmm || null == $vmm.guid ) {
 			Log.out( "ModelMetadataCache.add trying to add NULL metadata or guid", Log.WARN );
-			return;
+			throw new Error( "ModelMetadataCache.add trying to add NULL metadata or guid" );
 		}
+
 		// check to make sure is not already there
 		if ( null ==  _metadata[$vmm.guid] ) {
 			//Log.out( "ModelMetadataCache.add vmm: " + $vmm.guid, Log.WARN );
@@ -224,15 +233,9 @@ public class ModelMetadataCache
 	//  End - Persistence Events
 	/////////////////////////////////////////////////////////////////////////////////////////////
 
-	static public function getTrees():Vector.<ModelMetadata> {
-		var vectorOfTreeModels:Vector.<ModelMetadata> = new Vector.<ModelMetadata>();
-		for each( var mmd:ModelMetadata in _metadata ){
-			if ( 0 <= mmd.hashTags.indexOf("tree")) {
-				vectorOfTreeModels.push(mmd);
-			}
-		}
-		return vectorOfTreeModels;
-	}
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    //  Specialty function - builds a collection of tree objects when generating an island
+    /////////////////////////////////////////////////////////////////////////////////////////////
 
 	static private var _vectorOfTreeModels:Vector.<ModelMetadata> = null;
 	static public function getRandomTree():ModelMetadata {
@@ -243,6 +246,16 @@ public class ModelMetadataCache
 		var index:int = int( Math.random() ) * _vectorOfTreeModels.length;
 		var mmd:ModelMetadata = _vectorOfTreeModels[index];
 		return mmd;
+
+        function getTrees():Vector.<ModelMetadata> {
+            var vectorOfTreeModels:Vector.<ModelMetadata> = new Vector.<ModelMetadata>();
+            for each( var mmd:ModelMetadata in _metadata ){
+                if ( 0 <= mmd.hashTags.indexOf("tree")) {
+                    vectorOfTreeModels.push(mmd);
+                }
+            }
+            return vectorOfTreeModels;
+        }
 	}
 
 }
