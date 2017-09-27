@@ -91,7 +91,7 @@ public class TextureBank
         var result:Boolean = _texturesLoading[ $tle.name ];
         if ( false == result ) {
             _texturesLoading[$tle.name] = true;
-            Log.out( "TextureBank.getGUITexture NEED TO LOAD TEXTURE : " + $tle.name );
+            //Log.out( "TextureBank.request NEED TO LOAD TEXTURE : " + $tle.name );
             loadGUITexture( $tle.name );
         }
     }
@@ -105,7 +105,7 @@ public class TextureBank
         if ( "/" == Globals.appPath ) {
             var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
             var resolvedFilePath:String = fs.getUrl(Globals.texturePath + $textureName);
-            Log.out( "TextureBank.loadGUITexture - resolvedFilePath: " + resolvedFilePath );
+            //Log.out( "TextureBank.loadGUITexture - resolvedFilePath: " + resolvedFilePath );
             loader.load(new URLRequest(resolvedFilePath) );
         } else {
             Log.out( "TextureBank.loadGUITexture: " + Globals.texturePath + $textureName );
