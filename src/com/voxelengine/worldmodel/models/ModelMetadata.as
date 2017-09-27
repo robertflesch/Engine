@@ -123,9 +123,6 @@ public class ModelMetadata extends PersistenceObject
 
 
 			if ( dbo.thumbnail ) {
-                //Log.out( "ModelMetadata.init - loading thumbnail", Log.WARN);
-                //loader.contentLoaderInfo.addEventListener(Event.COMPLETE, thumbNailLoaded );
-				//loader.loadBytes( dbo.thumbnail );
 				try {
                     var bmd:BitmapData = new BitmapData(128,128,false);
                     bmd.setPixels(new Rectangle(0, 0, 128, 128), dbo.thumbnail);
@@ -142,14 +139,14 @@ public class ModelMetadata extends PersistenceObject
 			}
 
             function loadNoImage():void {
-                TextureLoadingEvent.addListener( TextureLoadingEvent.LOAD_SUCCEED, imageLoaded );
+                TextureLoadingEvent.addListener( TextureLoadingEvent.LOAD_SUCCEED, noImageLoaded );
 				TextureLoadingEvent.create( TextureLoadingEvent.REQUEST, TextureBank.NO_IMAGE_128 );
             }
 
-            function imageLoaded( $tle:TextureLoadingEvent ):void {
+            function noImageLoaded( $tle:TextureLoadingEvent ):void {
 				if ( TextureBank.NO_IMAGE_128 == $tle.name ) {
-                    TextureLoadingEvent.removeListener( TextureLoadingEvent.LOAD_SUCCEED, imageLoaded );
-                    Log.out("ModelMetadata.init.imageLoaded: " + TextureBank.NO_IMAGE_128 + "  for guid: " + guid, Log.WARN);
+                    TextureLoadingEvent.removeListener( TextureLoadingEvent.LOAD_SUCCEED, noImageLoaded );
+                    //Log.out("ModelMetadata.init.noImageLoaded: " + TextureBank.NO_IMAGE_128 + "  for guid: " + guid, Log.WARN);
                     _thumbnail = ($tle.data as Bitmap).bitmapData;
                     thumbnailLoaded = true;
 					changed = true;
