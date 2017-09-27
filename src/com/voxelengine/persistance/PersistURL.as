@@ -8,6 +8,7 @@
 package com.voxelengine.persistance 
 {
 import com.voxelengine.worldmodel.animation.AnimationSound;
+import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
 import flash.events.Event;
 import flash.events.ProgressEvent;
@@ -83,14 +84,17 @@ public class PersistURL
 		urlLoader.addEventListener(Event.COMPLETE, loadSuccess );
 		urlLoader.addEventListener(IOErrorEvent.IO_ERROR, loadError);
 		try {
-			if ( "/" == Globals.appPath ) {
+			if ( ModelMakerImport.isImporting ) {
+                urlLoader.load( new URLRequest( "E:/dev/VoxelVerse/Resources/bin" + _filePath ) );
+            }
+			else if ( "/" == Globals.appPath  ) {
                 var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
                 var resolvedFilePath:String = fs.getUrl(_filePath);
                 urlLoader.load(new URLRequest(resolvedFilePath));
-            }
-			else {
-                urlLoader.load(new URLRequest( _filePath ));
-            }
+            } else {
+                Log.out("PersistURL.load - Where am I trying to load from? " + _filePath, Log.WARN );
+
+			}
 
 		} catch (error:Error) {
 			Log.out("PersistURL.load - Unable to load requested document." + error.getStackTrace(), Log.WARN );
