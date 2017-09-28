@@ -168,7 +168,7 @@ public class OxelPersistenceCache
 	}
 
 	// This is the same as load succeed.
-	static private function generateSucceed( $pe:PersistenceEvent):void {
+	static private function generateSucceed( $pe:PersistenceEvent ):void {
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
 		//Log.out( "OxelDataCache.generateSucceed " + $pe.toString(), Log.INFO );

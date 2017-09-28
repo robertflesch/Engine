@@ -7,6 +7,16 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
+import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.events.PersistenceEvent;
+import com.voxelengine.events.RegionEvent;
+import com.voxelengine.renderer.Renderer;
+import com.voxelengine.worldmodel.Region;
+
+import flash.display.BitmapData;
+import flash.geom.Matrix;
+
 import flash.geom.Vector3D;
 
 import com.voxelengine.Log
@@ -88,7 +98,8 @@ public class ModelMakerClone extends ModelMakerBase {
 		}
 	}
 
-	private function completeMake():void {
+    private var waitForChildren:Boolean;
+	private function completeMakeOLD():void {
 		//Log.out("ModelMakerClone.completeMake: " + ii.toString());
 		if ( null != modelInfo && null != _modelMetadata ) {
 
@@ -122,30 +133,120 @@ public class ModelMakerClone extends ModelMakerBase {
 		}
 	}
 
-	override protected function markComplete( $success:Boolean ):void {
-		if ( true == $success ) {
-			ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
-			ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
-			_vm.complete = true;
+    private function completeMake():void {
+        //Log.out("ModelMakerClone.completeMake: " + ii.toString());
+        if ( null != modelInfo && null != _modelMetadata ) {
 
-			modelInfo.brandChildren();
-			modelInfo.changed = true;
-			_modelMetadata.changed = true;
-			_vm.save();
-		} else {
-			if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" )
-				Log.out( "ModelMakerClone.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.ERROR );
-			else if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName )
-				Log.out( "ModelMakerClone.markComplete - Failed import, Failed to load from IVM : " + modelInfo.guid, Log.ERROR );
-			else
-				Log.out( "ModelMakerClone.markComplete - Unknown error causing failure : " + ii.modelGuid, Log.ERROR );
+            _vm = make();
+            if ( _vm ) {
+                _vm.stateLock( true, 10000 ); // Lock state so that it has time to load animations
+                addODEListeners();
+                PersistenceEvent.create( PersistenceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, modelInfo.guid, null, modelInfo.oxelPersistence.ba, null, String( _modelMetadata.bound  ) );
+                if ( false == modelInfo.childrenLoaded ) { // its true if they are loaded or the model has no children.
+                    waitForChildren = true;
+                    ModelLoadingEvent.addListener(ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady);
+                }
+            } else {
+                markComplete(false);
+            }
+        }
+        else
+            Log.out( "ModelMakerClone.completeMake - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
 
-			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
-			ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
-		}
+        function childrenAllReady( $ode:ModelLoadingEvent):void {
+            if ( modelInfo.guid == $ode.data.modelGuid  ) {
+                Log.out( "ModelMakerClone.allChildrenReady - modelMetadata.description: " + _modelMetadata.description, Log.WARN );
+                ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
+                markComplete( true );
+            }
+        }
+    }
 
-		Log.out("ModelMakerClone.completeMake - needed info found: " + _modelMetadata.description );
-		super.markComplete( $success );
-	}
+    override protected function oxelBuildComplete($ode:OxelDataEvent):void {
+        if ($ode.modelGuid == modelInfo.guid ) {
+            Log.out( "ModelMakerBase.oxelBuildComplete  guid: " + modelInfo.guid, Log.WARN );
+            removeODEListeners();
+            // This has the additional wait for children
+            if ( !waitForChildren )
+                markComplete( true );
+        }
+    }
+
+    override protected function oxelBuildFailed($ode:OxelDataEvent):void {
+        if ($ode.modelGuid == modelInfo.guid ) {
+            removeODEListeners();
+            modelInfo.oxelPersistence = null;
+            _vm.dead = true;
+            if ( waitForChildren ) {
+                Log.out("ModelMakerImport - ERROR LOADING OXEL", Log.WARN);
+                // TODO cancel children loading???
+            }
+            markComplete( false );
+        }
+    }
+
+    override protected function markComplete( $success:Boolean ):void {
+        if ( true == $success ) {
+            modelInfo.brandChildren();
+            OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE,  quadsComplete );
+            Log.out("ModelMakerClone.completeMake - waiting on quad build: " + _modelMetadata.description );
+        } else {
+            if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" )
+                Log.out( "ModelMakerClone.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.ERROR );
+            else if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName )
+                Log.out( "ModelMakerClone.markComplete - Failed import, Failed to load from IVM : " + modelInfo.guid, Log.ERROR );
+            else
+                Log.out( "ModelMakerClone.markComplete - Unknown error causing failure : " + ii.modelGuid, Log.ERROR );
+
+            ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
+            OxelDataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
+            ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
+            super.markComplete( $success );
+        }
+
+    }
+
+    private	function quadsComplete( $ode:OxelDataEvent ):void {
+        if ( _modelMetadata.guid == $ode.modelGuid ) {
+
+            if ( !ii.controllingModel ) {
+                // Only do this for top level models.
+                var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 16)/2;
+                // this gives me corner.
+                var msCamPos:Vector3D = VoxelModel.controlledModel.cameraContainer.current.position;
+                var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld( msCamPos );
+
+                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector( new Vector3D( -(radius + 8), adjCameraPos.y-radius, -radius * 3 ) );
+                var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet();
+                diffPos = diffPos.add(lav);
+                _vm.instanceInfo.positionSet = diffPos;
+            }
+
+            OxelDataEvent.removeListener(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, quadsComplete);
+            var bmpd:BitmapData = Renderer.renderer.modelShot( _vm );
+            _vm.metadata.thumbnail = drawScaled(bmpd, 128, 128);
+
+            ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
+            ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
+            _vm.complete = true;
+
+            modelInfo.changed = true;
+            modelInfo.oxelPersistence.changed = true;
+            _modelMetadata.changed = true;
+            _vm.save();
+
+            Log.out("ModelMakerClone.quadsComplete - needed info found: " + _modelMetadata.description );
+            super.markComplete(true);
+        }
+
+        function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
+            var m:Matrix = new Matrix();
+            m.scale(destWidth/obj.width, destHeight/obj.height);
+            var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
+            bmpd.draw(obj, m);
+            return bmpd;
+        }
+    }
+
 }
 }

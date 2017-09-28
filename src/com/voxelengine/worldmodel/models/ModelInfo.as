@@ -578,10 +578,15 @@ public class ModelInfo extends PersistenceObject
 	public function set biomes(value:Biomes):void  					{ _biomes = value;  changed = true; }
 	
 	override public function save( $validateGuid:Boolean = true ):Boolean {
+
 		if ( false == animationsLoaded || false == childrenLoaded) {
 			Log.out("ModelInfo.save - NOT Saving guid: " + guid + " NEED Animations or children to complete", Log.WARN);
 			return false;
 		}
+
+        if ( oxelPersistence ) {
+            oxelPersistence.save();
+        }
 
 		if ( !super.save( $validateGuid ) )
 			return false;
@@ -677,26 +682,7 @@ public class ModelInfo extends PersistenceObject
 		delete newModelInfo.dbo.animations;
 		newModelInfo.animationsLoaded = true;
 		newModelInfo.oxelPersistence = oxelPersistence.cloneNew( $guid );
-		//TODO need handlers
-		ModelInfoEvent.create( ModelBaseEvent.CLONE, 0, newModelInfo.guid, newModelInfo );
 		return newModelInfo;
-	}
-
-	override public function clone( $guid:String ):* {
-		var oldObj:String = JSON.stringify( dbo );
-
-		var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.MODEL_INFO_EXT, $guid, null, oldObj );
-		PersistenceEvent.dispatch( pe );
-
-		// also need to clone the oxel
-		throw new Error( "REFACTOR = 2.22.17");
-		/*
-		// this adds the version header, need for the persistanceEvent
-		var ba:ByteArray = OxelPersistence.toByteArray( oxelPersistence.oxel );
-
-		var ope:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, $guid, null, ba )
-		PersistenceEvent.dispatch( ope )
-		*/
 	}
 
 	public function toString():String {  return "ModelInfo - guid: " + guid; }

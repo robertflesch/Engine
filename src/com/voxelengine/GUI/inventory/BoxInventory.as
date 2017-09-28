@@ -94,12 +94,8 @@ public class BoxInventory extends VVBox
 
 		switch ( $item.objectType ) {
 		case ObjectInfo.OBJECTINFO_EMPTY:
-			if ( !($item is ObjectInfo ) ) {
-                var oi:ObjectInfo = $item as ObjectInfo;
-                reset();
-                backgroundTexture = $item.backgroundTexture(width);
-                setHelp(oi.name);
-            }
+			reset();
+            backgroundTexture = $item.backgroundTexture(width);
             break;
 		case ObjectInfo.OBJECTINFO_MODEL:
 			var om:ObjectModel = _objectInfo as ObjectModel;
@@ -174,6 +170,16 @@ public class BoxInventory extends VVBox
 			backgroundTexture = $item.backgroundTexture( width );
 			setHelp( ot.name );			
 			_count.text = "";
+            if ( _editData ) {
+                removeElement(_editData);
+                _editData = null;
+            }
+            else if (_bpValue) {
+                removeElement(_bpValue);
+                _bpValue = null
+            }
+
+			_name.text = "";
 			break;
 			
 		case ObjectInfo.OBJECTINFO_VOXEL:
@@ -223,7 +229,7 @@ public class BoxInventory extends VVBox
 	public function reset():void {
 		setHelp( "Empty" );
 		_count.text = "";
-		backgroundTexture = TextureBank.BLANK_IMAGE
+		backgroundTexture = TextureBank.BLANK_IMAGE;
 		data = null;
 		if ( _bpValue ) {
 			removeElement( _bpValue );

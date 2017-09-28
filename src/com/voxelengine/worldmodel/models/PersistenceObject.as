@@ -219,7 +219,8 @@ public class PersistenceObject
 	protected function mergeOverwrite( obj0:Object ):void {
 		for( var p:String in obj0 ) {
 			if ( null != obj0[ p ]) {
-				dbo[p] = obj0[p];
+				if ( "key" != p && "table" != p  ) // key and table are read only
+					dbo[p] = obj0[p];
 				//trace("PersistenceObject.mergeOverwrite " + p, ' : obj0', obj0[p], 'dbo', dbo[p], '-> new value = ', dbo[p]);
 			}
 		}

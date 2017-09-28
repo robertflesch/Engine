@@ -45,8 +45,8 @@ public class ObjectInfo
 	public function backgroundTexture( size:int = 64 ):String { 
 		if ( 64 == size )
 			return _backgroundTexture;
-			
-		return _backgroundTexture;
+
+        return "blank128.png";
 	}
 	
 	public function ObjectInfo( $owner:BoxInventory, $objectType:int, $name:String ):void

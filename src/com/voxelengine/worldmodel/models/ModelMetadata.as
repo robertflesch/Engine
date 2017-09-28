@@ -12,6 +12,7 @@ import com.voxelengine.Log;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.TextureLoadingEvent;
+import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.TextureBank;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 
@@ -220,11 +221,12 @@ public class ModelMetadata extends PersistenceObject
 
 
 	public function cloneNew( $guid:String ):ModelMetadata {
-		var newMM:ModelMetadata = new ModelMetadata( $guid, null, dbo );
+        var oldObj:String = JSON.stringify( dbo );
+		var newData:Object = JSON.parse( oldObj );
+        newData.owner = Network.userId;
+        newData.createdDate = new Date().toUTCString();
 
-		//TODO need handlers
-		ModelMetadataEvent.create( ModelBaseEvent.CLONE, 0, newMM.guid, newMM );
-		return newMM;
+        return new ModelMetadata( $guid, null, newData );
 	}
 
 	override public function clone( $newGuid:String ):* {
