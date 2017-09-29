@@ -7,11 +7,14 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
 
+import com.voxelengine.worldmodel.models.ModelCacheUtils;
+import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
 import flash.display.DisplayObject;
 import flash.events.Event;
+import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
 import flash.net.FileReference;
 import flash.net.FileFilter;
@@ -189,7 +192,8 @@ public class InventoryPanelModel extends VVContainer
 	}
 
 	private function addModelMetadataEvent($mme:ModelMetadataEvent):void {
-		// I only want the results from the series I asked for
+		// I only want the results from the series I asked for, or from models being added outside a series, like a generated or new model
+        Log.out( "IPM.addModelMetadataEvent series: " + $mme.series +  "guid: " + $mme.modelGuid );
 		if ( _seriesModelMetadataEvent == $mme.series || 0 == $mme.series ) {
 			if ( "Player" == $mme.modelGuid)
 					return;
@@ -197,11 +201,10 @@ public class InventoryPanelModel extends VVContainer
 			om.vmm = $mme.modelMetadata;
 			var cat:String = _category.toLowerCase();
 			//Log.out( "IPM.addModelMetadataEvent cat: " + cat + "  hasTags: " + $mme.modelMetadata.hashTags + "  found? " + $mme.modelMetadata.hashTags.indexOf(cat));
-			if ( "all" == cat ) {
+			if ( "all" == cat )
 				addModel(om);
-			} else if ( 0 <= $mme.modelMetadata.hashTags.indexOf(cat)) {
+			else if ( 0 <= $mme.modelMetadata.hashTags.indexOf(cat))
 				addModel(om);
-			}
 		}
 	}
 	
@@ -245,7 +248,10 @@ public class InventoryPanelModel extends VVContainer
 		Log.out( "InventoryPanelModel.addModel - Failed to addModel: " + $oi, Log.ERROR );
 		return null
 	}
-	
+
+    static private var _cameraMatrix:Matrix3D = new Matrix3D();
+    static private var _viewVectors:Vector.<Vector3D> = new Vector.<Vector3D>(6);
+
 	static private function addModelTo( e:UIMouseEvent ):void {
 		if ( e.target.objectInfo is ObjectAction ) {
 			var oa:ObjectAction = e.target.objectInfo as ObjectAction;
@@ -266,11 +272,31 @@ public class InventoryPanelModel extends VVContainer
 				// Only do this for top level models.
 				var size:int = Math.max( GrainCursor.get_the_g0_edge_for_grain(om.vmm.bound), 32 );
 				// this give me edge,  really want center.
+                var cmRotation:Vector3D;
+				////////////////////////
+                if ( VoxelModel.controlledModel )
+                    cmRotation = VoxelModel.controlledModel.cameraContainer.current.rotation;
+                else
+                    cmRotation = new Vector3D();
+                _cameraMatrix.identity();
+                _cameraMatrix.prependRotation( -cmRotation.z, Vector3D.Z_AXIS );
+                _cameraMatrix.prependRotation( -cmRotation.y, Vector3D.Y_AXIS );
+                _cameraMatrix.prependRotation( -cmRotation.x, Vector3D.X_AXIS );
+                var endPoint:Vector3D = ModelCacheUtils.viewVector(ModelCacheUtils.FRONT);
+                endPoint.scaleBy( size * 1.5 );
+                var viewVector:Vector3D = _cameraMatrix.deltaTransformVector( endPoint );
+                viewVector = viewVector.add( VoxelModel.controlledModel.instanceInfo.positionGet );
+                viewVector.setTo( viewVector.x - size/2, viewVector.y - size/2, viewVector.z - size/2);
+                ii.positionSet = viewVector;
+				// was
+				/*
 				var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(size * 1.5);
 				lav.setTo( lav.x - size/2, lav.y - size/2, lav.z - size/2);
 				var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
 				diffPos = diffPos.add(lav);
 				ii.positionSet = diffPos;
+				*/
+
 			}
 
 			if ( !PopupMetadataAndModelInfo.inExistance )
