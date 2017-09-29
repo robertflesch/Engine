@@ -69,6 +69,8 @@ public class VoxelModel {
 		// unselect the old model
 		if ( _s_selectedModel ) {
 			_s_selectedModel.selected = false;
+            _s_selectedModel.save();
+
 			Axes.hide();
 		}
 		// change the static to new model
@@ -633,6 +635,7 @@ public class VoxelModel {
 			
 		modelInfo.save();
 		metadata.save();
+        Region.currentRegion.save()
 	}
 	
 	

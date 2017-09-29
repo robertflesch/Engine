@@ -76,12 +76,12 @@ public class ModelMetadataCache
 				Log.out( "ModelMetadataCache.requestType returning guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
 				ModelMetadataEvent.create( ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm );
 			}
-			else {
-				if ( vmm )
-                    Log.out( "ModelMetadataCache.requestType REJECTING guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
-				else
-                    Log.out( "ModelMetadataCache.requestType REJECTING null object: ", Log.WARN );
-			}
+//			else {
+//				if ( vmm )
+//                    Log.out( "ModelMetadataCache.requestType REJECTING guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
+//				else
+//                    Log.out( "ModelMetadataCache.requestType REJECTING null object: ", Log.WARN );
+//			}
 		}
 	}
 	

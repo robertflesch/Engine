@@ -224,9 +224,11 @@ public class ModelMetadata extends PersistenceObject
         var oldObj:String = JSON.stringify( dbo );
 		var newData:Object = JSON.parse( oldObj );
         newData.owner = Network.userId;
-        newData.createdDate = new Date().toUTCString();
-
-        return new ModelMetadata( $guid, null, newData );
+		newData.hashTags = this.hashTags + "#cloned";
+        newData.name = this.name + " cloned";
+        //newData.createdDate = new Date().toUTCString();
+        var newModelMetadata:ModelMetadata = new ModelMetadata( $guid, null, newData );
+        return newModelMetadata;
 	}
 
 	override public function clone( $newGuid:String ):* {

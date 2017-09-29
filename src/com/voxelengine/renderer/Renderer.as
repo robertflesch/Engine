@@ -201,17 +201,11 @@ public class Renderer extends EventDispatcher
 	public function render( screenShot:BitmapData = null ):void 
 	{
 		if ( null == context3D )
-		{
-			//Log.out( "Renderer.render - CONTEXT NULL" );
 			return;
-		}
-		
+
 		if ( "Disposed" == context3D.driverInfo )
-		{
-			//Log.out( "Renderer.render - CONTEXT Disposed" + context3D.toString() );
 			return;
-		}
-		
+
 
 		backgroundColor();
 
@@ -230,8 +224,7 @@ public class Renderer extends EventDispatcher
 			controlledModelRotation = new Vector3D();
 		}
 		else {
-			//controlledModelRotation = controlledModel.instanceInfo.rotationGet;
-			controlledModelRotation = CameraLocation.rotation;
+			controlledModelRotation = controlledModel.cameraContainer.current.rotation;
 
 			wsPositionCamera = controlledModel.instanceInfo.worldSpaceMatrix.transformVector(controlledModel.cameraContainer.current.position);
 			// This does not handle the case where the player has not collided with the model yet

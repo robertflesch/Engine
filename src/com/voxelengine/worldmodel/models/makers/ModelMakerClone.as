@@ -7,12 +7,6 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
-import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.PersistenceEvent;
-import com.voxelengine.events.RegionEvent;
-import com.voxelengine.renderer.Renderer;
-import com.voxelengine.worldmodel.Region;
 
 import flash.display.BitmapData;
 import flash.geom.Matrix;
@@ -24,13 +18,17 @@ import com.voxelengine.Globals
 import com.voxelengine.events.ModelBaseEvent
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelLoadingEvent;
+import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.events.ModelMetadataEvent
+import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.models.types.VoxelModel
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 
 public class ModelMakerClone extends ModelMakerBase {
-	
+
+    private var _waitForChildren:Boolean;
 	public function ModelMakerClone( $vm:VoxelModel, $killOldModel:Boolean = true ) {
 		super($vm.instanceInfo.clone());
 		Log.out("ModelMakerClone - clone model with instanceGuid: " + $vm.instanceInfo.instanceGuid + "  modelGuid: " + $vm.instanceInfo.modelGuid);
@@ -98,41 +96,6 @@ public class ModelMakerClone extends ModelMakerBase {
 		}
 	}
 
-    private var waitForChildren:Boolean;
-	private function completeMakeOLD():void {
-		//Log.out("ModelMakerClone.completeMake: " + ii.toString());
-		if ( null != modelInfo && null != _modelMetadata ) {
-
-			_vm = make();
-			if ( _vm ) {
-				_vm.stateLock( true, 10000 ); // Lock state so that it has time to load animations
-				new OxelLoadAndBuildManager( modelInfo.guid, modelInfo.oxelPersistence );
-				if ( false == modelInfo.childrenLoaded ){ // its true if they are loaded or the model has no children.
-					ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
-				} else
-					markComplete( true );
-			} else {
-				markComplete(false);
-			}
-		}
-		else
-			Log.out( "ModelMakerClone.completeMake - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
-
-		function childrenAllReady( $ode:ModelLoadingEvent):void {
-			if ( modelInfo.guid == $ode.data.modelGuid  ) {
-				Log.out( "ModelMakerClone.allChildrenReady - modelMetadata.description: " + _modelMetadata.description, Log.WARN );
-				ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
-				markComplete( true );
-			}
-		}
-		function childLoadFailed():void {
-			/*
-			TODO How to prepare for this?
-			Look at modelLoading event, and see if the guid is one of our children?
-			 */
-		}
-	}
-
     private function completeMake():void {
         //Log.out("ModelMakerClone.completeMake: " + ii.toString());
         if ( null != modelInfo && null != _modelMetadata ) {
@@ -143,7 +106,7 @@ public class ModelMakerClone extends ModelMakerBase {
                 addODEListeners();
                 PersistenceEvent.create( PersistenceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, modelInfo.guid, null, modelInfo.oxelPersistence.ba, null, String( _modelMetadata.bound  ) );
                 if ( false == modelInfo.childrenLoaded ) { // its true if they are loaded or the model has no children.
-                    waitForChildren = true;
+                    _waitForChildren = true;
                     ModelLoadingEvent.addListener(ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady);
                 }
             } else {
@@ -167,7 +130,7 @@ public class ModelMakerClone extends ModelMakerBase {
             Log.out( "ModelMakerBase.oxelBuildComplete  guid: " + modelInfo.guid, Log.WARN );
             removeODEListeners();
             // This has the additional wait for children
-            if ( !waitForChildren )
+            if ( !_waitForChildren )
                 markComplete( true );
         }
     }
@@ -177,7 +140,7 @@ public class ModelMakerClone extends ModelMakerBase {
             removeODEListeners();
             modelInfo.oxelPersistence = null;
             _vm.dead = true;
-            if ( waitForChildren ) {
+            if ( _waitForChildren ) {
                 Log.out("ModelMakerImport - ERROR LOADING OXEL", Log.WARN);
                 // TODO cancel children loading???
             }

@@ -496,7 +496,7 @@ public class Avatar extends ControllableVoxelModel
 
 			if ( MouseKeyboardHandler.isLeftMouseDown ) {
 
-                const currentCamRotationLMD:Vector3D = CameraLocation.rotation;
+                const currentCamRotationLMD:Vector3D = VoxelModel.controlledModel.cameraContainer.current.rotation;
 				setCameraAndHead( currentCamRotationLMD.x + dx
 						        , currentCamRotationLMD.y + dy
 						        , 0 );
@@ -511,14 +511,15 @@ public class Avatar extends ControllableVoxelModel
                     instanceInfo.rotationSetComp( newX + dx, newY, 0 );
                 }
 				// TODO Need to decay the y of the difference between camera rotation and body rotation
-				setCameraAndHead( CameraLocation.rotation.x + dx , newY , 0);
+                //trace( "Avatar.handleMouseMovement.setCameraAndHead: " + VoxelModel.controlledModel.cameraContainer.current.rotation );
+				setCameraAndHead( VoxelModel.controlledModel.cameraContainer.current.rotation.x + dx , newY , 0);
             }
 		}
 	}
 
 	private function setCameraAndHead( $x:Number, $y:Number, $z:Number ):void {
-		CameraLocation.rotation.setTo( $x , $y , $z );
-		//trace( "CameraLocation.rotation: " + CameraLocation.rotation + "  $x: " + $x + "  $y: " + $y + "  $z: " + $z );
+        //trace( "Avatar.setCameraAndHead: " + VoxelModel.controlledModel.cameraContainer.current.rotation + "  $x: " + $x + "  $y: " + $y + "  $z: " + $z );
+        VoxelModel.controlledModel.cameraContainer.current.rotationSetTo( $x , $y , $z );
 		var head:VoxelModel = childFindByName("Head");
 		if (head) {
 			const bodyRot:Vector3D = instanceInfo.rotationGet;

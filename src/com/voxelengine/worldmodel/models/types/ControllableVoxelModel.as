@@ -632,15 +632,17 @@ public class ControllableVoxelModel extends VoxelModel
 			if ( MouseKeyboardHandler.leftSlide )	{
 				const currentRotP:Vector3D = instanceInfo.rotationGet;
 				instanceInfo.rotationSetComp( currentRotP.x, currentRotP.y - ROTATE_FACTOR * $elapsedTimeMS, currentRotP.z );
-				const currentCamRotP:Vector3D = CameraLocation.rotation;
-				CameraLocation.rotation.setTo( currentCamRotP.x, currentCamRotP.y - ROTATE_FACTOR * $elapsedTimeMS, 0 );
+				// should this be Player.player?
+				const currentCamRotP:Vector3D = VoxelModel.controlledModel.cameraContainer.current.rotation;
+                VoxelModel.controlledModel.cameraContainer.current.rotationSetTo( currentCamRotP.x, currentCamRotP.y - ROTATE_FACTOR * $elapsedTimeMS, 0 );
 				changed = true;
 			}
 			if ( MouseKeyboardHandler.rightSlide ) {
 				const currentRot:Vector3D = instanceInfo.rotationGet;
 				instanceInfo.rotationSetComp(currentRot.x, currentRot.y + ROTATE_FACTOR * $elapsedTimeMS, currentRot.z);
-				const currentCamRot:Vector3D = CameraLocation.rotation;
-				CameraLocation.rotation.setTo( currentCamRot.x, currentCamRot.y + ROTATE_FACTOR * $elapsedTimeMS, 0 );
+                // should this be Player.player?
+				const currentCamRot:Vector3D = VoxelModel.controlledModel.cameraContainer.current.rotation;
+                VoxelModel.controlledModel.cameraContainer.current.rotationSetTo( currentCamRot.x, currentCamRot.y + ROTATE_FACTOR * $elapsedTimeMS, 0 );
 				changed = true;
 			}
 			if ( MouseKeyboardHandler.down )	  	{ instanceInfo.velocitySetComp( vel.x, vel.y + speedVal, vel.z ); changed = true; }
