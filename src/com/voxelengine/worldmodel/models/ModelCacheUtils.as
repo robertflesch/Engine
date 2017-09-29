@@ -51,8 +51,9 @@ public class ModelCacheUtils {
 	static private var _cameraMatrix:Matrix3D = new Matrix3D();
 
 	static private var _viewVectors:Vector.<Vector3D> = new Vector.<Vector3D>(6);
+	static public function viewVector( $dir:int ):Vector3D { return _viewVectors[$dir].clone() }
 
-	static public function get worldSpaceStartPoint():Vector3D { return _worldSpaceStartPoint; }
+    static public function get worldSpaceStartPoint():Vector3D { return _worldSpaceStartPoint; }
 	static public function get worldSpaceEndPoint():Vector3D { return _worldSpaceEndPoint; }
 	static public function worldSpaceStartPointFunction():Vector3D { return _worldSpaceStartPoint ? _worldSpaceStartPoint : new Vector3D(); }
 	static public function worldSpaceEndPointFunction():Vector3D { return _worldSpaceEndPoint ? _worldSpaceEndPoint : new Vector3D(); }
@@ -153,17 +154,21 @@ public class ModelCacheUtils {
 //            trace( "MCU - " + FM( "wssp: ", worldSpaceStartPoint )  ); // + FM( " avatar rot: ", pm.instanceInfo.rotationGet )
 
             // now create a vector in direction we are looking
-            var cmRotation:Vector3D = CameraLocation.rotation;
+            var cmRotation:Vector3D;
+			if ( VoxelModel.controlledModel )
+            	cmRotation = VoxelModel.controlledModel.cameraContainer.current.rotation;
+			else
+				cmRotation = new Vector3D();
             _cameraMatrix.identity();
 			_cameraMatrix.prependRotation( -cmRotation.z, Vector3D.Z_AXIS );
 			_cameraMatrix.prependRotation( -cmRotation.y, Vector3D.Y_AXIS );
             _cameraMatrix.prependRotation( -cmRotation.x, Vector3D.X_AXIS );
-            var endPoint:Vector3D = _viewVectors[$direction].clone();
+            var endPoint:Vector3D = viewVector($direction);
             endPoint.scaleBy( $editRange );
-            var viewVector:Vector3D = _cameraMatrix.deltaTransformVector( endPoint );
+            var tranformedVector:Vector3D = _cameraMatrix.deltaTransformVector( endPoint );
 //			trace( "MCU - " + FM( "viewVector: ", viewVector ) + FM( "  cmRotation: ", cmRotation ) );
 
-            _worldSpaceEndPoint = _worldSpaceStartPoint.add( viewVector );
+            _worldSpaceEndPoint = _worldSpaceStartPoint.add( tranformedVector );
 //			trace( "MCU - " + FM( "worldSpaceEndPoint: ", _worldSpaceEndPoint ) );
 
 			/////////////////////////////////////
