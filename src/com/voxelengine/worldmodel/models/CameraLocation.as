@@ -20,15 +20,17 @@ public class CameraLocation
 	public function get position():Vector3D { return _position; }
 	public function set position(value:Vector3D):void { _position = value; }
 
-	private static var _rotation:Vector3D = null;
-	static public function get rotation():Vector3D { return _rotation; }
-	//static public function set rotation(value:Vector3D):void { _rotation = value; }
+	private var _rotation:Vector3D = null;
+	public function get rotation():Vector3D { return _rotation; }
+	public function rotationSetTo( $x:Number, $y:Number, $z:Number ):void {
+        //trace( "CameraLocation.rotationSetTo: " + _rotation + "  $x: " + $x + "  $y: " + $y + "  $z: " + $z );
+		_rotation.setTo( $x, $y, $z )
+	}
 
 	private var _toolBarVisible:Boolean = false;
 	public function get toolBarVisible():Boolean { return _toolBarVisible; }
 
-	public function CameraLocation( $toolBarVisible:Boolean, x:int, y:int, z:int, roll:Number = 0, yaw:Number = 0, pitch:Number = 0 ):void
-	{
+	public function CameraLocation( $toolBarVisible:Boolean, x:int, y:int, z:int, roll:Number = 0, yaw:Number = 0, pitch:Number = 0 ):void {
 		_toolBarVisible = $toolBarVisible;
 		_position = new Vector3D( x, y, z );
 		_rotation = new Vector3D( roll, yaw, pitch );
