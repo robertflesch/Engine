@@ -74,22 +74,21 @@ public class PersistURL
 			return;
 		}
 
-		Log.out( "PersistURL.load - file: " + _filePath );
-
-		// You can also save the returned gamefs object and reuse it.
-
+		//Log.out( "PersistURL.load - file: " + _filePath );
 		var urlLoader:URLLoader = new URLLoader();
 		configureListeners(urlLoader);
 		urlLoader.dataFormat = $pe.format;
 		urlLoader.addEventListener(Event.COMPLETE, loadSuccess );
 		urlLoader.addEventListener(IOErrorEvent.IO_ERROR, loadError);
+        var resolvedFilePath:String;
 		try {
 			if ( ModelMakerImport.isImporting ) {
-                urlLoader.load( new URLRequest( "E:/dev/VoxelVerse/Resources/bin" + _filePath ) );
+				resolvedFilePath = "E:/dev/VoxelVerse/Resources/bin" + _filePath;
+                urlLoader.load( new URLRequest( resolvedFilePath ) );
             }
 			else if ( "/" == Globals.appPath  ) {
                 var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
-                var resolvedFilePath:String = fs.getUrl(_filePath);
+                resolvedFilePath = fs.getUrl(_filePath);
                 urlLoader.load(new URLRequest(resolvedFilePath));
             } else {
                 Log.out("PersistURL.load - Where am I trying to load from? " + _filePath, Log.WARN );
@@ -102,21 +101,16 @@ public class PersistURL
 
 
 		function loadSuccess(event:Event):void {
-
-			Log.out( "PersistURL.loadSuccess - guid: " + $pe.guid + $pe.table, Log.DEBUG );
-			if ( URLLoaderDataFormat.BINARY == $pe.format ) {
-				var ba:ByteArray = event.target.data;
-				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $pe.guid, null, ba, $pe.format, $pe.other ) );
-			}
-			else {
-
+			//Log.out( "PersistURL.loadSuccess - guid: " + $pe.guid + $pe.table + "  from location: " + resolvedFilePath, Log.DEBUG );
+			if ( URLLoaderDataFormat.BINARY == $pe.format )
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $pe.guid, null, event.target.data, $pe.format, $pe.other ) );
+			else
 				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $pe.guid, null, StringUtils.trim(event.target.data), $pe.format, $pe.other ) );
-			}
 		}
 
 		function loadError(event:IOErrorEvent):void {
+            Log.out( "PersistURL.loadError - guid: " + $pe.guid + $pe.table + "  from location: " + resolvedFilePath + "  event: " + event.toString(), Log.WARN );
 			var errorMsg:String = "PersistURL.loadError - event: " + event.toString() + "  filePath: " + _filePath;
-			//Log.out( errorMsg, Log.WARN );
 			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_FAILED, 0, $pe.table, $pe.guid, null, errorMsg, $pe.format, $pe.other ) );
 		}
 

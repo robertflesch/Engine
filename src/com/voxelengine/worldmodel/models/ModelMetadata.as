@@ -38,6 +38,7 @@ public class ModelMetadata extends PersistenceObject
 {
     static public const BIGDB_TABLE_MODEL_METADATA:String = "modelMetadata";
     static public const BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER:String = "owner";
+    static public const BIGDB_TABLE_MODEL_METADATA_INDEX_CREATOR:String = "creator";
 
 	private const DEFAULT_BOUND:int                       = 10;
 	private var _permissions:PermissionsModel;
@@ -169,7 +170,7 @@ public class ModelMetadata extends PersistenceObject
 	public function setGeneratedData( $name:String, $owner:String ): void {
 		dbo.name = $name;
 		dbo.description = $name + " - GENERATED";
-		dbo..owner = $owner;
+		dbo.owner = $owner;
 	}
 
 	override protected function assignNewDatabaseObject():void {
@@ -220,25 +221,27 @@ public class ModelMetadata extends PersistenceObject
 	}
 
 
-	public function cloneNew( $guid:String ):ModelMetadata {
+	override public function clone( $guid:String ):* {
         var oldObj:String = JSON.stringify( dbo );
 		var newData:Object = JSON.parse( oldObj );
+
         newData.owner = Network.userId;
 		newData.hashTags = this.hashTags + "#cloned";
         newData.name = this.name + " cloned";
         //newData.createdDate = new Date().toUTCString();
         var newModelMetadata:ModelMetadata = new ModelMetadata( $guid, null, newData );
+
+        if ( thumbnailLoaded ) {
+            var bmd:BitmapData = new BitmapData(128, 128, false);
+            bmd.setPixels(new Rectangle(0, 0, 128, 128), thumbnail.getPixels(new Rectangle(0, 0, 128, 128)));
+            newModelMetadata._thumbnail = bmd;
+            newModelMetadata.thumbnailLoaded = true;
+        }
+		else {
+            newModelMetadata.thumbnail = null;
+		}
+
         return newModelMetadata;
-	}
-
-	override public function clone( $newGuid:String ):* {
-		var oldName:String = dbo.name;
-		dbo.name = dbo.name + "_duplicate";
-		var oldObj:String = JSON.stringify( dbo );
-		dbo.name = oldName;
-
-		var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, BIGDB_TABLE_MODEL_METADATA, $newGuid, null, oldObj, URLLoaderDataFormat.TEXT, guid );
-		PersistenceEvent.dispatch( pe )
 	}
 }
 }

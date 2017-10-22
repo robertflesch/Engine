@@ -233,7 +233,7 @@ public class TypeInfo
 		function loadSucceed(e:PersistenceEvent):void {
 			if ( e.table == Globals.APP_EXT && e.guid == $fileName ) {
                 removePersistenceListeners();
-                Log.out("TypeInfo.load.loadSucceed: " + Globals.appPath + $fileName + Globals.APP_EXT, Log.INFO);
+                //Log.out("TypeInfo.load.loadSucceed: " + Globals.appPath + $fileName + Globals.APP_EXT, Log.INFO);
                 loadTypeDataFromJSON(e.data as String);
             }
 		}

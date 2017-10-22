@@ -87,7 +87,7 @@ import flash.events.EventDispatcher;
 			_provider = _factory.buildProvider( locale ) as AbstractProviderStrategy;
 			
 			var vo:ResourceBundleVO = _factory.buildBundleVO( locale, _baseUrl );
-			Log.out( "DefaultProviderManager.loadResourceBundle language definitions: " + Globals.appPath + vo.url , Log.WARN);
+			//Log.out( "DefaultProviderManager.loadResourceBundle language definitions: " + Globals.appPath + vo.url , Log.WARN);
 
             PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, loadSucceed );
             PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, loadFail );

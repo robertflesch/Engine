@@ -190,7 +190,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	}
 
 	override protected function oxelBuildComplete($ode:OxelDataEvent):void {
-		if ($ode.modelGuid == modelInfo.guid ) {
+		if ( modelInfo && $ode.modelGuid == modelInfo.guid ) {
 			Log.out( "ModelMakerBase.oxelBuildComplete  guid: " + modelInfo.guid, Log.WARN );
 			removeODEListeners();
 			// This has the additional wait for children
@@ -200,7 +200,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	}
 
 	override protected function oxelBuildFailed($ode:OxelDataEvent):void {
-		if ($ode.modelGuid == modelInfo.guid ) {
+		if ( modelInfo &&  $ode.modelGuid == modelInfo.guid ) {
 			removeODEListeners();
 			modelInfo.oxelPersistence = null;
 			_vm.dead = true;
@@ -240,6 +240,7 @@ public class ModelMakerImport extends ModelMakerBase {
 
 	private	function quadsComplete( $ode:OxelDataEvent ):void {
 		if ( _modelMetadata.guid == $ode.modelGuid || _originalGuid == $ode.modelGuid ) {
+            Log.out( "ModelMakerImport.quadsComplete - modelGuid: " + $ode.modelGuid, Log.ERROR );
 			//ModelMetadataEvent.create(ModelBaseEvent.CHANGED, 0, _vm.metadata.guid, _vm.metadata );
 
             if ( !ii.controllingModel ) {
@@ -267,8 +268,12 @@ public class ModelMakerImport extends ModelMakerBase {
             _modelMetadata.changed = true;
             _vm.save();
 
-            Log.out("ModelMakerImport.completeMake - needed info found: " + _modelMetadata.description );
-			super.markComplete(true);
+            Log.out("ModelMakerImport.quadsComplete - needed info found: " + _modelMetadata.description );
+            // The function Chunk.quadsBuildPartialComplete publishes these event in this order
+            // OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, _op);
+            // OxelDataEvent.create(OxelDataEvent.OXEL_BUILD_COMPLETE, 0, _guid, _op);
+			// So we dont want to do this until OXEL_BUILD_COMPLETE is complete
+			// super.markComplete(true);
 		}
 
 		function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {

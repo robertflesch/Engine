@@ -104,7 +104,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 			if ( _type && 0 == _name.length )
 				name = _name + TypeInfo.name( _type ) + "-" + _name;
 			else
-				name = _name;
+				name = TypeInfo.name( _type ) + _name;
 			// Bypass the setter so that we don't set it to changed
 			_modelMetadata.setGeneratedData( name, Network.userId );
 			attemptMake();

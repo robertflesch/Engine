@@ -121,10 +121,6 @@ public class PanelModels extends PanelBase
 		//Log.out( "PanelModels.populateModels - parentModel:" + $parentModel, Log.WARN )
 		_dictionarySource = $source;
 		_parentModel = $parentModel;
-        if ( VoxelModel.selectedModel )
-            _selectedText.text = VoxelModel.selectedModel.metadata.name;
-        else
-            _selectedText.text = "Nothing Selected";
 		if ( _listModels )
 			_listModels.removeAll();
 
@@ -150,6 +146,21 @@ public class PanelModels extends PanelBase
 			}
 		}
 		buttonsDisable();
+
+        if ( VoxelModel.selectedModel ) {
+            //_selectedText.text = VoxelModel.selectedModel.metadata.name;
+            var ig:String = VoxelModel.selectedModel.instanceInfo.instanceGuid;
+            //displayModelData( ig );
+            for ( var i:int = 0; i < _listModels.length; i++ ) {
+                var guids:Object = getItem( i );
+                if ( ig == guids.instanceGuid ) {
+                    _listModels.selectedIndex = i;
+                }
+            }
+        }
+        else
+            _selectedText.text = "Nothing Selected";
+
 		return countAdded;
 	}
 
@@ -231,8 +242,10 @@ public class PanelModels extends PanelBase
 		return currentY + BUTTON_DISTANCE;
 
 		function dupModel(event:UIMouseEvent):void  {
-			if ( VoxelModel.selectedModel )
-				new ModelMakerClone(  VoxelModel.selectedModel, false );
+			if ( VoxelModel.selectedModel ) {
+                var vm:VoxelModel = VoxelModel.selectedModel;
+				new ModelMakerClone( vm.instanceInfo, vm.modelInfo, vm.metadata, false);
+            }
 		}
 
 		function deleteModelHandler(event:UIMouseEvent):void  {
@@ -306,7 +319,7 @@ public class PanelModels extends PanelBase
 //	}
 
 	private function selectModel(event:ListEvent):void {
-			//Log.out("PanelModels.selectModel - AFTER Double");
+			//Log.out("PanelModels.selectModel");
 			if (event.target.data) {
 				var instanceGuid:String = event.target.data.instanceGuid;
 				Log.out("PanelModels.selectModel has TARGET DATA: " + event.target.data as String);

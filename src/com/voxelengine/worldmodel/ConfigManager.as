@@ -64,7 +64,7 @@ package com.voxelengine.worldmodel
 			PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, loadFail );
 			PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
 
-            Log.out( "ConfigManager requesting: " + Globals.appPath + CONFIG + Globals.APP_EXT, Log.INFO );
+            //Log.out( "ConfigManager requesting: " + Globals.appPath + CONFIG + Globals.APP_EXT, Log.INFO );
 			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, 0, Globals.APP_EXT, CONFIG, null, null ) );
 
             function loadSucceed(e:PersistenceEvent):void {
@@ -73,7 +73,7 @@ package com.voxelengine.worldmodel
                     PersistenceEvent.removeListener(PersistenceEvent.LOAD_FAILED, loadFail);
                     PersistenceEvent.removeListener(PersistenceEvent.LOAD_NOT_FOUND, loadFail);
 
-                    Log.out("ConfigManager.loadSucceed: " + Globals.appPath + CONFIG + Globals.APP_EXT, Log.INFO);
+                    //Log.out("ConfigManager.loadSucceed: " + Globals.appPath + CONFIG + Globals.APP_EXT, Log.INFO);
 
                     _defaultRegionJson = JSONUtil.parse(e.data, Globals.appPath + CONFIG + Globals.APP_EXT, "ConfigManager.loadSucceed");
                     if (null == _defaultRegionJson) {

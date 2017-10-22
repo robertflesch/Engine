@@ -1362,7 +1362,10 @@ import flash.display.DisplayObject;
 			if ( !si )
 				return;
 			if (index >= $objList.size) {
-				resetSelectableItem(si);
+                resetSelectableItem(si);
+            }
+            else if (dataCursor >= $objList.size) {
+                resetSelectableItem(si);
 			} else  {
 				var itemTemp:Object = $objList.get(dataCursor);
 				if ( itemTemp ) {

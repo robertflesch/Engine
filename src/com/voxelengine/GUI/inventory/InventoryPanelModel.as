@@ -10,6 +10,7 @@ package com.voxelengine.GUI.inventory {
 import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
+import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
 import flash.display.DisplayObject;
@@ -193,7 +194,7 @@ public class InventoryPanelModel extends VVContainer
 
 	private function addModelMetadataEvent($mme:ModelMetadataEvent):void {
 		// I only want the results from the series I asked for, or from models being added outside a series, like a generated or new model
-        Log.out( "IPM.addModelMetadataEvent series: " + $mme.series +  "guid: " + $mme.modelGuid );
+        Log.out( "IPM.addModelMetadataEvent series: " + $mme.series +  "  guid: " + $mme.modelGuid );
 		if ( _seriesModelMetadataEvent == $mme.series || 0 == $mme.series ) {
 			if ( "Player" == $mme.modelGuid)
 					return;
@@ -229,7 +230,7 @@ public class InventoryPanelModel extends VVContainer
 				}
 			} else {
 				if ( null != om.vmm.childOf && "" != om.vmm.childOf ) {
-					Log.out( "InventoryPanelModel.addModel - NOT added child model of: " + om.vmm.name, Log.INFO );
+					Log.out( "InventoryPanelModel.addModel - NOT adding child model of: " + om.vmm.name, Log.INFO );
 					return null;
 				}
 			}
@@ -266,8 +267,11 @@ public class InventoryPanelModel extends VVContainer
 			var ii:InstanceInfo = new InstanceInfo();
 			ii.modelGuid = om.modelGuid;
 			ii.instanceGuid = Globals.getUID();
-			if ( VoxelModel.selectedModel )
-				ii.controllingModel = VoxelModel.selectedModel;
+			if ( VoxelModel.selectedModel ) {
+                ii.controllingModel = VoxelModel.selectedModel;
+                if (!PopupMetadataAndModelInfo.inExistance)
+                    new ModelMakerClone( ii );
+            }
 			else {
 				// Only do this for top level models.
 				var size:int = Math.max( GrainCursor.get_the_g0_edge_for_grain(om.vmm.bound), 32 );
@@ -288,19 +292,10 @@ public class InventoryPanelModel extends VVContainer
                 viewVector = viewVector.add( VoxelModel.controlledModel.instanceInfo.positionGet );
                 viewVector.setTo( viewVector.x - size/2, viewVector.y - size/2, viewVector.z - size/2);
                 ii.positionSet = viewVector;
-				// was
-				/*
-				var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(size * 1.5);
-				lav.setTo( lav.x - size/2, lav.y - size/2, lav.z - size/2);
-				var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
-				diffPos = diffPos.add(lav);
-				ii.positionSet = diffPos;
-				*/
-
+                if ( !PopupMetadataAndModelInfo.inExistance )
+                    new ModelMaker( ii );
 			}
 
-			if ( !PopupMetadataAndModelInfo.inExistance )
-				new ModelMaker( ii );
 		}
 	}
 
@@ -440,7 +435,6 @@ public class InventoryPanelModel extends VVContainer
 				Log.out( "InventoryPanelModel.dropMaterial - slot: " + bcs.data + "  guid: " + om.modelGuid, Log.WARN );
 			}
 
-			
 			if ( e.dropTarget.target is QuickInventory ) {
 				if ( e.dropTarget is BoxInventory ) {
 					var bi:BoxInventory = e.dropTarget as BoxInventory;

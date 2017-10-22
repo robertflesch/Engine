@@ -367,7 +367,10 @@ public class ModelInfo extends PersistenceObject
 			//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
 			_childCount++;
 			//Log.out( "VoxelModel.childrenLoad - calling load on ii: " + ii + "  childCount: " + _childCount );
-			new ModelMaker( ii, true, false );
+            if ( ModelMakerImport.isImporting )
+                new ModelMakerImport( ii, false );
+			else
+				new ModelMaker( ii, true, false );
 		}
 		//Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
 		//Log.out( "VoxelModel.childrenLoad - loading child models END" );
@@ -672,7 +675,7 @@ public class ModelInfo extends PersistenceObject
 	//  end persistence functions
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public function cloneNew( $guid:String ):ModelInfo {
+	override public function clone( $guid:String ):* {
 		var newModelInfo:ModelInfo = new ModelInfo( $guid, null, dbo );
 		for each ( var ani:Animation in _animations ) {
 			var newAni:Animation = ani.clone( guid );

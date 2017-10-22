@@ -371,20 +371,11 @@ public class VoxelVerseGUI extends EventDispatcher
                 WindowInventoryNew.toggle( startingTab, title );
 			}
 
-			if ( Keyboard.N == e.keyCode && false == Globals.g_textInput )
+			if ( Keyboard.M == e.keyCode && false == Globals.g_textInput )
 				WindowRegionModels.toggle();
-				//new WindowVideoTest(); Wait for hummingbird
 
-			//if ( Keyboard.O == e.keyCode )
-			//{
-				//Globals.TestCheckForFlow();
-				////Renderer.renderer.context3D.dispose();
-			//}
-			
 			if ( Keyboard.L == e.keyCode )
-			{
 				Globals.muted = !Globals.muted;
-			}
 		}
 		// this is required for windows that have text fields. 
 		// but if I have crafting up, then I need to have inventory up too.
@@ -401,25 +392,10 @@ public class VoxelVerseGUI extends EventDispatcher
 			if ( Keyboard.F == e.keyCode )
 				createProjectile( VoxelModel.controlledModel );
 				
-			//if ( Keyboard.O == e.keyCode )
-			//{
-				//_bulletSize++;
-				//if ( _bulletSize > 5 )
-					//_bulletSize = 5;
-				//Log.out( "VVGui.onKeyPressed - increased bullet size to: " + _bulletSize );
-			//}
-			//if ( Keyboard.P == e.keyCode )
-			//{
-				//_bulletSize--;
-				//if ( _bulletSize < 1 )
-					//_bulletSize = 1;
-				//Log.out( "VVGui.onKeyPressed - decreased bullet size to: " + _bulletSize );
-			//}
-				
 			if ( Keyboard.P == e.keyCode )
 				new WindowSandboxList();
 				
-			if ( Keyboard.M == e.keyCode )
+			if ( Keyboard.N == e.keyCode )
 				if ( VoxelModel.selectedModel )
 					new WindowModelDetail( VoxelModel.selectedModel );
 				
@@ -428,20 +404,18 @@ public class VoxelVerseGUI extends EventDispatcher
 //				new WindowInventory();
 				new WindowCharacter();
 			}
-/*
-			// allows for saving of ivm to disk
-			if ( Globals.isDebug ) {
-				if (Keyboard.O == e.keyCode) {
-					// save current oxelData
-					const _fileRef:FileReference = new FileReference();
-					if (VoxelModel.selectedModel) {
-						var ba:ByteArray = OxelPersistence.toByteArray(VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel);
-						var fileName:String = VoxelModel.selectedModel.metadata.name + "_NEW" + ".ivm";
-						_fileRef.save(ba, fileName);
-					}
-				}
-			}
- */
+//			// allows for saving of ivm to disk
+//			if ( Globals.isDebug ) {
+//				if (Keyboard.O == e.keyCode) {
+//					// save current oxelData
+//					const _fileRef:FileReference = new FileReference();
+//					if (VoxelModel.selectedModel) {
+//						var ba:ByteArray = OxelPersistence.toByteArray(VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel);
+//						var fileName:String = VoxelModel.selectedModel.metadata.name + "_NEW" + ".ivm";
+//						_fileRef.save(ba, fileName);
+//					}
+//				}
+//			}
 		}
 	}
 	

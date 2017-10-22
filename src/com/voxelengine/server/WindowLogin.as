@@ -48,7 +48,7 @@ public class WindowLogin extends VVPopup
 
 	public function WindowLogin( $email:String, $password:String )
 	{
-        Log.out("WindowLogin.create", Log.WARN );
+        //Log.out("WindowLogin.create", Log.WARN );
 		var windowHeight:int = Globals.isDebug ? 366 : 336;
         super("Login ", 309, windowHeight);
 		tabEnabled = true;

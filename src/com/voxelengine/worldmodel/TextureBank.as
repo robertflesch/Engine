@@ -161,6 +161,7 @@ public class TextureBank
         loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
         //Log.out( "TextureBank.loadTexture - loading: " + Globals.appPath + textureNameAndPath );
 
+        // TODO this seems like a duplicate of whats in PersistURL, but I don't want to fix right now RSF 10.22.2017
         if ( "/" == Globals.appPath ) {
             var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
             var resolvedFilePath:String = fs.getUrl(Globals.appPath + textureNameAndPath);
@@ -181,11 +182,11 @@ public class TextureBank
 	public function onTextureLoadComplete (event:Event):void {
 		var textureBitmap:Bitmap = Bitmap(LoaderInfo(event.target).content);// .bitmapData;
 		var fileNameAndPath:String = event.target.url;
-		Log.out( "TextureBank.onTextureLoadComplete: " + fileNameAndPath );
+		//Log.out( "TextureBank.onTextureLoadComplete: " + fileNameAndPath );
 
 		var tex:Texture = uploadTexture( _tempContext, textureBitmap );
 		var textureNameAndPath:String = removeGlobalAppPath(fileNameAndPath);
-		Log.out( "TextureBank.onTextureLoadComplete: " + textureNameAndPath );
+		//Log.out( "TextureBank.onTextureLoadComplete: " + textureNameAndPath );
 
 		_bitmap[textureNameAndPath] = textureBitmap;
 		_textures[textureNameAndPath] = tex;

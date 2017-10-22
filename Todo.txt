@@ -1,4 +1,4 @@
-5075AE29-86EE-9A95-AC60-B2B5F1892C13
+
 
 VoxelVerse todo
 
@@ -29,6 +29,12 @@ When deleting a model that has inventory, make sure to delete its inventory.
 
 ! 12.1.16 need to add clipVelocity and speedMultiplier to rest of the animations, and to the setState, so that they are not hard coded.
 ! 12.4.16 static lighting on head of dragon
+
+SETUP NOTES
+I had to modified the 
+C:\Windows\SysWOW64\Macromed\Flash\FlashPlayerTrust\tw_encyclopedia_trust.cfg
+to which I added E:\dev\VoxelVerse\
+this allowed me to import assets
 
 For voice
 https://wiki.mumble.info/wiki/Main_Page

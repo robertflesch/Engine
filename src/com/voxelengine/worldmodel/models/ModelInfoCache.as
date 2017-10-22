@@ -206,7 +206,7 @@ public class ModelInfoCache
 			var newObjData:Object = JSONUtil.parse( fileData, $pe.guid + $pe.table, "ModelInfoCache.loadSucceed" );
 			if ( null == newObjData ) {
 				Log.out( "ModelInfoCache.loadSucceed - error parsing modelInfo on import. guid: " + $pe.guid, Log.ERROR );
-				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
+				ModelInfoEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null );
 				return;
 			}
             if ( newObjData.model ) {
@@ -221,7 +221,7 @@ public class ModelInfoCache
 			if ( _block.has( $pe.guid ) )
 				_block.clear( $pe.guid )
 		} else {
-			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
+			ModelInfoEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null );
 		}
 	}
 
@@ -231,7 +231,7 @@ public class ModelInfoCache
 		Log.out( "ModelInfoCache.loadFailed PersistenceEvent: " + $pe.toString(), Log.WARN );
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid );
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
+		ModelInfoEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 	}
 	
 	static private function loadNotFound( $pe:PersistenceEvent):void {
@@ -240,7 +240,7 @@ public class ModelInfoCache
 		Log.out( "ModelInfoCache.loadNotFound PersistenceEvent: " + $pe.toString(), Log.WARN );
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid );
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
+		ModelInfoEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////

@@ -42,7 +42,7 @@ public class CanvasReleaseMenu extends VVCanvas
 		layout.orientation = LayoutOrientation.VERTICAL;
 		layout.horizontalAlignment = LayoutHorizontalAlignment.RIGHT;
 
-		var name:Label = new Label( "VoxelVerse 2017.09.12 - 11:28 AM" );
+		var name:Label = new Label( "VoxelVerse 2017.09.29 - 11:28 AM" );
 		name.fontSize = 14;
 		name.fontColor = 0xffffff;
 		addElement( name );

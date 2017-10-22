@@ -41,7 +41,7 @@ public class PropListIcon extends VVCanvas
 		eventCollector.addEvent( _outline, UIMouseEvent.PRESS, pressShape );
 		addElement( _outline );
 		var it:UITextField = new UITextField();
-		it.text = "Propeller List (N)";
+		it.text = "Model List (M)";
 		it.x = 24;
 		it.y = 48;
 		it.textColor = 0xFFFFFF;

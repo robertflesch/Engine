@@ -8,6 +8,11 @@
 package com.voxelengine.worldmodel.models.makers
 {
 
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.ModelInfo;
+import com.voxelengine.worldmodel.models.ModelMetadata;
+
 import flash.display.BitmapData;
 import flash.geom.Matrix;
 
@@ -29,29 +34,65 @@ import com.voxelengine.worldmodel.oxel.GrainCursor;
 public class ModelMakerClone extends ModelMakerBase {
 
     private var _waitForChildren:Boolean;
-	public function ModelMakerClone( $vm:VoxelModel, $killOldModel:Boolean = true ) {
-		super($vm.instanceInfo.clone());
-		Log.out("ModelMakerClone - clone model with instanceGuid: " + $vm.instanceInfo.instanceGuid + "  modelGuid: " + $vm.instanceInfo.modelGuid);
-		ii.modelGuid = Globals.getUID();
+    private var _newModelGuid:String;
+    public function ModelMakerClone( $instanceInfo:InstanceInfo, $modelInfo:ModelInfo = null, $modelMetadata:ModelMetadata = null, $killOldModel:Boolean = true ) {
+		super($instanceInfo.clone());
+		Log.out("ModelMakerClone - clone model with instanceGuid: " + $instanceInfo.instanceGuid + "  modelGuid: " + $instanceInfo.modelGuid);
+        _newModelGuid = Globals.getUID();
 		Log.out("ModelMakerClone - clone model with NEW instanceGuid: " + ii.instanceGuid + "  NEW modelGuid: " + ii.modelGuid);
 		if ($killOldModel) {
-			$vm.dead = true;
+            var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( ii.instanceGuid );
+			if ( vm )
+                vm.dead = true;
 		} else {
 			// Only do this for top level models.
-			if ( null == $vm.instanceInfo.controllingModel ) {
-				var size:int = GrainCursor.two_to_the_g( $vm.modelInfo.oxelPersistence.oxel.gc.grain );
+			if ( null == $instanceInfo.controllingModel ) {
+				var size:int = GrainCursor.two_to_the_g( $modelInfo.oxelPersistence.oxel.gc.grain );
 				var v:Vector3D = ii.positionGet.clone();
 				ii.positionSetComp(v.x + size / 4, v.y + size / 4, v.z + size / 4);
 			}
 		}
 
-		// This gives me two new objects that have not been saved.
-		_modelMetadata = $vm.metadata.cloneNew( ii.modelGuid );
-		_modelInfo = $vm.modelInfo.cloneNew( ii.modelGuid );
-		attemptMakeRetrieveParentModelInfo();
+        if ( $modelMetadata )
+            _modelMetadata = $modelMetadata.clone( _newModelGuid );
+        if ( $modelInfo ) {
+            _modelInfo = $modelInfo.clone( _newModelGuid );
+            if ( $modelMetadata ){
+                _modelMetadata = $modelMetadata.clone( _newModelGuid );
+                attemptMakeRetrieveParentModelInfo();
+            } else {
+                addMetadataListeners();
+                ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null );
+            }
+        } else {
+            requestModelInfo();
+        }
 	}
 
+    override protected function retrievedModelInfo($mie:ModelInfoEvent):void  {
+        if ( ii.modelGuid == $mie.modelGuid ) {
+            removeMIEListeners();
+            _modelInfo = $mie.vmi.clone( _newModelGuid );
+            if ( _modelMetadata ){
+                attemptMakeRetrieveParentModelInfo();
+            } else {
+                addMetadataListeners();
+                ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null );
+            }
+        }
+    }
+
+    override protected function retrievedMetadata( $mme:ModelMetadataEvent):void {
+        if ( ii.modelGuid == $mme.modelGuid ) {
+            removeMetadataListeners();
+            _modelMetadata = $mme.modelMetadata.clone( ii.modelGuid );
+            //Log.out( "ModelMakerBase.retrievedMetadata - metadata: " + _modelMetadata.toString() )
+            attemptMakeRetrieveParentModelInfo();
+        }
+    }
+
 	private function attemptMakeRetrieveParentModelInfo():void {
+        ii.modelGuid = _newModelGuid;
 		if ( parentModelGuid )
 			retrieveParentModelInfo();
 		else
