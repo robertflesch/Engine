@@ -11,6 +11,7 @@ package com.voxelengine.worldmodel.models.types
 
 import com.voxelengine.events.VVKeyboardEvent;
 import com.voxelengine.events.VVMouseEvent;
+import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.ModelPlacementType;
 
 import flash.display3D.Context3D;
@@ -920,6 +921,7 @@ public class EditCursor extends VoxelModel
 					t.x += dx;
 				}
 				VoxelModel.selectedModel.instanceInfo.positionSetComp( int(t.x), int(t.y), int(t.z) );
+				Region.currentRegion.changed = true;
 			}
 		}
 	}
