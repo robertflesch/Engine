@@ -39,13 +39,24 @@ public class PlayerInfoCache
     //  PlayerInfoEvents
     /////////////////////////////////////////////////////////////////////////////////////////////
     static public function saveHandler( $pie:PlayerInfoEvent ):void {
-//        PlayerInfoEvent.create( ModelBaseEvent.DELETE, $pie.guid, $pie.playerInfo );
-//        var pi:PlayerInfo = $pie.playerInfo;
-//        pi.save();
+        PersistenceEvent.addListener( PersistenceEvent.DELETE_SUCCEED, deleteSucceed );
+        PersistenceEvent.addListener( PersistenceEvent.DELETE_FAILED, deleteFailed );
+        PlayerInfoEvent.create( ModelBaseEvent.DELETE, $pie.guid, $pie.playerInfo );
+
+        function deleteSucceed( $pe:PersistenceEvent ):void {
+            PersistenceEvent.removeListener(PersistenceEvent.DELETE_SUCCEED, deleteSucceed);
+            var pi:PlayerInfo = $pie.playerInfo;
+            pi.save();
+        }
+        function deleteFailed( $pe:PersistenceEvent ):void {
+            PersistenceEvent.removeListener(PersistenceEvent.DELETE_SUCCEED, deleteSucceed);
+            var pi:PlayerInfo = $pie.playerInfo;
+            pi.save();
+        }
     }
 
     static public function deleteHandler( $pie:PlayerInfoEvent ):void {
-        PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, 1, BIGDB_TABLE_PLAYEROBJECTS, $pie.playerInfo.creator, null, BIGDB_TABLE_PLAYEROBJECTS_CREATOR ) );
+        PersistenceEvent.create( PersistenceEvent.DELETE_REQUEST, 0, BIGDB_TABLE_PLAYEROBJECTS, $pie.guid );
     }
 
     static private function request( $pie:PlayerInfoEvent ):void {
