@@ -134,7 +134,7 @@ public class ModelMakerImport extends ModelMakerBase {
 		}
 
 		function parentModelInfoResultFailed($mie:ModelInfoEvent):void {
-			Log.out("ModelMakerImport.parentModelInfoResultFailed: " + ii.toString(), Log.ERROR);
+			Log.out("ModelMakerImport.parentModelInfoResultFailed: " + ii.toString(), Log.WARN );
 			if ( $mie.modelGuid == modelInfo.guid ) {
 				removeParentModelInfoListener();
 				markComplete( false );
@@ -167,7 +167,8 @@ public class ModelMakerImport extends ModelMakerBase {
 
 				if ( false == modelInfo.childrenLoaded ) { // its true if they are loaded or the model has no children.
 					waitForChildren = true;
-					ModelLoadingEvent.addListener(ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady);
+                    Log.out( "ModelMakerImport.completeMake - adding listener for CHILD_LOADING_COMPLETE description: " + _modelMetadata.description, Log.WARN );
+					ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady);
 				}
 
 				if ( modelInfo && modelInfo.biomes && modelInfo.biomes.layers[0] && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" )
@@ -180,11 +181,13 @@ public class ModelMakerImport extends ModelMakerBase {
 			Log.out( "ModelMakerImport.completeMake ERROR - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
 
 		function childrenAllReady( $ode:ModelLoadingEvent):void {
-			if ( modelInfo.guid == $ode.data.modelGuid ) {
-				Log.out( "ModelMakerImport.allChildrenReady - modelMetadata.description: " + _modelMetadata.description, Log.WARN );
+			if ( modelInfo.guid == $ode.data.parentModelGuid ) {
+                waitForChildren = false;
+				Log.out( "ModelMakerImport.allChildrenReady - modelInfo.guid: " + modelInfo.guid + "  modelMetadata.description: " + _modelMetadata.description, Log.WARN );
 				ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
-				markComplete( true );
-			}
+				// If the oxel loads before the children are ready this doesn't work.
+                markComplete( true );
+            }
 		}
 
 	}
@@ -196,6 +199,8 @@ public class ModelMakerImport extends ModelMakerBase {
 			// This has the additional wait for children
 			if ( !waitForChildren )
 				markComplete( true );
+			else
+				Log.out( "ModelMakerBase.oxelBuildComplete  WAITING ON CHILDREN  guid: " + modelInfo.guid, Log.WARN );
 		}
 	}
 
@@ -204,25 +209,16 @@ public class ModelMakerImport extends ModelMakerBase {
 			removeODEListeners();
 			modelInfo.oxelPersistence = null;
 			_vm.dead = true;
-			if ( waitForChildren ) {
-				Log.out("ModelMakerImport - ERROR LOADING OXEL", Log.WARN);
-				// TODO cancel children loading???
-			}
+			Log.out("ModelMakerImport - ERROR LOADING OXEL - how do I handle children?", Log.WARN);
+			// TODO cancel children loading???
 			markComplete( false );
 		}
 	}
 
-	override protected function markComplete( $success:Boolean ):void {
+        override protected function markComplete( $success:Boolean ):void {
 		if ( true == $success ) {
-			if ( !Globals.isGuid( _modelMetadata.guid ) )
-				_modelMetadata.guid = Globals.getUID();
-
-			modelInfo.guid = _modelMetadata.guid;
-			ii.modelGuid 	= _modelMetadata.guid;
-
-			modelInfo.brandChildren();
-
-			OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE,  quadsComplete );
+			if ( !waitForChildren )
+				importComplete();
 
 		} else {
 			if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" )
@@ -238,43 +234,48 @@ public class ModelMakerImport extends ModelMakerBase {
 		}
 	}
 
-	private	function quadsComplete( $ode:OxelDataEvent ):void {
-		if ( _modelMetadata.guid == $ode.modelGuid || _originalGuid == $ode.modelGuid ) {
-            Log.out( "ModelMakerImport.quadsComplete - modelGuid: " + $ode.modelGuid, Log.ERROR );
-			//ModelMetadataEvent.create(ModelBaseEvent.CHANGED, 0, _vm.metadata.guid, _vm.metadata );
+	private function importComplete():void {
+		if ( !Globals.isGuid( _modelMetadata.guid ) ) {
+			var newGuid:String = Globals.getUID();
+			Log.out( "ModelMakerImport.markComplete setting guids to " + newGuid );
 
-            if ( !ii.controllingModel ) {
-                // Only do this for top level models.
-                var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 16)/2;
-                // this gives me corner.
-                var msCamPos:Vector3D = VoxelModel.controlledModel.cameraContainer.current.position;
-                var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld( msCamPos );
-
-                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector( new Vector3D( -(radius + 8), adjCameraPos.y-radius, -radius * 3 ) );
-                var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet();
-                diffPos = diffPos.add(lav);
-                _vm.instanceInfo.positionSet = diffPos;
-            }
-
-            OxelDataEvent.removeListener(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, quadsComplete);
-            var bmpd:BitmapData = Renderer.renderer.modelShot( _vm );
-            _vm.metadata.thumbnail = drawScaled(bmpd, 128, 128);
-
-            ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
-            ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
-            _vm.complete = true;
-
-            modelInfo.changed = true;
-            _modelMetadata.changed = true;
-            _vm.save();
-
-            Log.out("ModelMakerImport.quadsComplete - needed info found: " + _modelMetadata.description );
-            // The function Chunk.quadsBuildPartialComplete publishes these event in this order
-            // OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, _op);
-            // OxelDataEvent.create(OxelDataEvent.OXEL_BUILD_COMPLETE, 0, _guid, _op);
-			// So we dont want to do this until OXEL_BUILD_COMPLETE is complete
-			// super.markComplete(true);
+			_modelMetadata.guid = newGuid;
+			modelInfo.guid 		= newGuid;
+			ii.modelGuid 		= newGuid;
 		}
+
+		modelInfo.brandChildren();
+
+		if ( !ii.controllingModel ) {
+			// Only do this for top level models.
+			var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 16)/2;
+			// this gives me corner.
+			var msCamPos:Vector3D = VoxelModel.controlledModel.cameraContainer.current.position;
+			var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld( msCamPos );
+
+			var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector( new Vector3D( -(radius + 8), adjCameraPos.y-radius, -radius * 3 ) );
+			var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet();
+			diffPos = diffPos.add(lav);
+			_vm.instanceInfo.positionSet = diffPos;
+		}
+
+		var bmpd:BitmapData = Renderer.renderer.modelShot( _vm );
+		_vm.metadata.thumbnail = drawScaled(bmpd, 128, 128);
+
+		ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
+		ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
+		_vm.complete = true;
+
+		modelInfo.changed = true;
+		_modelMetadata.changed = true;
+		_vm.save();
+
+		Log.out("ModelMakerImport.quadsComplete - needed info found: " + _modelMetadata.description );
+		// The function Chunk.quadsBuildPartialComplete publishes these event in this order
+		// OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, _op);
+		// OxelDataEvent.create(OxelDataEvent.OXEL_BUILD_COMPLETE, 0, _guid, _op);
+		// So we dont want to do this until OXEL_BUILD_COMPLETE is complete
+		// super.markComplete(true);
 
 		function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
 			var m:Matrix = new Matrix();
