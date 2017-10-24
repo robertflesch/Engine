@@ -42,7 +42,7 @@ public class ModelMaker extends ModelMakerBase {
 	
 	override protected function retrievedModelInfo($mie:ModelInfoEvent):void  {
 		if (ii.modelGuid == $mie.modelGuid ) {
-			//Log.out( "ModelMakerBase.retrievedModelInfo - ii: " + _ii.toString(), Log.DEBUG )
+			//Log.out( "ModelMaker.retrievedModelInfo - ii: " + ii.toString() + "  modelInfo: " + $mie.vmi );
 			removeMIEListeners();
 			_modelInfo = $mie.vmi;
 			addMetadataListeners();
@@ -56,7 +56,6 @@ public class ModelMaker extends ModelMakerBase {
 	override protected function attemptMake():void {
 		if ( null != _modelMetadata && null != modelInfo ) {
 			//Log.out( "ModelMaker.attemptMake - ii: " + ii.toString() )
-
 			_vm = make();
 			if ( _vm ) {
 				addODEListeners();

@@ -194,7 +194,7 @@ public class InventoryPanelModel extends VVContainer
 
 	private function addModelMetadataEvent($mme:ModelMetadataEvent):void {
 		// I only want the results from the series I asked for, or from models being added outside a series, like a generated or new model
-        Log.out( "IPM.addModelMetadataEvent series: " + $mme.series +  "  guid: " + $mme.modelGuid );
+        //Log.out( "IPM.addModelMetadataEvent series: " + $mme.series +  "  guid: " + $mme.modelGuid );
 		if ( _seriesModelMetadataEvent == $mme.series || 0 == $mme.series ) {
 			if ( "Player" == $mme.modelGuid)
 					return;
@@ -230,7 +230,7 @@ public class InventoryPanelModel extends VVContainer
 				}
 			} else {
 				if ( null != om.vmm.childOf && "" != om.vmm.childOf ) {
-					Log.out( "InventoryPanelModel.addModel - NOT adding child model of: " + om.vmm.name, Log.INFO );
+					//Log.out( "InventoryPanelModel.addModel - NOT adding child model of: " + om.vmm.name, Log.INFO );
 					return null;
 				}
 			}
