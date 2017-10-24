@@ -105,6 +105,10 @@ public class ModelMakerBase {
 		if ( _ii && _ii.modelGuid == $mie.modelGuid ) {
 			Log.out( "ModelMakerBase.failedData - ii: " + _ii.toString(), Log.WARN );
 			removeMIEListeners();
+			if ( ii.controllingModel ) {
+				// Tell the parent one of the children failed to load
+                ii.controllingModel.modelInfo.onChildAddFailure( $mie.modelGuid );
+			}
 			markComplete( false );
 		}
 	}
@@ -216,7 +220,6 @@ public class ModelMakerBase {
 		//}
 	}
 
-	// This last step is needed for model which have children.
 	protected function oxelBuildComplete($ode:OxelDataEvent):void {
 		if ($ode.modelGuid == modelInfo.guid ) {
             //Log.out("ModelMakerBase.oxelBuildComplete  type: " + $ode.type + "  guid: " + modelInfo.guid, Log.WARN);
@@ -257,20 +260,34 @@ public class ModelMakerBase {
 	}
 
 	public function makerCountGet():int { return _makerCount }
-	public function makerCountIncrement():void {
-		if ( 0 == makerCountGet() && !( _vm is Avatar ) )
-			LoadingImageEvent.create( LoadingImageEvent.CREATE );
-		if (!( _vm is Avatar ))
-			_makerCount++;
-	}
-	public function makerCountDecrement():void {
-        if (!( _vm is Avatar ))
-			_makerCount-- ;
-		if ( 0 == makerCountGet() ) {
-			LoadingImageEvent.create( LoadingImageEvent.DESTROY );
-			if ( !Region.currentRegion.loaded )
-				RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
-		}
-	}
+    public function makerCountIncrement():void {
+        _makerCount++;
+        if ( 0 == makerCountGet() ) {
+            LoadingImageEvent.create(LoadingImageEvent.CREATE);
+        }
+    }
+    public function makerCountDecrement():void {
+        _makerCount-- ;
+        if ( 0 == makerCountGet() ) {
+            LoadingImageEvent.create( LoadingImageEvent.DESTROY );
+            if ( !Region.currentRegion.loaded )
+                RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
+        }
+    }
+//	public function makerCountIncrement():void {
+//		if ( 0 == makerCountGet() && !( _vm is Avatar ) )
+//			LoadingImageEvent.create( LoadingImageEvent.CREATE );
+//		if (!( _vm is Avatar ))
+//			_makerCount++;
+//	}
+//	public function makerCountDecrement():void {
+//        if (!( _vm is Avatar ))
+//			_makerCount-- ;
+//		if ( 0 == makerCountGet() ) {
+//			LoadingImageEvent.create( LoadingImageEvent.DESTROY );
+//			if ( !Region.currentRegion.loaded )
+//				RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
+//		}
+//	}
 }
 }

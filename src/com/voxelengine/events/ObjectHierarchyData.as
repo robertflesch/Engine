@@ -40,6 +40,12 @@ public class ObjectHierarchyData {
     }
 
     public function fromModel( $vm:VoxelModel ):void {
+        if ( null == $vm ) {
+            _modelGuid = "";
+            _instanceGuid = "";
+            return;
+        }
+
         _modelGuid = $vm.instanceInfo.modelGuid;
         _instanceGuid = $vm.instanceInfo.instanceGuid;
         if ( $vm.instanceInfo.controllingModel ) {
@@ -47,6 +53,22 @@ public class ObjectHierarchyData {
             _parentInstanceGuid = $vm.instanceInfo.controllingModel.instanceInfo.instanceGuid;
 
             var tmvm:VoxelModel = $vm.instanceInfo.controllingModel.topmostControllingModel();
+            if ( tmvm ) {
+                _rootModelGuid = tmvm.instanceInfo.modelGuid;
+                _rootInstanceGuid = tmvm.instanceInfo.instanceGuid;
+            }
+        }
+    }
+
+    public function fromNullChildModel( $vmParent:VoxelModel, $guidFailedChild:String ):void {
+
+        _modelGuid = $guidFailedChild;
+        _instanceGuid = "";
+        if ( $vmParent ) {
+            _parentModelGuid = $vmParent.instanceInfo.modelGuid;
+            _parentInstanceGuid = $vmParent.instanceInfo.instanceGuid;
+
+            var tmvm:VoxelModel = $vmParent.topmostControllingModel();
             if ( tmvm ) {
                 _rootModelGuid = tmvm.instanceInfo.modelGuid;
                 _rootInstanceGuid = tmvm.instanceInfo.instanceGuid;
