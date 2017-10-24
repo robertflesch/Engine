@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models
 {
 
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
+import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 import com.voxelengine.worldmodel.oxel.OxelBad;
 
 import flash.display3D.Context3D;
@@ -130,7 +131,8 @@ public class ModelInfo extends PersistenceObject
 		return obj;
 	}
 
-	override public function set guid($newGuid:String):void { 
+	override public function set guid( $newGuid:String ):void {
+		Log.out( "ModelInfo.guid  oldGuid: " + super.guid + " new Guid: " + $newGuid );
 		var oldGuid:String = super.guid;
 		super.guid = $newGuid;
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null ) );
@@ -138,7 +140,9 @@ public class ModelInfo extends PersistenceObject
 			oxelPersistence.guid = $newGuid;
 			OxelDataEvent.create( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null );
 		}
-		changed = true;
+        changed = true;
+		if ( null != _owner.instanceInfo.controllingModel )
+            _owner.instanceInfo.controllingModel.modelInfo.changed = true;
 	}
 
 	public function update( $context:Context3D, $elapsedTimeMS:int ):void {
@@ -378,19 +382,34 @@ public class ModelInfo extends PersistenceObject
 			delete dbo.children;
 	}
 
-	protected function onChildAdded( me:ModelEvent ):void {
-		if ( me.vm && me.vm.instanceInfo.controllingModel && me.vm.instanceInfo.controllingModel.modelInfo.guid == guid ) {
+    protected function onChildAdded( $me:ModelEvent ):void {
+		if ( $me.vm && $me.vm.instanceInfo.controllingModel && $me.vm.instanceInfo.controllingModel.modelInfo.guid == guid ) {
 			_childCount--;
-			//Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children remaining: " + _childCount, Log.WARN );
-			if (0 == _childCount) {
-				//Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children COMPLETE", Log.WARN );
-				ModelEvent.removeListener(ModelEvent.CHILD_MODEL_ADDED, onChildAdded);
-				childrenLoaded = true;
-				var ohd:ObjectHierarchyData = new ObjectHierarchyData();
-				ohd.fromModel( me.vm );
-				ModelLoadingEvent.create( ModelLoadingEvent.CHILD_LOADING_COMPLETE, ohd, me.vm );
-			}
+//			Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children remaining: " + _childCount, Log.WARN );
+            checkChildCountForZero( $me.vm, $me.vm.modelInfo.guid );
 		}
+	}
+
+    public function onChildAddFailure( $childGuid:String ):void {
+        	Log.out( "ModelInfo.onChildAddFailure - this model: " + guid + "  childModel.modelGuid: " + $childGuid );
+            _childCount--;
+            checkChildCountForZero( null, $childGuid );
+    }
+
+	private function checkChildCountForZero( $vm:VoxelModel, $childModelGuid:String ):void {
+        if (0 == _childCount) {
+//			Log.out( "ModelInfo.checkChildCountForZero - modelInfo: " + guid + "  children COMPLETE", Log.WARN );
+            ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded);
+            childrenLoaded = true;
+            var ohd:ObjectHierarchyData = new ObjectHierarchyData();
+			// If the child load failed
+            if ( null == $vm )
+                ohd.fromNullChildModel( _owner, $childModelGuid );
+			else
+                ohd.fromModel( $vm );
+
+            ModelLoadingEvent.create( ModelLoadingEvent.CHILD_LOADING_COMPLETE, ohd, $vm );
+        }
 	}
 
 	public function brandChildren():void {
