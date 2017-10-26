@@ -228,7 +228,7 @@ public class ModelMetadata extends PersistenceObject
 
         newData.owner = Network.userId;
 		newData.hashTags = this.hashTags + "#cloned";
-        newData.name = this.name + " cloned";
+        newData.name = this.name;
         //newData.createdDate = new Date().toUTCString();
         var newModelMetadata:ModelMetadata = new ModelMetadata( $guid, null, newData );
 
