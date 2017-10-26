@@ -141,6 +141,7 @@ public class InstanceInfo extends Location	{
 		var obj:Object = toObject();
 		ii.fromObject( obj );
 		ii.instanceGuid = Globals.getUID();
+		ii.controllingModel = controllingModel;
 		return ii;
 	}
 	
