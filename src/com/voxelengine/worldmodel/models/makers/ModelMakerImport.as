@@ -41,27 +41,30 @@ import com.voxelengine.worldmodel.oxel.GrainCursor;
 public class ModelMakerImport extends ModelMakerBase {
 	
 	private var _prompt:Boolean;
-    private var _originalGuid:String;
 
 	public function ModelMakerImport( $ii:InstanceInfo, $prompt:Boolean = true ) {
 		// This should never happen in a release version, so dont worry about setting it to false when done
 		state = IMPORTING;
 		_prompt = $prompt;
 		super( $ii );
-        _originalGuid = ii.modelGuid;
 		Log.out( "ModelMakerImport - ii: " + ii.toString(), Log.DEBUG );
+		// First request the modelInfo
 		requestModelInfo();
 	}
 
+	// override default since this version uses the file system
 	override protected function requestModelInfo():void {
+		// use default handler in base to go to next step
+		// which is to attempt to build make the model.
 		addMIEListeners();
-		// Since this is the import, it uses the local file system rather then persistance
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null, ModelBaseEvent.USE_FILE_SYSTEM ) );
+		// Since this is the import, it uses the local file system rather then persistence
+		ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null, ModelBaseEvent.USE_FILE_SYSTEM );
 	}
 	
 	// next get or generate the metadata
 	override protected function attemptMake():void {
 		//Log.out( "ModelMakerImport - attemptMake: " + ii.toString() );
+        // for imports we have no metadata, so we go ahead and either generate it, or prompt the user for it.
 		if ( null != modelInfo && null == _modelMetadata ) {
 			// The new guid is generated in the Window or in the hidden metadata creation
 			if ( _prompt ) {
@@ -77,14 +80,15 @@ public class ModelMakerImport extends ModelMakerBase {
 				attemptMakeRetrieveParentModelInfo(); }
 		}
 		else if ( null == modelInfo && null == _modelMetadata )
-			Log.out( "ModelMakerImport - attemptMake: null == modelInfo && null == _modelMetadata " + ii.toString() );
+			Log.out( "ModelMakerImport - attemptMake: null == modelInfo && null == _modelMetadata " + ii.toString(), Log.ERROR );
 		else if ( null == modelInfo )
-			Log.out( "ModelMakerImport - attemptMake: null == modelInfo " + ii.toString() );
+			Log.out( "ModelMakerImport - attemptMake: null == modelInfo " + ii.toString(), Log.ERROR );
 		else
 			Log.out( "ModelMakerImport - attemptMake: INVALID CONDITION" + ii.toString(), Log.ERROR );
 
 	}
 	
+	// The metadata has been collected in the UI
 	private function metadataFromUI( $mme:ModelMetadataEvent):void {
 		if ( $mme.modelGuid == modelInfo.guid ) {
 			ModelMetadataEvent.removeListener( ModelMetadataEvent.DATA_COLLECTED, metadataFromUI );
@@ -256,8 +260,9 @@ public class ModelMakerImport extends ModelMakerBase {
 			_vm.instanceInfo.positionSet = diffPos;
 		}
 
+		// This works for simple models, but not for deep hierarchies
 		var bmpd:BitmapData = Renderer.renderer.modelShot( _vm );
-		_vm.metadata.thumbnail = drawScaled(bmpd, 128, 128);
+		_vm.metadata.thumbnail = drawScaled( bmpd, 128, 128 );
 
 		ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
 		ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
