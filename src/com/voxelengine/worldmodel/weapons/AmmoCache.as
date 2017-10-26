@@ -8,6 +8,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.weapons
 {
 
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+
 import flash.utils.Dictionary;
 
 import com.voxelengine.Log;
@@ -119,8 +121,8 @@ public class AmmoCache {
 			return;
 		// maybe this ammo has not been loaded into the table yet, try loading it from json file
 		if ( Globals.BIGDB_TABLE_AMMO == $pe.table ) {
-			if ( !ModelMakerImport.isImporting )
-				Log.out( "AmmoCache.loadNotFound - retrying from local object " + $pe.toString(), Log.WARN );
+            if ( ModelMakerBase.state == ModelMakerBase.IMPORTING )
+                Log.out( "AmmoCache.loadNotFound - retrying from local object " + $pe.toString(), Log.WARN );
 			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST, $pe.series, $pe.guid, null, ModelBaseEvent.USE_FILE_SYSTEM ) );
 		}
 		else {	

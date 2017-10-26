@@ -9,7 +9,7 @@ package com.voxelengine.worldmodel.models
 {
 
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
-import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
+import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 import com.voxelengine.worldmodel.oxel.OxelBad;
 
 import flash.display3D.Context3D;
@@ -371,14 +371,16 @@ public class ModelInfo extends PersistenceObject
 			//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
 			_childCount++;
 			//Log.out( "VoxelModel.childrenLoad - calling load on ii: " + ii + "  childCount: " + _childCount );
-            if ( ModelMakerImport.isImporting )
+            if ( ModelMakerBase.state == ModelMakerBase.IMPORTING )
                 new ModelMakerImport( ii, false );
+            if ( ModelMakerBase.state == ModelMakerBase.CLONING )
+                new ModelMakerClone( owner, ii, null, null, false );
 			else
 				new ModelMaker( ii, true, false );
 		}
 		//Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
 		//Log.out( "VoxelModel.childrenLoad - loading child models END" );
-		if ( ModelMakerImport.isImporting )
+		if ( ModelMakerBase.state == ModelMakerBase.IMPORTING )
 			delete dbo.children;
 	}
 

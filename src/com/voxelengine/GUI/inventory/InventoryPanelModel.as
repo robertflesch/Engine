@@ -270,7 +270,7 @@ public class InventoryPanelModel extends VVContainer
 			if ( VoxelModel.selectedModel ) {
                 ii.controllingModel = VoxelModel.selectedModel;
                 if (!PopupMetadataAndModelInfo.inExistance)
-                    new ModelMakerClone( ii );
+                    new ModelMakerClone( VoxelModel.selectedModel, ii );
             }
 			else {
 				// Only do this for top level models.

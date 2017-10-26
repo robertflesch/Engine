@@ -35,9 +35,15 @@ public class ModelMakerClone extends ModelMakerBase {
 
     private var _waitForChildren:Boolean;
     private var _newModelGuid:String;
-    public function ModelMakerClone( $instanceInfo:InstanceInfo, $modelInfo:ModelInfo = null, $modelMetadata:ModelMetadata = null, $killOldModel:Boolean = true ) {
+    private var _oldModelInfo:ModelInfo;
+    private var _oldModelMetadata:ModelMetadata;
+    private var _parentModel:VoxelModel;
+
+    public function ModelMakerClone( $parentModel:VoxelModel, $instanceInfo:InstanceInfo, $modelInfo:ModelInfo = null, $modelMetadata:ModelMetadata = null, $killOldModel:Boolean = true ) {
 		super($instanceInfo.clone());
-		Log.out("ModelMakerClone - clone model with instanceGuid: " + $instanceInfo.instanceGuid + "  modelGuid: " + $instanceInfo.modelGuid);
+        _parentModel = $parentModel;
+        state = CLONING;
+        Log.out("ModelMakerClone - clone model with instanceGuid: " + $instanceInfo.instanceGuid + "  modelGuid: " + $instanceInfo.modelGuid);
         _newModelGuid = Globals.getUID();
 		Log.out("ModelMakerClone - clone model with NEW instanceGuid: " + ii.instanceGuid + "  NEW modelGuid: " + ii.modelGuid);
 		if ($killOldModel) {
@@ -53,88 +59,50 @@ public class ModelMakerClone extends ModelMakerBase {
 			}
 		}
 
-        if ( $modelMetadata )
-            _modelMetadata = $modelMetadata.clone( _newModelGuid );
-        if ( $modelInfo ) {
-            _modelInfo = $modelInfo.clone( _newModelGuid );
-            if ( $modelMetadata ){
-                _modelMetadata = $modelMetadata.clone( _newModelGuid );
-                attemptMakeRetrieveParentModelInfo();
-            } else {
-                addMetadataListeners();
-                ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null );
-            }
-        } else {
+        _oldModelInfo = $modelInfo;
+        _oldModelMetadata = $modelMetadata;
+
+        if ( _oldModelInfo )
+            processModelInfo();
+        else
             requestModelInfo();
-        }
 	}
 
     override protected function retrievedModelInfo($mie:ModelInfoEvent):void  {
         if ( ii.modelGuid == $mie.modelGuid ) {
             removeMIEListeners();
-            _modelInfo = $mie.vmi.clone( _newModelGuid );
-            if ( _modelMetadata ){
-                attemptMakeRetrieveParentModelInfo();
-            } else {
-                addMetadataListeners();
-                ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null );
-            }
+            _oldModelInfo = $mie.vmi;
+            processModelInfo();
+        }
+    }
+
+    private function processModelInfo():void {
+        _modelInfo = _oldModelInfo.clone( _newModelGuid );
+        if ( _oldModelMetadata ) {
+            processModelMetadata();
+        } else {
+            addMetadataListeners();
+            ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null );
         }
     }
 
     override protected function retrievedMetadata( $mme:ModelMetadataEvent):void {
         if ( ii.modelGuid == $mme.modelGuid ) {
             removeMetadataListeners();
-            _modelMetadata = $mme.modelMetadata.clone( ii.modelGuid );
-            //Log.out( "ModelMakerBase.retrievedMetadata - metadata: " + _modelMetadata.toString() )
-            attemptMakeRetrieveParentModelInfo();
+            _oldModelMetadata = $mme.modelMetadata;
+            processModelMetadata()
         }
     }
 
-	private function attemptMakeRetrieveParentModelInfo():void {
+    private function processModelMetadata():void {
+        _modelMetadata = _oldModelMetadata.clone( _newModelGuid );
+        // Now that all the information has been processed, we can assign the new model guid
         ii.modelGuid = _newModelGuid;
-		if ( parentModelGuid )
-			retrieveParentModelInfo();
-		else
-			completeMake();
-	}
-
-	private function retrieveParentModelInfo():void {
-		//Log.out("ModelMakerClone.retrieveParentModelInfo: " + ii.toString());
-		// We need the parents modelClass so we can know what kind of animations are correct for this model.
-		addParentModelInfoListener();
-		var _topMostModelGuid:String = ii.topmostModelGuid();
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _topMostModelGuid, null ) );
-
-		function parentModelInfoResult($mie:ModelInfoEvent):void {
-			if ( $mie.modelGuid == _topMostModelGuid ) {
-				//Log.out("ModelMakerClone.parentModelInfoResult: " + ii.toString());
-				removeParentModelInfoListener();
-				var modelClass:String = $mie.vmi.modelClass;
-				_modelMetadata.animationClass = AnimationCache.requestAnimationClass( modelClass );
-				completeMake();
-			}
-		}
-
-		function parentModelInfoResultFailed($mie:ModelInfoEvent):void {
-			Log.out("ModelMakerClone.parentModelInfoResultFailed: " + ii.toString(), Log.ERROR);
-			if ( $mie.modelGuid == modelInfo.guid ) {
-				removeParentModelInfoListener();
-				markComplete( false );
-			}
-		}
-
-		function addParentModelInfoListener():void {
-			ModelInfoEvent.addListener( ModelBaseEvent.RESULT, parentModelInfoResult );
-			ModelInfoEvent.addListener( ModelBaseEvent.ADDED, parentModelInfoResult );
-			ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed );
-		}
-
-		function removeParentModelInfoListener():void {
-			ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, parentModelInfoResult);
-			ModelInfoEvent.removeListener(ModelBaseEvent.ADDED, parentModelInfoResult);
-			ModelInfoEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed);
-		}
+		if ( !parentModelGuid ) {
+            var modelClass:String = _oldModelInfo.modelClass;
+            _modelMetadata.animationClass = AnimationCache.requestAnimationClass(modelClass);
+        }
+		completeMake();
 	}
 
     private function completeMake():void {
@@ -241,6 +209,10 @@ public class ModelMakerClone extends ModelMakerBase {
 
             Log.out("ModelMakerClone.quadsComplete - needed info found: " + _modelMetadata.description );
             super.markComplete(true);
+
+            _parentModel = null;
+            _oldModelInfo = null;
+            _oldModelMetadata = null;
         }
 
         function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {

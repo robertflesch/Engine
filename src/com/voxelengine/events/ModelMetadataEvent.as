@@ -51,7 +51,7 @@ public class ModelMetadataEvent extends ModelBaseEvent
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function create( $type:String, $series:int, $modelGuid:String, $modelMetadata:ModelMetadata ) : Boolean {
+	static public function create( $type:String, $series:int, $modelGuid:String, $modelMetadata:ModelMetadata = null ) : Boolean {
 		return _eventDispatcher.dispatchEvent( new ModelMetadataEvent( $type, $series, $modelGuid, $modelMetadata ) );
 	}
 	///////////////// Event handler interface /////////////////////////////

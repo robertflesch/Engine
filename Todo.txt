@@ -1,15 +1,19 @@
-
+People to bring into voxelverse
+http://pennycow.blogspot.com/
 
 VoxelVerse todo
+
+DONE - make sure model inventory gets reset
+DONE - make sure duplicated model gets added to inventory window
+DONE - make sure permissions are correct on duplicated model.
+Do modify check on model
+The "Edit Data" button on the model inventory needs to be a MapAreaButton. Otherwise clicks on on transparent part of button get intercepted.
 
 --Collision
 Camera needs to collide with world!
 When side of the avatar is touching an oxel it get pushed up over and over again.
 what happens to vines when sub oxels are created?
 
-TB records
-alexa flesch kaiser 1906546
-medical records - 770 220 3870
 
 https://medium.com/@solkimicreb/the-react-stack-challenge-5fd166e1245f
 
@@ -29,6 +33,8 @@ When deleting a model that has inventory, make sure to delete its inventory.
 
 ! 12.1.16 need to add clipVelocity and speedMultiplier to rest of the animations, and to the setState, so that they are not hard coded.
 ! 12.4.16 static lighting on head of dragon
+
+
 
 SETUP NOTES
 I had to modified the 
@@ -53,10 +59,11 @@ C9389DB5-7A87-A5D8-2495-445D8391CDC1 - Pistol
 
 What is VoxelVerse.
 
-My goal is to create a browser based platform where everyone is able to create, explore, and share 3D voxel models, games, adventures.
+My goal is to create a browser based AR platform where everyone is able to create, explore, and share 3D voxel models, games, adventures.
 User created content
 User rated content
 User sellable content
+AI powered NPC's
 User created regions
 PvP action in Zeppelins, Dragons, etc
 Destruction of other users content (temp or perm?)

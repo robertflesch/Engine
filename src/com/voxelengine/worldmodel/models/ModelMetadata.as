@@ -23,6 +23,7 @@ import flash.events.Event;
 import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 import flash.net.URLLoaderDataFormat;
+import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;
 
@@ -231,15 +232,18 @@ public class ModelMetadata extends PersistenceObject
         //newData.createdDate = new Date().toUTCString();
         var newModelMetadata:ModelMetadata = new ModelMetadata( $guid, null, newData );
 
-        if ( thumbnailLoaded ) {
-            var bmd:BitmapData = new BitmapData(128, 128, false);
-            bmd.setPixels(new Rectangle(0, 0, 128, 128), thumbnail.getPixels(new Rectangle(0, 0, 128, 128)));
-            newModelMetadata._thumbnail = bmd;
-            newModelMetadata.thumbnailLoaded = true;
-        }
-		else {
-            newModelMetadata.thumbnail = null;
-		}
+Log.out( "ModelMetadata.clone - fix thumbnail", Log.WARN );
+// TODO fix this
+//        if ( thumbnailLoaded ) {
+//            var bmd:BitmapData = new BitmapData(128, 128, false);
+//            var ba:ByteArray = thumbnail.getPixels(new Rectangle(0, 0, 128, 128));
+//            bmd.setPixels(new Rectangle(0, 0, 128, 128), ba );
+//            newModelMetadata._thumbnail = bmd;
+//            newModelMetadata.thumbnailLoaded = true;
+//        }
+//		else {
+//            newModelMetadata.thumbnail = null;
+//		}
 
         return newModelMetadata;
 	}

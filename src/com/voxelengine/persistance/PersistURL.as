@@ -8,6 +8,7 @@
 package com.voxelengine.persistance 
 {
 import com.voxelengine.worldmodel.animation.AnimationSound;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
 import flash.events.Event;
@@ -82,7 +83,7 @@ public class PersistURL
 		urlLoader.addEventListener(IOErrorEvent.IO_ERROR, loadError);
         var resolvedFilePath:String;
 		try {
-			if ( ModelMakerImport.isImporting ) {
+			if ( ModelMakerBase.state == ModelMakerBase.IMPORTING ) {
 				resolvedFilePath = "E:/dev/VoxelVerse/Resources/bin" + _filePath;
                 urlLoader.load( new URLRequest( resolvedFilePath ) );
             }

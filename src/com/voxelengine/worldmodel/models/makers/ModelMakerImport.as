@@ -40,15 +40,12 @@ import com.voxelengine.worldmodel.oxel.GrainCursor;
 	 */
 public class ModelMakerImport extends ModelMakerBase {
 	
-	static private var _isImporting:Boolean;
-	static public function get isImporting():Boolean { return _isImporting; }
-	
 	private var _prompt:Boolean;
     private var _originalGuid:String;
 
 	public function ModelMakerImport( $ii:InstanceInfo, $prompt:Boolean = true ) {
 		// This should never happen in a release version, so dont worry about setting it to false when done
-		_isImporting = true;
+		state = IMPORTING;
 		_prompt = $prompt;
 		super( $ii );
         _originalGuid = ii.modelGuid;

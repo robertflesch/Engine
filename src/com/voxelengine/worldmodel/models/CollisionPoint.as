@@ -7,20 +7,20 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.Log;
+import com.voxelengine.Globals;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
 import com.voxelengine.worldmodel.models.types.ControllableVoxelModel;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
+import com.voxelengine.worldmodel.oxel.Oxel;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 import flash.geom.Vector3D;
 	
-	import com.voxelengine.Log;
-	import com.voxelengine.Globals;
-	import com.voxelengine.worldmodel.oxel.Oxel;
-	import com.voxelengine.worldmodel.Region;
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 	public class CollisionPoint
 	{

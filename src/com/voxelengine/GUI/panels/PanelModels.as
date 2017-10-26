@@ -244,7 +244,7 @@ public class PanelModels extends PanelBase
 		function dupModel(event:UIMouseEvent):void  {
 			if ( VoxelModel.selectedModel ) {
                 var vm:VoxelModel = VoxelModel.selectedModel;
-				new ModelMakerClone( vm.instanceInfo, vm.modelInfo, vm.metadata, false);
+				new ModelMakerClone( vm, vm.instanceInfo, vm.modelInfo, vm.metadata, false);
             }
 		}
 

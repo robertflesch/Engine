@@ -15,6 +15,7 @@ import com.voxelengine.worldmodel.PermissionsBase;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.animation.AnimationSound;
 import com.voxelengine.worldmodel.models.SecureNumber;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
 import playerio.DatabaseObject;
@@ -146,8 +147,8 @@ public class Animation extends PersistenceObject
 	}
 
     private function soundAdded( $se:SoundEvent ):void {
-		if ( ModelMakerImport.isImporting )
-			SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID_COMPLETE, updateSoundGuid );
+        if ( ModelMakerBase.state == ModelMakerBase.IMPORTING )
+            SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID_COMPLETE, updateSoundGuid );
         SoundEvent.removeListener( ModelBaseEvent.ADDED, soundAdded );
         SoundEvent.removeListener( ModelBaseEvent.RESULT, soundAdded );
         _animationSound = $se.snd;

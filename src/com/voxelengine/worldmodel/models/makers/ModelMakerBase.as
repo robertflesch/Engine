@@ -36,8 +36,15 @@ import org.flashapi.swing.Alert;
 	 * Not sure what a failure case for a timeout would be would be
 	 */
 public class ModelMakerBase {
-	
-	static private var _makerCount:int;
+
+    static public const IMPORTING:String = "IMPORTING";
+    static public const CLONING:String = "CLONING";
+    static public const MAKING:String = "MAKING";
+	static private var _s_state:String;
+    static public function get state():String { return _s_state; }
+    static public function set state( $newState:String ):void { _s_state = $newState; }
+
+    static private var _makerCount:int;
 	
 	protected   	var _modelMetadata:ModelMetadata;
 	
