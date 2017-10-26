@@ -7,17 +7,14 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
-	import com.voxelengine.pools.FlowInfoPool;
-	import flash.utils.ByteArray;
-	
-	import com.voxelengine.Globals;
-	import com.voxelengine.Log;
-/**
- * ...
- * @author Robert Flesch RSF Oxel - An OctTree / Voxel - model
- */
-public class FlowInfo
-{
+import com.voxelengine.pools.FlowInfoPool;
+import flash.utils.ByteArray;
+
+import com.voxelengine.Globals;
+import com.voxelengine.Log;
+
+public class FlowInfo {
+
 	private static const FLOW_DOWN:uint 					= 0x000000ff;
 	private static const FLOW_DOWN_MASK:uint 				= 0xffffff00;
 	private static const FLOW_OUT:uint 						= 0x0000ff00;

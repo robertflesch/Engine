@@ -16,7 +16,6 @@ import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.pools.LightInfoPool;
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 import com.voxelengine.utils.ColorUtils;
 	
 public class Lighting  {
@@ -36,8 +35,6 @@ public class Lighting  {
 	 *        \/
 	 */
 	public static const DEFAULT_COLOR:uint = 0x00ffffff;
-//	private static const DEFAULT_SIGMA:uint = 2;
-//	public static const _defaultBaseLightAttn:uint = 0x33; // out of 255
 
 	public static const AMBIENT_ADD:Boolean = true;
 	public static const AMBIENT_REMOVE:Boolean = false;
@@ -393,61 +390,6 @@ public class Lighting  {
 		else
 			throw new Error( "Brightness.fromByteArray - unsupported version: " + $version );
 
-		return $ba;
-	}
-
-	// TODO Maybe - Not sure what attnPerMeter should be here, that value is not persisted to the ivm.
-	// However I dont know if it is ever used again, so what should I set it to?
-	public function fromByteArrayV9( $version:int, $ba:ByteArray, $attnPerMeter:uint = Lighting.DEFAULT_ATTN ):ByteArray {
-		try {
-			var lightsFromBA:int = 0;
-			if (Globals.VERSION_001 == $version || Globals.VERSION_002 == $version) {
-				// Old style, Just throw away this information.
-				$ba.readInt();
-				$ba.readInt();
-				$ba.readInt();
-				$ba.readInt();
-				$ba.readInt();
-				$ba.readInt();
-				$ba.readInt();
-				$ba.readInt();
-			} else if (Globals.VERSION_003 == $version) {
-				lightsFromBA = $ba.readByte();
-			} else if (Globals.VERSION_004 == $version || Globals.VERSION_005 == $version) {
-				_lowerAmbient = $ba.readUnsignedInt();
-				_higherAmbient = $ba.readUnsignedInt();
-				lightsFromBA = $ba.readByte();
-			} else if (Globals.VERSION_006 <= $version) {
-				_color = $ba.readUnsignedInt();
-				_lowerAmbient = $ba.readUnsignedInt();
-				_higherAmbient = $ba.readUnsignedInt();
-				lightsFromBA = $ba.readByte();
-
-				Log.out("Lighting.fromByteArray _color: \t\t" + _color.toString(16));
-				Log.out("Lighting.fromByteArray _lowerAmbient: \t" + _lowerAmbient.toString(16));
-				Log.out("Lighting.fromByteArray _higherAmbient: \t" + _higherAmbient.toString(16));
-				Log.out("Lighting.fromByteArray lightsFromLoop: \t" + lightsFromBA);
-			} else
-				throw new Error("Brightness.fromByteArray - unsupported version: " + $version);
-
-			if ( ModelMakerImport.isImporting ) {
-				// throw away lights for imports
-				for (var j:int = 0; j < lightsFromBA; j++) {
-					var li:LightInfo = LightInfoPool.poolGet();
-					li.fromByteArray($ba);
-				}
-			}
-			else {
-				// Now read each light
-				for (var i:int = 0; i < lightsFromBA; i++) {
-					_lights[i] = LightInfoPool.poolGet();
-					_lights[i].fromByteArray($ba);
-				}
-			}
-		}
-		catch( e:Error ){
-			Log.out( "Lighting.fromByteArray error: " + e.toString() );
-		}
 		return $ba;
 	}
 
