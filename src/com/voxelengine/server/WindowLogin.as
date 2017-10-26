@@ -305,7 +305,6 @@ public class WindowLogin extends VVPopup
 	}
 
 	private function loginSuccess( $e:LoginEvent ):void {
-        Log.out("WindowLogin.loginSuccess", Log.WARN );
 		try {
             removeLoginEventHandlers();
             if (_userInfo) {
