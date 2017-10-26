@@ -1947,6 +1947,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
             if ( !flowInfo )
                 flowInfo = FlowInfoPool.poolGet();
             $ba = flowInfo.fromByteArray( $version, $ba );
+			flowInfo.reset(); // reset flow info from old versions.
 
             // the baseLightLevel gets overridden by data from byte array.
             if ( !lighting ) {
