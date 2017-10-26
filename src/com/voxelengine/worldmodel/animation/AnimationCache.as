@@ -119,10 +119,12 @@ public class AnimationCache
 		}
 	}
 
-	static private function clone( $ae:AnimationEvent):void {
+	static private function clone( $ae:AnimationEvent ):void {
 		var ani:Animation =  _animations[$ae.aniGuid];
 		if ( null == ani ) {
 			_animations[$ae.aniGuid] = $ae.ani;
+            $ae.ani.changed = true;
+            $ae.ani.save();
 			//AnimationEvent.create( ModelBaseEvent.ADDED, $ae.series, $ae.modelGuid, $ae.aniGuid, $ae.ani );
 		}
 	}
