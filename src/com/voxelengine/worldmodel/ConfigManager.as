@@ -7,11 +7,15 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-	import com.voxelengine.utils.JSONUtil;
+import com.voxelengine.GUI.LanguageManager;
+import com.voxelengine.utils.JSONUtil;
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
 	import flash.events.IOErrorEvent;
-	//import org.flashapi.swing.Alert;
+
+import org.flashapi.swing.Alert;
+
+//import org.flashapi.swing.Alert;
 	
 	import com.voxelengine.utils.StringUtils;
 
@@ -98,7 +102,8 @@ package com.voxelengine.worldmodel
                     PersistenceEvent.removeListener(PersistenceEvent.LOAD_FAILED, loadFail);
                     PersistenceEvent.removeListener(PersistenceEvent.LOAD_NOT_FOUND, loadFail);
                     var errorMsg:String = (e.data as String);
-                    Log.out("ConfigManager.loadFail - error: " + errorMsg + " file name and path: " + Globals.appPath + CONFIG + Globals.APP_EXT, Log.ERROR) ;
+                    Log.out("ConfigManager.loadFail - error: " + errorMsg + " file name and path: " + Globals.appPath + CONFIG + Globals.APP_EXT, Log.ERROR);
+                    (new Alert( LanguageManager.localizedStringGet( "ServerNotAvailable" ) )).display();
                 }
             }
 
