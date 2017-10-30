@@ -7,7 +7,9 @@ DONE - make sure model inventory gets reset
 DONE - make sure duplicated model gets added to inventory window
 DONE - make sure permissions are correct on duplicated model.
 Do modify check on model
-The "Edit Data" button on the model inventory needs to be a MapAreaButton. Otherwise clicks on on transparent part of button get intercepted.
+
+UI Bugs to be fixed after moving to TypeScript
+The "Edit Data" button on the model inventory needs to be a MapAreaButton(triangular). Otherwise clicks on on transparent part of button get intercepted.
 
 --Collision
 Camera needs to collide with world!
