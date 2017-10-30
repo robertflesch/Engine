@@ -9,6 +9,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.GUI.panels
 {
 
+import com.voxelengine.events.InstanceInfoEvent;
+
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.event.ListEvent;
@@ -73,7 +75,9 @@ public class PanelModels extends PanelBase
 
 		//ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
 		ModelInfoEvent.addListener( ModelBaseEvent.DELETE, modelDeletedGlobally );
-		
+        ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
+        InstanceInfoEvent.addListener( ModelBaseEvent.CHANGED, instanceInfoChanged );
+
 		// ALL DRAG AND DROP methods, which are not working
 		//_listModels.dndData
 		//_listModels.eventCollector.addEvent( _dragOp, DnDEvent.DND_DROP_ACCEPTED, dropMaterial );
@@ -86,6 +90,24 @@ public class PanelModels extends PanelBase
 		//_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_PRESSED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - ITEM_PRESSED $le: " + $le ) } )		
 		//_listModels.eventCollector.addEvent( _listModels, ListEvent.DATA_PROVIDER_CHANGED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - DATA_PROVIDER_CHANGED $le: " + $le ) } )		
 	}
+
+    private function metadataChanged( $mme:ModelMetadataEvent ):void {
+        populateModels( _dictionarySource, _parentModel );
+    }
+
+    private function instanceInfoChanged( $mme:InstanceInfoEvent ):void {
+        for ( var i:int = 0; i < _listModels.length; i++ ) {
+            var li:ListItem = _listModels.getItemAt( i );
+            var item:Object = li.data;
+            if ( $mme.instanceGuid == item.instanceGuid ) {
+                //_listModels.removeItemAt( i );
+				_listModels.updateItemAt( i, $mme.instanceInfo.name, item );
+                break;
+            }
+        }
+		_listModels.redraw();
+    }
+
 
 	// This model is being removed from the library of models, remove all instances of it.
 	private function modelDeletedGlobally( e:ModelInfoEvent ): void {
@@ -110,10 +132,18 @@ public class PanelModels extends PanelBase
 	
 	override public function close():void {
 		super.close();
-		_listModels.removeEventListener( ListEvent.LIST_CHANGED, selectModel );
+		//_listModels.removeEventListener( ListEvent.LIST_CHANGED, selectModel );
 		//ModelMetadataEvent.removeListener( ModelBaseEvent.IMPORT_COMPLETE, metadataImported );
 
-		_parentModel = null;
+        ModelInfoEvent.removeListener( ModelBaseEvent.DELETE, modelDeletedGlobally );
+        ModelMetadataEvent.removeListener( ModelBaseEvent.CHANGED, metadataChanged );
+        InstanceInfoEvent.removeListener( ModelBaseEvent.CHANGED, instanceInfoChanged );
+        ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, childModelAdded );
+        ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED, parentModelAdded );
+        ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved );
+
+
+        _parentModel = null;
 		_dictionarySource = null;
 	}
 	
@@ -155,6 +185,8 @@ public class PanelModels extends PanelBase
                 var guids:Object = getItem( i );
                 if ( ig == guids.instanceGuid ) {
                     _listModels.selectedIndex = i;
+                    _selectedText.text = guids.name;
+					break;
                 }
             }
         }
@@ -285,17 +317,7 @@ public class PanelModels extends PanelBase
 			}
 		}
 		
-		function modelRemoved( $me:ModelEvent ):void {
-			if ( VoxelModel.selectedModel && $me.instanceGuid == VoxelModel.selectedModel.instanceInfo.instanceGuid ) {
-				ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved );
-				if ( null == _parentModel ) {
-					VoxelModel.selectedModel.selected = false;
-					VoxelModel.selectedModel = null
-				}
-			}
-		}
-
-		function addModel(event:UIMouseEvent):void { 
+		function addModel(event:UIMouseEvent):void {
 			if ( VoxelModel.selectedModel && null != VoxelModel.selectedModel.instanceInfo.controllingModel )
 				WindowInventoryNew._s_hackShowChildren = true;
 			else
@@ -309,7 +331,18 @@ public class PanelModels extends PanelBase
 		}
 	}
 
-	//ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
+	private function modelRemoved( $me:ModelEvent ):void {
+        if ( VoxelModel.selectedModel && $me.instanceGuid == VoxelModel.selectedModel.instanceInfo.instanceGuid ) {
+            ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved );
+            if ( null == _parentModel ) {
+                VoxelModel.selectedModel.selected = false;
+                VoxelModel.selectedModel = null
+            }
+        }
+    }
+
+
+    //ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
 //	private function metadataImported( $mme:ModelMetadataEvent ):void {
 //		var instances:Vector.<VoxelModel> = Region.currentRegion.modelCache.instancesOfModelGet( $mme.modelGuid );
 //		// should be one if I just imported it.
