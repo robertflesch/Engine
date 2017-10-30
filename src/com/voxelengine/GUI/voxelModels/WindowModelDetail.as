@@ -7,6 +7,10 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 
 package com.voxelengine.GUI.voxelModels {
+import com.voxelengine.events.InstanceInfoEvent;
+import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.events.ModelMetadataEvent;
+
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.events.MouseEvent;
@@ -154,7 +158,7 @@ public class WindowModelDetail extends VVPopup {
 		if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival = ival/2;
 		else 											ival = ival*2;
 		$e.target.data.text = ival.toString();
-		setChanged();
+        setChanged();
 		return ival;
 	}
 
@@ -162,13 +166,20 @@ public class WindowModelDetail extends VVPopup {
 		var ival:int = int( $e.target.data.text );
 		if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival--;
 		else 											ival++;
-		setChanged();
+        setChanged();
 		$e.target.data.text = ival.toString();
 		return ival;
 	}
 
-	private function setChanged():void {
-		_vm.instanceInfo.changed = true;
+    private function setChanged():void {
+        _vm.instanceInfo.changed = true
+    }
+
+
+	private function setRecalcMatrix():void {
+		// This changed is used in recalculating position matrix.
+		// The actual instanceInfo data is not directly stored in DB.
+		_vm.instanceInfo.recalcMatrix = true;
 		if ( _vm.instanceInfo.controllingModel )
 			_vm.instanceInfo.controllingModel.modelInfo.changed = true;
 	}
@@ -178,9 +189,24 @@ public class WindowModelDetail extends VVPopup {
 			new WindowOxelUtils( _vm );
 	}
 
-	static private function closeFunction():void {
+	private function closeFunction():void {
 		RegionEvent.create( ModelBaseEvent.CHANGED, 0, Region.currentRegion.guid );
 		RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid );
-	}
+
+	    if ( _vm.metadata.changed ) {
+            ModelMetadataEvent.create( ModelBaseEvent.CHANGED, 0, _vm.modelInfo.guid, _vm.metadata );
+            ModelMetadataEvent.create( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, _vm.metadata );
+        }
+        if ( _vm.modelInfo.changed ) {
+            ModelInfoEvent.create( ModelBaseEvent.CHANGED, 0, _vm.modelInfo.guid, _vm.modelInfo );
+            ModelInfoEvent.create( ModelBaseEvent.SAVE, 0,_vm.modelInfo.guid, _vm.modelInfo );
+        }
+        if ( _vm.instanceInfo.changed ) {
+            InstanceInfoEvent.create( ModelBaseEvent.CHANGED, _vm.instanceInfo.instanceGuid, _vm.modelInfo.guid, _vm.instanceInfo );
+            InstanceInfoEvent.create( ModelBaseEvent.SAVE, _vm.instanceInfo.instanceGuid,_vm.modelInfo.guid, _vm.instanceInfo );
+        }
+
+    }
+
 }
 }

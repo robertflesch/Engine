@@ -14,12 +14,12 @@ import flash.geom.Matrix3D;
 public class Location
 {
 	private static var _scratchVec:Vector3D 				= new Vector3D();
-	private var _changed:Boolean 							= false;					// INSTANCE NOT EXPORTED
+	private var _recalcMatrix:Boolean 							= false;					// INSTANCE NOT EXPORTED
 	private var _useOrigPosition:Boolean 					= false;					// Set via script
 
 
-	public function get changed():Boolean 					{ return _changed; }
-	public function set changed($val:Boolean):void			{ _changed = $val; }
+	public function get recalcMatrix():Boolean 					{ return _recalcMatrix; }
+	public function set recalcMatrix($val:Boolean):void			{ _recalcMatrix = $val; }
 
 	public function get useOrigPosition():Boolean 			{ return _useOrigPosition; }
 	public function set useOrigPosition($val:Boolean):void	{ _useOrigPosition = $val; }
@@ -37,7 +37,7 @@ public class Location
 	public function 	centerSetComp( $x:Number, $y:Number, $z:Number ):void {
 		if ( lockCenter )
 			return;
-		changed = true;
+        recalcMatrix = true;
 		_centerNotScaled.setTo( $x, $y, $z );
 		_center.setTo( _centerNotScaled.x * scale.x, _centerNotScaled.y * scale.y, _centerNotScaled.z * scale.z );
 		//Log.out( "set centerSetComp - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerNotScaled );
@@ -51,14 +51,14 @@ public class Location
 	private var _scale:Vector3D 							= new Vector3D(1, 1, 1);	// toJSON
 	public function get scale():Vector3D 					{ return _scale; }
 	public function 	scaleSetComp( $x:Number, $y:Number, $z:Number ):void {
-		changed = true;
+        recalcMatrix = true;
 		//trace( "Location.scaleSetComp x: " + $x + " y: " + $y + " z: " + $z );
 		_scale.setTo( $x, $y, $z );
 		_center.setTo( _centerNotScaled.x * $x, _centerNotScaled.y * $y, _centerNotScaled.z * $z );
 		//Log.out( "set scaleSetComp - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerNotScaled );
 	}
 	public function set scale($val:Vector3D):void 			{
-		changed = true;
+        recalcMatrix = true;
 		//trace( "Location.scale x: " + $val.x + " y: " + $val.y + " z: " + $val.z );
 		_scale.setTo( $val.x, $val.y, $val.z );
 		_center.setTo( _centerNotScaled.x * $val.x, _centerNotScaled.y * $val.y, _centerNotScaled.z * $val.z );
@@ -84,7 +84,7 @@ public class Location
 	public function 	rotationSetComp( $x:Number, $y:Number, $z:Number ):void {
 		//Log.out( "PosAndRot rot: " + _rotation.x+" " +_rotation.y+" " +_rotation.z );
 		// Copy old rotation
-		changed = true;
+        recalcMatrix = true;
 
 		_rotations[2].setTo( _rotations[1].x, _rotations[1].y, _rotations[1].z );
 		_rotations[1].setTo( _rotations[0].x, _rotations[0].y, _rotations[0].z );
@@ -106,7 +106,7 @@ public class Location
 	public function set positionSet( $val:Vector3D ):void 	{ positionSetComp( $val.x, $val.y, $val.z ); }
 	public function 	positionSetComp( $x:Number, $y:Number, $z:Number ):void
 	{
-		changed = true;
+        recalcMatrix = true;
 
 		_positions[2].setTo( _positions[1].x, _positions[1].y, _positions[1].z );
 		_positions[1].setTo( _positions[0].x, _positions[0].y, _positions[0].z );
@@ -166,7 +166,7 @@ public class Location
 		//trace( "Location.restoreOld position["+index+"] position: " + _positions[index] );
 		_position.setTo( _positions[index].x, _positions[index].y, _positions[index].z );
 		_rotation.setTo( _rotations[index].x, _rotations[index].y, _rotations[index].z );
-		changed = true;
+        recalcMatrix = true;
 	}
 
 	public function nearEquals( $val:Location ):Boolean
@@ -189,7 +189,7 @@ public class Location
 
 	protected function recalculateMatrix( force:Boolean = false ):void
 	{
-		if ( changed || force )
+		if ( recalcMatrix || force )
 		{
 			_modelMatrix.identity();
 			//Log.out( "recalculateMatrix - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerNotScaled );
@@ -211,7 +211,7 @@ public class Location
 			_worldMatrix.copyFrom( _modelMatrix );
 			_worldMatrix.invert();
 
-			_changed = false;
+			_recalcMatrix = false;
 		}
 	}
 
@@ -224,7 +224,7 @@ public class Location
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public function lookAtVector( length:int ):Vector3D
 	{
-		if ( changed )
+		if ( recalcMatrix )
 			recalculateMatrix();
 		// was using _modelMatrix, but I think that is wrong.
 		return _invModelMatrix.deltaTransformVector( new Vector3D( 0, 0, -length ) );
@@ -232,35 +232,35 @@ public class Location
 
 	public function lookDownVector( length:int ):Vector3D
 	{
-		if ( changed )
+		if ( recalcMatrix )
 			recalculateMatrix();
 		return _modelMatrix.deltaTransformVector( new Vector3D( 0, length, 0 ) );
 	}
 
 	public function lookUpVector( length:int ):Vector3D
 	{
-		if ( changed )
+		if ( recalcMatrix )
 			recalculateMatrix();
 		return _modelMatrix.deltaTransformVector( new Vector3D( 0, -length, 0 ) );
 	}
 
 	public function lookRightVector( length:int ):Vector3D
 	{
-		if ( changed )
+		if ( recalcMatrix )
 			recalculateMatrix();
 		return _modelMatrix.deltaTransformVector( new Vector3D( length, 0, 0 ) );
 	}
 
 	public function lookBackVector( length:int ):Vector3D
 	{
-		if ( changed )
+		if ( recalcMatrix )
 			recalculateMatrix();
 		return _modelMatrix.deltaTransformVector( new Vector3D( 0, 0, length ) );
 	}
 
 	public function placeAt( length:int ):Vector3D
 	{
-		if ( changed )
+		if ( recalcMatrix )
 			recalculateMatrix();
 		var newPos:Vector3D = _modelMatrix.deltaTransformVector( new Vector3D( 0, 0, length ) );
 		//
@@ -272,14 +272,14 @@ public class Location
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public function worldToModel( v:Vector3D ):Vector3D
 	{
-		if ( changed )
+		if ( recalcMatrix )
 			recalculateMatrix();
 		return _modelMatrix.transformVector( v );
 	}
 
 	public function modelToWorld( v:Vector3D ):Vector3D
 	{
-		if ( changed )
+		if ( recalcMatrix )
 			recalculateMatrix();
 		return worldSpaceMatrix.transformVector( v );
 	}
@@ -296,7 +296,7 @@ public class Location
 				scale.z = $obj.z;
 		_scaleOrig.setTo( scale.x, scale.y, scale.z );
 		//Log.out( "Location.setScaleInfo - scale: " + _scale );
-		changed = true;
+		recalcMatrix = true;
 	}
 
 	// This is used during initialization and from instance/model? data

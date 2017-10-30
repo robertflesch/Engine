@@ -46,7 +46,11 @@ public class InstanceInfo extends Location	{
 	public function get collidable():Boolean 					{ return _collidable; }
 	public function set collidable(val:Boolean):void 			{ _collidable = val; }
 
-	private var _critical:Boolean 								= false;						// toObject
+    private var _changed:Boolean 								= false;							// toObject
+    public function get changed():Boolean 						{ return _changed; }
+    public function set changed(val:Boolean):void 				{ _changed = val; }
+
+    private var _critical:Boolean 								= false;						// toObject
 	public function get critical():Boolean 						{ return _critical; }
 	public function set critical(val:Boolean):void 				{
 		_critical = val;
@@ -483,7 +487,7 @@ public class InstanceInfo extends Location	{
 	// WorldToModel and ModelToWorld
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	override public function worldToModel( v:Vector3D ):Vector3D {
-		if ( changed )
+		if ( recalcMatrix )
 			recalculateMatrix();
 		if ( _controllingModel )
 			return modelMatrix.transformVector( _controllingModel.worldToModel( v ) );
@@ -492,7 +496,7 @@ public class InstanceInfo extends Location	{
 	}
 	
 	public function worldToModelNew( v:Vector3D, d:Vector3D ):void {
-		if ( changed )
+		if ( recalcMatrix )
 			recalculateMatrix();
 		if ( _controllingModel ){ 
 			var test:Vector3D = modelMatrix.transformVector( _controllingModel.worldToModel( v ) );
@@ -516,7 +520,7 @@ public class InstanceInfo extends Location	{
 	}	
 	
 	override public function modelToWorld( v:Vector3D ):Vector3D {
-		if ( changed )
+		if ( recalcMatrix )
 			recalculateMatrix();
 		if ( _controllingModel ) {
 			var parentMS:Vector3D = _controllingModel.modelToWorld( v );
