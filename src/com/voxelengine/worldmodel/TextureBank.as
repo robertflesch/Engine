@@ -102,14 +102,17 @@ public class TextureBank
         loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loadComplete );
         loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, loadError );
 
+        var path:String;
         if ( "/" == Globals.appPath ) {
             var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
-            var resolvedFilePath:String = fs.getUrl(Globals.texturePath + $textureName);
+            path = "/VoxelVerse/" + Globals.texturePath + $textureName;
+            var resolvedFilePath:String = fs.getUrl( path );
             //Log.out( "TextureBank.loadGUITexture - resolvedFilePath: " + resolvedFilePath );
             loader.load(new URLRequest(resolvedFilePath) );
         } else {
-            Log.out( "TextureBank.loadGUITexture: " + Globals.texturePath + $textureName );
-            loader.load(new URLRequest( Globals.texturePath + $textureName ));
+            path = Globals.texturePath + $textureName;
+            Log.out( "TextureBank.loadGUITexture: " + path );
+            loader.load(new URLRequest( path ));
         }
 
         function loadComplete (event:Event):void {
@@ -124,7 +127,7 @@ public class TextureBank
         function loadError(event:IOErrorEvent):void {
             removeListeners();
 
-            Log.out("TextureBank.onFileLoadError - FILE LOAD ERROR, DIDN'T FIND: " + Globals.texturePath + $textureName, Log.ERROR );
+            Log.out("TextureBank.onFileLoadError - FILE LOAD ERROR, DIDN'T FIND: " + path, Log.ERROR );
             TextureLoadingEvent.create( TextureLoadingEvent.LOAD_FAILED, $textureName, null );
         }
 
@@ -164,7 +167,7 @@ public class TextureBank
         // TODO this seems like a duplicate of whats in PersistURL, but I don't want to fix right now RSF 10.22.2017
         if ( "/" == Globals.appPath ) {
             var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
-            var resolvedFilePath:String = fs.getUrl(Globals.appPath + textureNameAndPath);
+            var resolvedFilePath:String = fs.getUrl(Globals.appPath + "VoxelVerse/" + textureNameAndPath);
             loader.load(new URLRequest(resolvedFilePath));
         } else {
             loader.load(new URLRequest( Globals.appPath + textureNameAndPath ));

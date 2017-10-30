@@ -41,7 +41,6 @@ public class WindowCharacter extends VVPopup {
         height = 436;
         backgroundTexture = "characterBackgroundMale.jpg";
         var i:Image = new Image( "characterBackgroundMale.jpg" );
-        //var i:Image = new Image( Globals.texturePath + "toolSelector.png" )
         i.width = 230;
         i.height = 426;
         addElement(i);

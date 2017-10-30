@@ -201,7 +201,7 @@ use namespace spas_internal;
             //Log.out( "UILoader.loadAndAddChild - loading: " + url );
 
             var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
-            var resolvedFilePath:String = fs.getUrl(Globals.texturePath + url );
+            var resolvedFilePath:String = fs.getUrl( "/VoxelVerse/" + Globals.texturePath + url );
             //Log.out( "UILoader.loadAndAddChild - loading: " + resolvedFilePath );
             var request:URLRequest = new URLRequest(resolvedFilePath);
 			if (parameters != null) {
