@@ -878,25 +878,26 @@ import flash.display.DisplayObject;
 		/**
 		 * 	[Not implemented yet.]
 		 */
-		override public function addItemAt(index:int, value:*, data:* = null):ListItem {
-			/*
-			var obj:Object = value is XML ? XMLSerializer.decode(value) : value;
-			
-			obj.index = index;
-			if (obj.selected == undefined) obj.selected = false;
-			var li:ListItem = new ListItem(obj, objList, value, data, index);
-			
-			_dataLength++;
-			
-			if (index >= _currentDataCursor && index < _currentDataCursor +_selectItemNum)
-				this.updateItemById(index, index);
-			
-			//setRefresh();
-			return li;*/
-			setScrollBarProps();
-			return null;
-		}
-		
+
+//		override public function addItemAt(index:int, value:*, data:* = null):ListItem {
+//			/*
+//			var obj:Object = value is XML ? XMLSerializer.decode(value) : value;
+//
+//			obj.index = index;
+//			if (obj.selected == undefined) obj.selected = false;
+//			var li:ListItem = new ListItem(obj, objList, value, data, index);
+//
+//			_dataLength++;
+//
+//			if (index >= _currentDataCursor && index < _currentDataCursor +_selectItemNum)
+//				this.updateItemById(index, index);
+//
+//			//setRefresh();
+//			return li;*/
+//			setScrollBarProps();
+//			return null;
+//		}
+
 		/**
 		 * 	@private
 		 */
