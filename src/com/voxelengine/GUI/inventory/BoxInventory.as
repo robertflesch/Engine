@@ -77,7 +77,7 @@ public class BoxInventory extends VVBox
 	private function metadataChanged( $mme:ModelMetadataEvent ):void {
 		var om:ObjectModel = _objectInfo as ObjectModel;
 		if ( om && ( $mme.modelGuid == om.modelGuid ) ) {
-			ModelMetadataEvent.removeListener( ModelBaseEvent.CHANGED, metadataChanged );
+			//ModelMetadataEvent.removeListener( ModelBaseEvent.CHANGED, metadataChanged );
 			om.vmm = $mme.modelMetadata;
 			updateObjectInfo( om )
 		}
@@ -85,6 +85,8 @@ public class BoxInventory extends VVBox
 	
 	
 	public function updateObjectInfo( $item:ObjectInfo, $displayAddons:Boolean = true ):void {
+        // this may or may not have this event registered, but we need to make sure its not in more than one.
+		ModelMetadataEvent.removeListener( ModelBaseEvent.CHANGED, metadataChanged );
 		if ( null == $item )
 			return;
 			

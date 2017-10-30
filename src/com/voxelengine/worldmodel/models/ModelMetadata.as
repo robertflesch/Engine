@@ -113,7 +113,7 @@ public class ModelMetadata extends PersistenceObject
 
 		if ( "EditCursor" != guid ) {
 			ModelMetadataEvent.addListener(ModelBaseEvent.SAVE, saveEvent);
-			ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
+			//ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
 		}
 
 		function init( $newData:Object = null ):void {
@@ -199,13 +199,14 @@ public class ModelMetadata extends PersistenceObject
 	
 	override public function release():void {
 		ModelMetadataEvent.removeListener( ModelBaseEvent.SAVE, saveEvent );
-		ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
+//		ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
 	}
 	
 	// This was private, force a message to be sent to it.
 	// But the voxelModel has a handle to it, seems silly to have to propgate it every where, so its public
-	private function saveEvent( $vmd:ModelMetadataEvent ):void {
-		if ( guid != $vmd.modelGuid ) {
+	private function saveEvent( $mmde:ModelMetadataEvent ):void {
+        Log.out( "ModelMetadata.saveEvent - my guid: " + guid + " target guid: " + $mmde.modelGuid, Log.WARN );
+		if ( guid != $mmde.modelGuid ) {
 			//Log.out( "ModelMetadata.saveEvent - Ignoring save meant for other model my guid: " + guid + " target guid: " + $vmd.modelGuid, Log.WARN );
 			return;
 		}
