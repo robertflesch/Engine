@@ -10,6 +10,7 @@ package com.voxelengine.GUI.panels
 {
 
 import com.voxelengine.events.InstanceInfoEvent;
+import com.voxelengine.worldmodel.models.types.Avatar;
 
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
@@ -92,20 +93,28 @@ public class PanelModels extends PanelBase
 	}
 
     private function metadataChanged( $mme:ModelMetadataEvent ):void {
-        populateModels( _dictionarySource, _parentModel );
-    }
-
-    private function instanceInfoChanged( $mme:InstanceInfoEvent ):void {
         for ( var i:int = 0; i < _listModels.length; i++ ) {
             var li:ListItem = _listModels.getItemAt( i );
-            var item:Object = li.data;
-            if ( $mme.instanceGuid == item.instanceGuid ) {
-                //_listModels.removeItemAt( i );
-				_listModels.updateItemAt( i, $mme.instanceInfo.name, item );
+            var item:Object = li.data; // This is an object with instanceGuid and modelGuid
+            if ( $mme.modelGuid == item.modelGuid ) {
+				// I need the object
+                //_listModels.updateItemAt( i, $mme.instanceInfo.name, item );
                 break;
             }
         }
-		_listModels.redraw();
+
+    }
+
+    private function instanceInfoChanged( $iie:InstanceInfoEvent ):void {
+        for ( var i:int = 0; i < _listModels.length; i++ ) {
+            var li:ListItem = _listModels.getItemAt( i );
+            var item:Object = li.data; // This is an object with instanceGuid and modelGuid
+            if ( $iie.instanceGuid == item.instanceGuid ) {
+				_listModels.updateItemAt( i, $iie.instanceInfo.name, item );
+                break;
+            }
+        }
+//		_listModels.redraw();
     }
 
 
@@ -113,7 +122,7 @@ public class PanelModels extends PanelBase
 	private function modelDeletedGlobally( e:ModelInfoEvent ): void {
 		var modelFound:Boolean = true;
 		for ( var i:int = 0; i < _listModels.length; i++ ) {
-			var guids:Object = getItem( i );
+			var guids:Object = getItemData( i );
 			if ( e.modelGuid == guids.modelGuid ) {
 				_listModels.removeItemAt( i );
 				modelFound = true;
@@ -155,37 +164,24 @@ public class PanelModels extends PanelBase
 			_listModels.removeAll();
 
 		var countAdded:int = 0;
-		for each ( var vm:VoxelModel in _dictionarySource() )
-		{
+		for each ( var vm:VoxelModel in _dictionarySource() ) {
 			if ( vm && !vm.instanceInfo.dynamicObject && !vm.dead ) {
-//				if ( !Globals.isDebug ) {
-//					if ( vm is Player )
-//						continue;
-//				}
-				var itemName:String = "";
-				if ( vm.instanceInfo.name )
-					itemName = vm.instanceInfo.name;
-				else if ( vm.metadata.name )
-					itemName = vm.metadata.name;
-				else
-					itemName = vm.modelInfo.guid;
-				//Log.out( "PanelModels.populateModels - adding: " + itemName );
+				if ( !Globals.isDebug && vm is Avatar )
+					continue;
 
-				addItem( itemName, vm.instanceInfo.instanceGuid, vm.modelInfo.guid );
+				addItem( determineObjectName(vm), vm.instanceInfo.instanceGuid, vm.modelInfo.guid );
 				countAdded++;
 			}
 		}
 		buttonsDisable();
 
         if ( VoxelModel.selectedModel ) {
-            //_selectedText.text = VoxelModel.selectedModel.metadata.name;
+            _selectedText.text = determineObjectName( VoxelModel.selectedModel );
             var ig:String = VoxelModel.selectedModel.instanceInfo.instanceGuid;
-            //displayModelData( ig );
             for ( var i:int = 0; i < _listModels.length; i++ ) {
-                var guids:Object = getItem( i );
+                var guids:Object = getItemData( i );
                 if ( ig == guids.instanceGuid ) {
                     _listModels.selectedIndex = i;
-                    _selectedText.text = guids.name;
 					break;
                 }
             }
@@ -196,11 +192,23 @@ public class PanelModels extends PanelBase
 		return countAdded;
 	}
 
+	private function determineObjectName( $vm:VoxelModel ):String {
+        var itemName:String = "";
+        if ( $vm.instanceInfo.name )
+            itemName = $vm.instanceInfo.name;
+        else if ( $vm.metadata.name )
+            itemName = $vm.metadata.name;
+        else
+            itemName = $vm.modelInfo.guid;
+
+		return itemName;
+	}
+
 	private function addItem( $name:String, $instanceGuid:String, $modelGuid:String ):void {
 		_listModels.addItem( $name, { "instanceGuid" : $instanceGuid, "modelGuid" : $modelGuid } );
 	}
 
-	private function getItem( $index:int ):Object {
+	private function getItemData( $index:int ):Object {
 		var listItem:ListItem = _listModels.getItemAt( $index );
 		if ( listItem )
 			return listItem.data as Object;

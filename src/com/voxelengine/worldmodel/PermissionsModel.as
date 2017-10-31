@@ -34,29 +34,55 @@ public class PermissionsModel extends PermissionsBase
     static public const BIND_MODIFY:String 		= "BIND_MODIFY";
 
     public function get blueprintGuid():String  			{ return _dboReference.permissions.blueprintGuid; }
-    public function set blueprintGuid(value:String):void 	{ _dboReference.permissions.blueprintGuid = value; }
+    public function set blueprintGuid(value:String):void 	{ _dboReference.permissions.blueprintGuid = value; changed = true; }
 
     public function get modify():Boolean 					{ return _dboReference.permissions.modify; }
-    public function set modify(value:Boolean):void 			{ _dboReference.permissions.modify = value; }
+    public function set modify(value:Boolean):void 			{ _dboReference.permissions.modify = value; changed = true; }
 
     public function get copyCount():int  					{ return _dboReference.permissions.copyCount; }
-    public function set copyCount(value:int):void  			{ _dboReference.permissions.copyCount = value; }
+    public function set copyCount(value:int):void  			{ _dboReference.permissions.copyCount = value; changed = true; }
 
     public function get binding():String 					{ return _dboReference.permissions.binding; }
-    public function set binding(value:String):void  		{ _dboReference.permissions.binding = value; }
+    public function set binding(value:String):void  		{ _dboReference.permissions.binding = value; changed = true; }
 
     public function get blueprint():Boolean 				{ return _dboReference.permissions.blueprint; }
-    public function set blueprint(value:Boolean):void		{ _dboReference.permissions.blueprint = value; }
+    public function set blueprint(value:Boolean):void		{ _dboReference.permissions.blueprint = value; changed = true; }
 
-    public function PermissionsModel( $dboReference:DatabaseObject ) {
-        super( $dboReference );
+    public function PermissionsModel( $dboReference:DatabaseObject, $guid:String ) {
+        var newPermissions:Boolean = false;
+        if ( !$dboReference.permissions )
+            newPermissions = true;
+        super( $dboReference, $guid );
 
-        copyCount 							= COPY_COUNT;
-        modify								= true;
-        blueprint							= false;
-        blueprintGuid						= null;
-        binding								= BIND_NONE;
+        var p:Object = $dboReference.permissions;
+        if ( newPermissions ) {
+            copyCount 							= COPY_COUNT;
+            modify								= true;
+            blueprint							= false;
+            blueprintGuid						= null;
+            binding								= BIND_NONE;
+        }
+        else {
+            copyCount 						    = p.copyCount;
+            modify							    = p.modify;
+            blueprint							= p.blueprint;
+            blueprintGuid						= p.blueprintGuid;
+            binding							    = p.binding;
+        }
+
     }
+
+    override public function toObject():Object {
+        var o:Object = super.toObject();
+        o.copyCount 						= copyCount;
+        o.modify							= modify;
+        o.blueprint							= blueprint;
+        o.blueprintGuid						= blueprintGuid;
+        o.binding							= binding;
+
+        return o;
+    }
+
 }
 }
 

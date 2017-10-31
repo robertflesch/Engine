@@ -29,15 +29,11 @@ public class PermissionsRegion extends PermissionsBase
 	//public function get editors():Vector.<String> { return _editors; }
 	//public function set editors(value:Vector.<String>):void  { _editors = value; }
 	
-	public function get created():String  { return dboReference.permissions.created; }
-	public function set created(value:String):void  { dboReference.permissions.created = value; }
-	public function get modified():String  { return dboReference.permissions.modified; }
-	public function set modified(value:String):void  { dboReference.permissions.modified = value; }
 	public function get guest():Boolean  { return dboReference.permissions.guest; }
 	public function set guest(value:Boolean):void  { dboReference.permissions.guest = value; }
 
-	public function PermissionsRegion( $dboReference:DatabaseObject ) {
-		super( $dboReference );
+	public function PermissionsRegion( $dboReference:DatabaseObject, $guid:String ) {
+		super( $dboReference, $guid );
 
 		if ( !dboReference.permissions.guests )
 			dboReference.permissions.guests = false;
@@ -45,17 +41,18 @@ public class PermissionsRegion extends PermissionsBase
 		//$info.permissions.admins = [];
 	}
 
-	public function toObject():Object {
+	override public function toObject():Object {
 		//_permissions.editors = editorsListGet();
 		//_permissions.admins = adminsListGet();
-		return dboReference.permissions;
+		var o:Object = super.toObject();
+		return o
 	}
 
 	//private function editorsListGet():String { return _editors.toString(); }
 	//private function adminsListGet():String { return _admins.toString(); }
 	
 	////////////////////////////////////////
-	// comma seperated variables
+	// comma separated variables
 	private function cvsToVector( value:String ):Vector.<String> {
 		var v:Vector.<String> = new Vector.<String>;
 		var start:int = 0;

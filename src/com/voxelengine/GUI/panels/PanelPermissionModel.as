@@ -7,8 +7,11 @@
 ==============================================================================*/
 
 package com.voxelengine.GUI.panels {
+import com.voxelengine.GUI.components.ComponentCheckBox;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.PermissionsModel;
+import com.voxelengine.worldmodel.models.Role;
+import com.voxelengine.worldmodel.models.types.Player;
 
 import org.flashapi.swing.*
 import org.flashapi.swing.event.*
@@ -38,7 +41,9 @@ public class PanelPermissionModel extends ExpandableBox
 		
 		outString += "creator: " + _permissions.creator + "   ";
 		if ( _permissions.blueprint )
-			outString += "blue print: " + (_permissions.blueprint?"yes ":"no ");
+			outString += "blue print: " + (_permissions.blueprint?"Yes ":"No ");
+		else
+            outString += "blue print: No ";
 		//if ( _at.hasScale )
 			//outString += formatVec3DToSummary( "scl:", _at.scale )
 		//if ( outString == "" ) {
@@ -69,30 +74,40 @@ public class PanelPermissionModel extends ExpandableBox
 	
 	override protected function expand():void {
 		super.expand();
-	
-		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 4 ) );
-		// creator
-		_itemBox.addElement( new ComponentLabelSide( "Creator", _permissions.creator, _itemBox.width ) );
-		// createdData
-		_itemBox.addElement( new ComponentLabelSide( "Created Date", _permissions.createdDate, _itemBox.width ) );
-		// copyCount
-		_itemBox.addElement( new ComponentLabelSide( "Copy Count", String( _permissions.copyCount ), _itemBox.width ) );
-		// blueprint
-		_itemBox.addElement( new ComponentCheckBox( "Blueprint", _permissions.blueprint, _itemBox.width, changeBluePrint ) );
-		// blueprintGuid
-		_itemBox.addElement( new ComponentLabelSide( "Blue Print Guid", _permissions.blueprintGuid ? _permissions.blueprintGuid : "" , _itemBox.width ) );
-		// modifyData
-		_itemBox.addElement( new ComponentLabelSide( "Modified Date", _permissions.modifiedDate ? _permissions.modifiedDate : "", _itemBox.width ) );
-		// modify
-		_itemBox.addElement( new ComponentCheckBox( "Modify", _permissions.modify, _itemBox.width, changeModify ) );
-		// binding
-		_itemBox.addElement( new ComponentLabelSide( "Binding", _permissions.binding, _itemBox.width ) )
+
+        _itemBox.addElement( new ComponentSpacer( _itemBox.width, 4 ) );
+
+        // copyCount
+        _itemBox.addElement( new ComponentLabelSide( "Copy Count", String( _permissions.copyCount ), _itemBox.width ) );
+        // binding
+        _itemBox.addElement( new ComponentLabelSide( "Binding", _permissions.binding, _itemBox.width ) );
+		// is this item a blue print
+        var bluePrintCB:ComponentCheckBox = new ComponentCheckBox( "Blueprint", _permissions.blueprint, _itemBox.width, changeBluePrint );
+        if ( Network.userId != _permissions.creator ) {
+            bluePrintCB.enabled = false;
+        }
+        _itemBox.addElement( bluePrintCB );
+
+        // blueprintGuid
+        _itemBox.addElement( new ComponentLabelSide( "Blue Print Guid", _permissions.blueprintGuid ? _permissions.blueprintGuid : "" , _itemBox.width ) );
+		// can the user modify this
+        var modifyCB:ComponentCheckBox = new ComponentCheckBox( "Modify", _permissions.modify, _itemBox.width, changeModify )
+        if ( Network.userId != _permissions.creator ) {
+			modifyCB.enabled = false;
+        }
+		_itemBox.addElement( modifyCB );
+
+        // creator
+        _itemBox.addElement( new ComponentLabelSide( "Creator", _permissions.creator, _itemBox.width ) );
+        // createdDate
+        _itemBox.addElement( new ComponentLabelSide( "Created Date", _permissions.createdDate, _itemBox.width ) );
+        // modifyDate
+        _itemBox.addElement( new ComponentLabelSide( "Modified Date", _permissions.modifiedDate ? _permissions.modifiedDate : "", _itemBox.width ) );
 	}
 	
 	private function changeModify(event:UIMouseEvent):void {
 		if ( Network.userId == _permissions.creator ) {
 			_permissions.modify = (event.target as CheckBox).selected;
-			_permissions.dboReference.changed = true
 		}
 		else
 			(new Alert("You do not have permission to change the 'modify' permission on this object")).display();		
@@ -101,7 +116,6 @@ public class PanelPermissionModel extends ExpandableBox
 	private function changeBluePrint(event:UIMouseEvent):void {
 		if ( Network.userId == _permissions.creator ) {
 			_permissions.blueprint = (event.target as CheckBox).selected;
-			_permissions.dboReference.changed = true
 		}
 		else
 			(new Alert("You do not have permission to change the 'blue print' permission on this object")).display();		

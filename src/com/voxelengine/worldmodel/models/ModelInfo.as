@@ -8,8 +8,11 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 
+import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
+import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.oxel.OxelBad;
 
 import flash.display3D.Context3D;
@@ -27,7 +30,6 @@ import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.RegionEvent;
-import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.animation.Animation;
@@ -710,5 +712,48 @@ public class ModelInfo extends PersistenceObject
 	}
 
 	public function toString():String {  return "ModelInfo - guid: " + guid; }
+
+    private var testPermissions:Boolean
+	public function assignToPublic( $testPermissions = false ):void {
+        testPermissions = $testPermissions;
+        ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, handleMetadataRequest );
+        ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, handleMetadataRequest );
+        ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
+		ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, guid );
+
+	}
+
+    private function metadataFailed(e:ModelMetadataEvent):void {
+        if ( guid == e.modelGuid ) {
+            ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, handleMetadataRequest );
+            ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, handleMetadataRequest );
+            ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
+            Log.out( "ModelInfo.metadataFailed - guid: " + guid + " didn't find metadata when trying to assign to public", Log.ERROR );
+        }
+    }
+
+    private function handleMetadataRequest( $mmde:ModelMetadataEvent ):void {
+		if ( $mmde.modelGuid == guid ) {
+            ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, handleMetadataRequest );
+            ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, handleMetadataRequest );
+            ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
+
+            var role:Role = Player.player.role;
+            if ( role.modelNominate && role.modelPromote && $mmde.modelMetadata.creator == Network.userId ) {
+                if ( !testPermissions ) {
+                    $mmde.modelMetadata.owner = Network.PUBLIC;
+                    ModelMetadataEvent.create(ModelBaseEvent.SAVE, 0, $mmde.modelGuid, $mmde.modelMetadata);
+                }
+            } else
+					ModelInfoEvent.create( ModelInfoEvent.PERMISSION_FAIL, 0, guid, null );
+
+            for ( var i:int=0; i < _childVoxelModels.length; i++ ) {
+				var childModel:VoxelModel = _childVoxelModels[i];
+				if ( childModel ) {
+					childModel.modelInfo.assignToPublic();
+				}
+            }
+		}
+	}
 }	
 }

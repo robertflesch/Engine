@@ -105,7 +105,7 @@ import flash.geom.Vector3D;
 
 			function init():void {
 				// This creates and parses the permissions
-				_permissions = new PermissionsRegion(dbo);
+				_permissions = new PermissionsRegion( dbo, guid );
 			}
 		}
 

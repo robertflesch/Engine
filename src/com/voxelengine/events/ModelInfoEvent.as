@@ -15,6 +15,8 @@ import com.voxelengine.worldmodel.models.ModelInfo;
 public class ModelInfoEvent extends ModelBaseEvent
 {
 	static public const DELETE_RECURSIVE:String					= "DELETE_RECURSIVE";
+    static public const PERMISSION_FAIL:String					= "PERMISSION_FAIL";
+
 	
 	private var _vmi:ModelInfo;
 	private var _modelGuid:String;

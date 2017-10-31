@@ -112,8 +112,8 @@ public class ModelMetadata extends PersistenceObject
 		init( $newData );
 
 		if ( "EditCursor" != guid ) {
-			ModelMetadataEvent.addListener(ModelBaseEvent.SAVE, saveEvent);
-			//ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
+			ModelMetadataEvent.addListener( ModelBaseEvent.SAVE, saveEvent);
+            ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
 		}
 
 		function init( $newData:Object = null ):void {
@@ -122,7 +122,7 @@ public class ModelMetadata extends PersistenceObject
 				mergeOverwrite( $newData );
 
 			// the permission object is just an encapsulation of the permissions section of the object
-			_permissions = new PermissionsModel( dbo );
+			_permissions = new PermissionsModel( dbo, guid );
 
 
 			if ( dbo.thumbnail ) {
@@ -161,10 +161,8 @@ public class ModelMetadata extends PersistenceObject
 	}
 
 	private function metadataChanged( $mme:ModelMetadataEvent ):void {
-		Log.out( "PanelModels.metaDataChanged - IS THIS NEEDED?", Log.WARN);
 		if ( $mme.modelGuid == guid ) {
-			Log.out( "ModelMetaData.changed - how to do update with new data?", Log.WARN );
-			// or do I even need to?
+			changed = true;
 		}
 	}
 
@@ -199,7 +197,7 @@ public class ModelMetadata extends PersistenceObject
 	
 	override public function release():void {
 		ModelMetadataEvent.removeListener( ModelBaseEvent.SAVE, saveEvent );
-//		ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
+		ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
 	}
 	
 	// This was private, force a message to be sent to it.
@@ -220,7 +218,9 @@ public class ModelMetadata extends PersistenceObject
             dbo.thumbnail 		= thumbnail.getPixels(new Rectangle(0, 0, 128, 128));
 		else
 			dbo.thumbnail = null;
-	}
+
+		dbo.permissions = _permissions.toObject();
+    }
 
 
 	override public function clone( $guid:String ):* {

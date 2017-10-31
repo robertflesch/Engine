@@ -77,8 +77,6 @@ public class BoxInventory extends VVBox
 	private function metadataChanged( $mme:ModelMetadataEvent ):void {
 		var om:ObjectModel = _objectInfo as ObjectModel;
 		if ( om && ( $mme.modelGuid == om.modelGuid ) ) {
-			//ModelMetadataEvent.removeListener( ModelBaseEvent.CHANGED, metadataChanged );
-			om.vmm = $mme.modelMetadata;
 			updateObjectInfo( om )
 		}
 	}
@@ -218,7 +216,7 @@ public class BoxInventory extends VVBox
 		function editModelData( $me:UIMouseEvent ):void {
 			var t:ObjectModel = _objectInfo as ObjectModel;
 			var vmm:ModelMetadata = t.vmm;
-			if ( !PopupMetadataAndModelInfo.inExistance )
+			if ( vmm && !PopupMetadataAndModelInfo.inExistance )
 				new PopupMetadataAndModelInfo( vmm );
 		}
 	}

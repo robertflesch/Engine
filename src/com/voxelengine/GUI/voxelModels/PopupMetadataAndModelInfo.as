@@ -9,8 +9,13 @@
 package com.voxelengine.GUI.voxelModels
 {
 
+import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.models.Role;
+import com.voxelengine.worldmodel.models.types.Player;
+
 import flash.display.Bitmap;
 import flash.display.BitmapData;
+import flash.events.MouseEvent;
 import flash.geom.Matrix;
 
 import org.flashapi.swing.*;
@@ -109,9 +114,36 @@ public class PopupMetadataAndModelInfo extends VVPopup
                 , WIDTH ) );
         addElement( new ComponentLabel( "Created Date",  String(_mmd.createdDate), WIDTH ) );
         addElement( new ComponentLabel( "Creator",  String(_mmd.creator), WIDTH ) );
+        addElement( (new Button( "Give To Public", 200, 24 )).addEventListener( MouseEvent.CLICK, giveToPublic ));
 
         addPermissions();
     }
+
+    private function giveToPublic( $me:MouseEvent ):void {
+        if ( _mmd.owner  && _mmd.permissions.creator == Network.userId ){
+            // ASK IF THEY ARE SURE
+            // EVENT
+
+            // Check to make sure they own it and all of the child models permissions
+            var cancelAssignment:Boolean = false;
+            var role:Role = Player.player.role;
+            if ( role.modelNominate && role.modelPromote ) {
+                ModelInfoEvent.addListener( ModelInfoEvent.PERMISSION_FAIL, permissionFailure )
+                _mi.assignToPublic( true );
+            }
+
+            if ( cancelAssignment )
+               return;
+            else
+                _mi.assignToPublic();
+        }
+
+        function permissionFailure( $mie:ModelInfoEvent ):void {
+            cancelAssignment = true;
+        }
+
+    }
+
 
     private function addModelInfo():void {
         addElement( new ComponentLabel( "Model GUID",  _mi.guid, WIDTH ) );

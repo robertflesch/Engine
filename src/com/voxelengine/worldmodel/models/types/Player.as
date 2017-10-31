@@ -90,6 +90,7 @@ public class Player extends PersistenceObject
 			"Vida",
 			"Lucky" ];
 
+    public function get role():Role { return dbo.role }
 
     private static var _s_player:Player = null;
 	public static function get player():Player { return _s_player; }
@@ -144,6 +145,7 @@ public class Player extends PersistenceObject
             WindowSplashEvent.create(WindowSplashEvent.ANNIHILATE);
 		}
 	}
+
 
 	static public const DEFAULT_PLAYER:String = "DefaultPlayer";
 	public function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
