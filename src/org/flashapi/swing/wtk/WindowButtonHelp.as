@@ -34,8 +34,8 @@ public class WindowButtonHelp extends WindowButton implements Observer, WTKButto
     /**
      *  Constructor. Creates a new <code>WindowButtonClose</code> instance.
      */
-    public function WindowButtonHelp() {
-        super("", 20, 20);
+    public function WindowButtonHelp( $title = "", $width = 20, $height = 20) {
+        super( $title, $width, $height );
         initObj();
     }
 
