@@ -27,9 +27,9 @@ public class InventoryVoxelEvent extends Event
 	private var _typeId:int;	  // Voxel Type ID
 	private var _result:*;
 	
-	public function InventoryVoxelEvent( $type:String, $ownerGuid:String, $typeId:int, $result:*, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function InventoryVoxelEvent( $type:String, $ownerGuid:String, $typeId:int, $result:* )
 	{
-		super( $type, $bubbles, $cancellable );
+		super( $type );
 		_networkId = $ownerGuid;
 		_typeId = $typeId;
 		_result = $result;
@@ -37,7 +37,7 @@ public class InventoryVoxelEvent extends Event
 	
 	public override function clone():Event
 	{
-		return new InventoryVoxelEvent( type, _networkId, _typeId, _result, bubbles, cancelable);
+		return new InventoryVoxelEvent( type, _networkId, _typeId, _result);
 	}
    
 	public override function toString():String
@@ -70,9 +70,10 @@ public class InventoryVoxelEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:InventoryVoxelEvent ) : Boolean {
-		return _eventDispatcher.dispatchEvent( $event );
+    static public function create( $type:String, $ownerGuid:String, $typeId:int, $result:* ):Boolean {
+        return _eventDispatcher.dispatchEvent( new InventoryVoxelEvent( $type, $ownerGuid, $typeId, $result ) );
 	}
+
 
 	///////////////// Event handler interface /////////////////////////////
 }	

@@ -25,7 +25,10 @@ public class Network
 	
 	static private var _userId:String = LOCAL;
 	static public function get userId():String { return _userId; }
-	
+
+    static private var _storeID:String = "store";
+    static public function get storeId():String { return _storeID; }
+
 	// This was a test to see if I could make a client that didnt need user interaction.
 	// This will allow me to do things like post to Facebook things that users create.
 	static public function autoLogin( $startingRegionGuid:String ):void {

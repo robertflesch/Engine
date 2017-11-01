@@ -37,17 +37,21 @@ public class InventoryPanelRegions extends VVContainer
 	// This hold the items to be displayed
 	private var _itemContainer:Container;
 	private var _listbox1:ListBox;
-	private var _createFileButton:Button;
+	private var _dataSource:String;
+
 	
-	public function InventoryPanelRegions( $parent:VVContainer ) {
+	public function InventoryPanelRegions( $parent:VVContainer, $dataSource:String ) {
 		super( $parent );
+        _dataSource = $dataSource;
 		width = _parent.width;
 		//autoSize = true;
 		layout.orientation = LayoutOrientation.HORIZONTAL;
 		
 //		upperTabsAdd();
 		addItemContainer();
-		displayAllRegions();
+        RegionEvent.addListener( ModelBaseEvent.ADDED, regionLoadedEvent );
+        RegionEvent.addListener( ModelBaseEvent.RESULT, regionLoadedEvent );
+        displaySelectedSource( $dataSource );
 	}
 	/*
 	private function upperTabsAdd():void {
@@ -86,12 +90,22 @@ public class InventoryPanelRegions extends VVContainer
 	//{			
 		//displaySelectedRegionList();	
 	//}
-	
+
+    private function displaySelectedSource( $dataSource:String ):void {
+
+	}
 	private function displayAllRegions():void
 	{
 		_listbox1.removeAll();
-		RegionEvent.addListener( ModelBaseEvent.ADDED, regionLoadedEvent );
-		RegionEvent.addListener( ModelBaseEvent.RESULT, regionLoadedEvent );
+
+//        _seriesModelMetadataEvent = ModelBaseEvent.seriesCounter;
+//        if ( $source == WindowInventoryNew.SOURCE_PUBLIC )
+//            ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.PUBLIC, null );
+//        else if ( $source == WindowInventoryNew.SOURCE_BACKPACK )
+//            ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId, null );
+//        else
+//            ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.storeId, null );
+
 		RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId );
 		if ( Globals.isDebug )
 			RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.PUBLIC );
@@ -103,8 +117,7 @@ public class InventoryPanelRegions extends VVContainer
 		_listbox1.addItem( region.name + "\t Owner: " + region.owner + "\t Desc: " + region.desc , region.guid );
 	}
 	
-	private function editThisRegion(event:UIMouseEvent):void 
-	{
+	private function editThisRegion(event:UIMouseEvent):void  {
 		if ( -1 == _listbox1.selectedIndex )
 			return;
 			
@@ -112,8 +125,7 @@ public class InventoryPanelRegions extends VVContainer
 		if ( li ) {
 			RegionEvent.removeListener( ModelBaseEvent.ADDED, regionLoadedEvent );
 			RegionEvent.removeListener( ModelBaseEvent.RESULT, regionLoadedEvent );
-			var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_REGIONS );
-			//new WindowRegionDetail( li.data, WindowInventoryNew, startingTab );
+//			var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_REGIONS );
 			new WindowRegionDetail( li.data, null );
 		}
 	}

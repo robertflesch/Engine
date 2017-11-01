@@ -56,19 +56,19 @@ public class ModelMetadataCache
 		
 		//Log.out( "ModelMetadataCache.requestType  owner: " + $mme.modelGuid, Log.WARN );
 		// For each one loaded this will send out a new ModelMetadataEvent( ModelBaseEvent.ADDED, $vmm.guid, $vmm ) event
-		if ( false == _initializedPublic ) {
+		if ( false == _initializedPublic && $mme.modelGuid == Network.PUBLIC ) {
 			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, ModelMetadata.BIGDB_TABLE_MODEL_METADATA, Network.PUBLIC, null, ModelMetadata.BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
 			_initializedPublic = true;
 		}
 
-		if ( false == _initializedPrivate ) {
+		if ( false == _initializedPrivate && $mme.modelGuid == Network.userId ) {
 			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, ModelMetadata.BIGDB_TABLE_MODEL_METADATA, Network.userId, null, ModelMetadata.BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
 			_initializedPrivate = true;
 		}
 
 		// This will return models already loaded.
 		for each ( var vmm:ModelMetadata in _metadata ) {
-			if ( vmm && ( vmm.owner == $mme.modelGuid || vmm.owner == Network.PUBLIC ) ) {
+			if ( vmm && vmm.owner == $mme.modelGuid ) {
                 Log.out( "ModelMetadataCache.requestType RETURN  " +  vmm.owner + " ==" + $mme.modelGuid + "  guid: " + vmm.guid + "  desc: " + vmm.description , Log.WARN );
 				ModelMetadataEvent.create( ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm );
 			}

@@ -66,7 +66,7 @@ public class InventoryPanelModel extends VVContainer
 	static public const MODEL_CAT_CRAFT:String = "Craft";
 	static public const MODEL_CAT_CREATURE:String = "Creature";
 	static public const MODEL_CAT_ALL:String = "All";
-	
+
 	static private const MODEL_CONTAINER_WIDTH:int = 512;
 	static private const MODEL_IMAGE_WIDTH:int = 128;
 	static private const MODEL_IMAGE_HEIGHT:int = 128;
@@ -80,7 +80,7 @@ public class InventoryPanelModel extends VVContainer
 	private var _seriesModelMetadataEvent:int;
 	private var _category:String = MODEL_CAT_ALL;
 	
-	public function InventoryPanelModel( $parent:VVContainer ) {
+	public function InventoryPanelModel( $parent:VVContainer, $source:String ) {
 		super( $parent );
 		layout.orientation = LayoutOrientation.HORIZONTAL;
 		
@@ -96,7 +96,7 @@ public class InventoryPanelModel extends VVContainer
 		upperTabsAdd();
 		addItemContainer();
 		addTrashCan();
-		displaySelectedCategory( MODEL_CAT_ALL );
+        displaySelectedSource( $source );
 		
 		// This forces the window into a multiple of MODEL_IMAGE_WIDTH width
 		var count:int = width / MODEL_IMAGE_WIDTH;
@@ -176,19 +176,31 @@ public class InventoryPanelModel extends VVContainer
 	
 	// TODO I see problem here when language is different then what is in TypeInfo RSF - 11.16.14
 	// That is if I use the target "Name"
-	private function displaySelectedCategory( $category:String ):void {
+	private function displaySelectedSource( $source:String ):void {
 		//Log.out( "InventoryPanelModels.displaySelectedCategory - Not implemented", Log.WARN );
 		// The series makes it so that I dont see results from other objects requests
 		// This grabs the current series counter which will be used on the REQUEST_TYPE call
-		if ( MODEL_CAT_ALL == $category ) {
+		if ( WindowInventoryNew.SOURCE_BACKPACK == $source ) {
 			addTools();
 		}
+
 		_seriesModelMetadataEvent = ModelBaseEvent.seriesCounter;
-		ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId, null );
-		//ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.PUBLIC, null );
+		if ( $source == WindowInventoryNew.SOURCE_PUBLIC )
+            ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.PUBLIC, null );
+		else if ( $source == WindowInventoryNew.SOURCE_BACKPACK )
+			ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId, null );
+		else
+            ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.storeId, null );
 	}
 
-	private function removeModelMetadataEvent($mme:ModelMetadataEvent):void {
+    // TODO I see problem here when language is different then what is in TypeInfo RSF - 11.16.14
+    // That is if I use the target "Name"
+    private function displaySelectedCategory( $category:String ):void {
+        Log.out( "InventoryPanelModels.displaySelectedCategory - Not implemented", Log.WARN );
+		throw new Error( "Not implemented");
+    }
+
+    private function removeModelMetadataEvent($mme:ModelMetadataEvent):void {
 		removeModel( $mme.modelGuid );
 	}
 

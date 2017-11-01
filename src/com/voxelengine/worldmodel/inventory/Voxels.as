@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 
+import com.voxelengine.GUI.inventory.InventoryPanelVoxel;
 import com.voxelengine.events.InventoryEvent;
 
 import flash.utils.ByteArray;
@@ -19,6 +20,20 @@ import com.voxelengine.worldmodel.models.SecureInt;
 
 public class Voxels
 {
+    static public const VOXEL_CAT_ALL:String 		= "All";
+    static public const VOXEL_CAT_EARTH:String 	= "Earth";
+    static public const VOXEL_CAT_LIQUID:String 	= "Liquid";
+    static public const VOXEL_CAT_PLANT:String 	= "Plant";
+    static public const VOXEL_CAT_METAL:String 	= "Metal";
+    static public const VOXEL_CAT_AIR:String 		= "Air";
+    static public const VOXEL_CAT_BEAST:String 	= "Beast";
+    static public const VOXEL_CAT_UTIL:String 		= "Util";
+    static public const VOXEL_CAT_GEM:String 		= "Gem";
+    static public const VOXEL_CAT_AVATAR:String 	= "Avatar";
+    static public const VOXEL_CAT_LIGHT:String 	= "Light";
+    static public const VOXEL_CAT_CRAFTING:String 	= "Crafting";
+
+
 	private var  _items:Vector.<SecureInt> = new Vector.<SecureInt>( TypeInfo.MAX_TYPE_INFO, true );
 	public function get items():Vector.<SecureInt>  { return _items; }
 	private var _owner:Inventory;
@@ -30,7 +45,7 @@ public class Voxels
 		for ( var typeId:int = 0; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
 			_items[typeId] = new SecureInt( 0 );
 			
-		InventoryVoxelEvent.addListener( InventoryVoxelEvent.CHANGE, 			change );
+		InventoryVoxelEvent.addListener( InventoryVoxelEvent.CHANGE, 		change );
 		InventoryVoxelEvent.addListener( InventoryVoxelEvent.COUNT_REQUEST,	count );
 		InventoryVoxelEvent.addListener( InventoryVoxelEvent.TYPES_REQUEST,	types );
 	}
@@ -45,9 +60,9 @@ public class Voxels
 	public function types(e:InventoryVoxelEvent):void 
 	{
 		if ( e.networkId == _owner.ownerGuid ) {
-			const cat:String = (e.result as String).toUpperCase();
-			if ( cat == "ALL" ) {
-				InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.TYPES_RESULT, _owner.ownerGuid, -1, _items ) );
+			const cat:String = (e.result as String);
+			if ( cat == VOXEL_CAT_ALL ) {
+				InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_RESULT, _owner.ownerGuid, -1, _items );
 				return;
 			}
 				
@@ -68,7 +83,7 @@ public class Voxels
 				}
 			}
 
-			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.TYPES_RESULT, _owner.ownerGuid, -1, result ) );
+			InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_RESULT, _owner.ownerGuid, -1, result );
 		}
 	}
 	
@@ -79,7 +94,7 @@ public class Voxels
 		if ( e.networkId == _owner.ownerGuid ) {
 			var typeId:int = e.typeId;
 			var voxelCount:int = _items[typeId].val;
-			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_RESULT, _owner.ownerGuid, typeId, voxelCount ) );
+			InventoryVoxelEvent.create( InventoryVoxelEvent.COUNT_RESULT, _owner.ownerGuid, typeId, voxelCount );
 		}
 		//Log.out( "Voxels.voxelCount - Failed test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
 	}
@@ -106,7 +121,7 @@ public class Voxels
 			voxelCount += changeAmount;
 			_items[typeId].val = voxelCount;
 			//Log.out( "Voxels.change - Succeeded test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
-			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_RESULT, _owner.ownerGuid, typeId, voxelCount ) );
+			InventoryVoxelEvent.create( InventoryVoxelEvent.COUNT_RESULT, _owner.ownerGuid, typeId, voxelCount );
             _owner.changed = true;
             InventoryEvent.create( InventoryEvent.SAVE_REQUEST, _owner.ownerGuid, null );
 		}

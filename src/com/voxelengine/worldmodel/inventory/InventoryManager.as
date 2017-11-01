@@ -28,7 +28,7 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 	 
 public class InventoryManager
 {
-	// There is still some confustion here, do I use network id? that would mean only avatars can have intentory
+	// There is still some confusion here, do I use network id? that would mean only avatars can have inventory
 	// really I want any model to be able to have inventory. so this is instanceInfo.instanceGuid.
 	static private var  _s_inventoryByGuid:Object = {};
 	

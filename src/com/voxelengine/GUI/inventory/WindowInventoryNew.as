@@ -27,9 +27,15 @@ import org.flashapi.swing.*
 	public class WindowInventoryNew extends VVPopup
 	{
         static public const ALL_ITEMS:String = "all_items";
+        static public const INVENTORY_PUBLIC:String = "public";
         static public const INVENTORY_OWNED:String = "backpack";
         static public const INVENTORY_STORE:String = "store";
         static public const INVENTORY_LAST:String = "last";
+
+        static public const SOURCE_BACKPACK:String = "backpack";
+        static public const SOURCE_PUBLIC:String = "public";
+        static public const SOURCE_STORE:String = "store";
+
 		
 		// TODO need a more central location for these
         static public const INVENTORY_CAT_VOXELS:String = "Voxels";
@@ -81,14 +87,13 @@ import org.flashapi.swing.*
 			addEventListener( UIOEvent.RESIZED, onResized );
 		}
 		
-		public function onResized(e:UIOEvent):void 
-		{
-			_ownedVsStore.setButtonsWidth( width / 2, 36 );
+		private const TAB_BAR_HEIGHT:int = 36;
+		public function onResized(e:UIOEvent):void  {
+			_ownedVsStore.setButtonsWidth( width / _ownedVsStore.length, TAB_BAR_HEIGHT );
 		}
 		
-		public function onResizedFromChild(e:UIOEvent):void 
-		{
-			_ownedVsStore.setButtonsWidth( width / 2, 36 );
+		public function onResizedFromChild(e:UIOEvent):void	{
+			_ownedVsStore.setButtonsWidth( width / _ownedVsStore.length, TAB_BAR_HEIGHT );
 		}
 
 		private function ownedVsStoreTabsHorizontal( $tabTokens:String ):void {
@@ -101,14 +106,16 @@ import org.flashapi.swing.*
 			_ownedVsStore = new TabBar();
 			_ownedVsStore.orientation = ButtonBarOrientation.HORIZONTAL;
 			_ownedVsStore.name = "ownedVsStore";
-			// TODO I should really iterate thru the types and collect the categories - RSF
+            _ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_PUBLIC ), INVENTORY_PUBLIC );
             _ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_OWNED ), INVENTORY_OWNED );
-			//_ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_STORE ), INVENTORY_STORE );
-			_ownedVsStore.setButtonsWidth( 256, 36 );
+			_ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_STORE ), INVENTORY_STORE );
+			_ownedVsStore.setButtonsWidth( 728.55 / _ownedVsStore.length, TAB_BAR_HEIGHT );
 			if ( startingTabName == INVENTORY_STORE )
-				_ownedVsStore.selectedIndex = 1;
+				_ownedVsStore.selectedIndex = 2;
+            else if ( startingTabName == INVENTORY_PUBLIC )
+                _ownedVsStore.selectedIndex = 0;
 			else
-				_ownedVsStore.selectedIndex = 0;
+				_ownedVsStore.selectedIndex = 1;
 			//_ownedVsStore.itemsCollection
             eventCollector.addEvent( _ownedVsStore, ListEvent.ITEM_CLICKED, selectCategory );
             addGraphicElements( _ownedVsStore );

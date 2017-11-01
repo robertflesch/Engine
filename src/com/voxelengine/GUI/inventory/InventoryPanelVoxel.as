@@ -6,6 +6,8 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
+import com.voxelengine.worldmodel.inventory.Voxels;
+
 import flash.display.DisplayObject;
 import org.flashapi.swing.*
 import org.flashapi.swing.core.UIObject;
@@ -29,19 +31,6 @@ import com.voxelengine.worldmodel.inventory.ObjectVoxel;
 
 public class InventoryPanelVoxel extends VVContainer
 {
-	static private const VOXEL_CAT_ALL:String 		= "All";
-	static private const VOXEL_CAT_EARTH:String 	= "Earth";
-	static private const VOXEL_CAT_LIQUID:String 	= "Liquid";
-	static private const VOXEL_CAT_PLANT:String 	= "Plant";
-	static private const VOXEL_CAT_METAL:String 	= "Metal";
-	static private const VOXEL_CAT_AIR:String 		= "Air";
-	static private const VOXEL_CAT_BEAST:String 	= "Beast";
-	static private const VOXEL_CAT_UTIL:String 		= "Util";
-	static private const VOXEL_CAT_GEM:String 		= "Gem";
-	static private const VOXEL_CAT_AVATAR:String 	= "Avatar";
-	static private const VOXEL_CAT_LIGHT:String 	= "Light";
-	static private const VOXEL_CAT_CRAFTING:String 	= "Crafting";
-
 	static private const VOXEL_CONTAINER_WIDTH:int = 512;
 	static private const VOXEL_IMAGE_WIDTH:int = 64;
 	static private const VOXEL_IMAGE_HEIGHT:int = 64;
@@ -50,89 +39,65 @@ public class InventoryPanelVoxel extends VVContainer
 	private var _barUpper:TabBar;
 	private var _barLower:TabBar;
 	private var _itemContainer:Container = new Container( VOXEL_IMAGE_WIDTH, VOXEL_IMAGE_HEIGHT);
+    private var _voxelData:Vector.<SecureInt>;
 	
-	public function InventoryPanelVoxel( $parent:VVContainer )
+	public function InventoryPanelVoxel( $parent:VVContainer, $dataSource:String )
 	{
 		// TODO I notice when I repeatedly open and close this window that more and more memory is allocated
-		// so something is not be released, or maybe I jsut need to be most patient for GC.
 		super( $parent );
-//			autoSize = true;
 		layout.orientation = LayoutOrientation.HORIZONTAL;
 		
 		upperTabsAdd();
-		addItemContainer();
+
+        addElement( _itemContainer );
+        _itemContainer.autoSize = true;
+        _itemContainer.layout.orientation = LayoutOrientation.VERTICAL;
+
 		lowerTabsAdd();
-		displaySelectedCategory( "all" );
-		
+        InventoryVoxelEvent.addListener( InventoryVoxelEvent.TYPES_RESULT, populateVoxels );
+        displaySelectedSource( $dataSource );
+
 		// This forces the window into a multiple of 64 width
 		var count:int = width / 64;
 		width = count * 64;
-		
+
 		eventCollector.addEvent(_dragOp, DnDEvent.DND_DROP_ACCEPTED, dropMaterial );
 	}
-	
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	private function inventoryTestListeners():void { 
-		
-		InventoryVoxelEvent.addListener( InventoryVoxelEvent.COUNT_RESULT, testInventoryVoxelResult ) ;
-		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_REQUEST, Network.userId, TypeInfo.STONE, -1 ) );
-		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_REQUEST, Network.userId, TypeInfo.IRON, -1 ) );
-		
-		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.CHANGE, Network.userId, TypeInfo.STONE, 1 ) );
-		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.CHANGE, Network.userId, TypeInfo.STONE, 100 ) );
-		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.CHANGE, Network.userId, TypeInfo.STONE, 1000 ) );
-		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.CHANGE, Network.userId, TypeInfo.STONE, 10000 ) );
-	}
-
-	private function testInventoryVoxelResult(e:InventoryVoxelEvent):void 
-	{
-		Log.out( "WindowRegionModels.testInventoryVoxelResult - id: " + e.type + "  count: " + e.result );
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-
 	
 	private function upperTabsAdd():void {
 		_barUpper = new TabBar();
 		_barUpper.orientation = ButtonBarOrientation.VERTICAL;
 		_barUpper.name = "upper";
 		// TODO I should really iterate thru the types and collect the categories - RSF
-		_barUpper.addItem( LanguageManager.localizedStringGet( VOXEL_CAT_EARTH ), VOXEL_CAT_EARTH );
-		_barUpper.addItem( LanguageManager.localizedStringGet( VOXEL_CAT_LIQUID ), VOXEL_CAT_LIQUID );
-		_barUpper.addItem( LanguageManager.localizedStringGet( VOXEL_CAT_PLANT ), VOXEL_CAT_PLANT );
-		_barUpper.addItem( LanguageManager.localizedStringGet( VOXEL_CAT_METAL ), VOXEL_CAT_METAL );
-		_barUpper.addItem( LanguageManager.localizedStringGet( VOXEL_CAT_AIR ), VOXEL_CAT_AIR );
-		var li:ListItem = _barUpper.addItem( LanguageManager.localizedStringGet( VOXEL_CAT_ALL ), VOXEL_CAT_ALL );
+		_barUpper.addItem( LanguageManager.localizedStringGet( Voxels.VOXEL_CAT_EARTH ), Voxels.VOXEL_CAT_EARTH );
+		_barUpper.addItem( LanguageManager.localizedStringGet( Voxels.VOXEL_CAT_LIQUID ), Voxels.VOXEL_CAT_LIQUID );
+		_barUpper.addItem( LanguageManager.localizedStringGet( Voxels.VOXEL_CAT_PLANT ), Voxels.VOXEL_CAT_PLANT );
+		_barUpper.addItem( LanguageManager.localizedStringGet( Voxels.VOXEL_CAT_METAL ), Voxels.VOXEL_CAT_METAL );
+		_barUpper.addItem( LanguageManager.localizedStringGet( Voxels.VOXEL_CAT_AIR ), Voxels.VOXEL_CAT_AIR );
+		var li:ListItem = _barUpper.addItem( LanguageManager.localizedStringGet( Voxels.VOXEL_CAT_ALL ), Voxels.VOXEL_CAT_ALL );
 		_barUpper.setButtonsWidth( 96, 32 );
 		_barUpper.selectedIndex = li.index;
 		eventCollector.addEvent( _barUpper, ListEvent.ITEM_CLICKED, selectCategory );
 		addGraphicElements( _barUpper );
 	}
 
-	private function addItemContainer():void {
-		addElement( _itemContainer );
-		_itemContainer.autoSize = true;
-		_itemContainer.layout.orientation = LayoutOrientation.VERTICAL;
-	}
 	private function lowerTabsAdd():void {
 		_barLower = new TabBar();
 		_barLower.orientation = ButtonBarOrientation.VERTICAL;
 		_barLower.name = "lower";
 		// TODO I should really iterate thru the types and collect the categories - RSF
-		_barLower.addItem( LanguageManager.localizedStringGet( VOXEL_CAT_BEAST ), VOXEL_CAT_BEAST );
-		_barLower.addItem( LanguageManager.localizedStringGet( VOXEL_CAT_UTIL ), VOXEL_CAT_UTIL );
-		_barLower.addItem( LanguageManager.localizedStringGet( VOXEL_CAT_GEM ), VOXEL_CAT_GEM );
-		_barLower.addItem( LanguageManager.localizedStringGet( VOXEL_CAT_AVATAR ), VOXEL_CAT_AVATAR );
-		_barLower.addItem( LanguageManager.localizedStringGet( VOXEL_CAT_LIGHT ), VOXEL_CAT_LIGHT );
-		_barLower.addItem( LanguageManager.localizedStringGet( VOXEL_CAT_CRAFTING ), VOXEL_CAT_CRAFTING );
+		//_barLower.addItem( LanguageManager.localizedStringGet( Voxels.VOXEL_CAT_BEAST ), Voxels.VOXEL_CAT_BEAST );
+		_barLower.addItem( LanguageManager.localizedStringGet( Voxels.VOXEL_CAT_UTIL ), Voxels.VOXEL_CAT_UTIL );
+		_barLower.addItem( LanguageManager.localizedStringGet( Voxels.VOXEL_CAT_GEM ), Voxels.VOXEL_CAT_GEM );
+		_barLower.addItem( LanguageManager.localizedStringGet( Voxels.VOXEL_CAT_AVATAR ), Voxels.VOXEL_CAT_AVATAR );
+		_barLower.addItem( LanguageManager.localizedStringGet( Voxels.VOXEL_CAT_LIGHT ), Voxels.VOXEL_CAT_LIGHT );
+		_barLower.addItem( LanguageManager.localizedStringGet( Voxels.VOXEL_CAT_CRAFTING ), Voxels.VOXEL_CAT_CRAFTING );
 		_barLower.setButtonsWidth( 96, 32 );
 		eventCollector.addEvent( _barLower, ListEvent.ITEM_CLICKED, selectCategory );
 		addGraphicElements( _barLower );
 	}
 	
-	private function selectCategory(e:ListEvent):void 
-	{			
+	private function selectCategory(e:ListEvent):void {
 		//Log.out( "PanelVoxelInventory.selectCategory" );
 		while ( 1 <= _itemContainer.numElements )
 			_itemContainer.removeElementAt( 0 );
@@ -144,58 +109,73 @@ public class InventoryPanelVoxel extends VVContainer
 			
 		displaySelectedCategory( e.target.value );	
 	}
-	
+
+    private function displaySelectedSource( $source:String ):void {
+        if ( $source == WindowInventoryNew.SOURCE_PUBLIC )
+            InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.PUBLIC, -1, Voxels.VOXEL_CAT_ALL );
+        else if ( $source == WindowInventoryNew.SOURCE_BACKPACK )
+            InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.userId, -1, Voxels.VOXEL_CAT_ALL );
+        else
+            InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.storeId, -1, Voxels.VOXEL_CAT_ALL );
+    }
+
 	private function displaySelectedCategory( $category:String ):void {
-		InventoryVoxelEvent.addListener( InventoryVoxelEvent.TYPES_RESULT, populateVoxels );
-		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.TYPES_REQUEST, Network.userId, -1, $category ) );
-	}
-	
-	private function populateVoxels(e:InventoryVoxelEvent):void {
-		
-		var results:Vector.<SecureInt> = e.result as Vector.<SecureInt>;
-		InventoryVoxelEvent.removeListener( InventoryVoxelEvent.TYPES_RESULT, populateVoxels );
-		
-		var count:int = 0;
-		var pc:Container = new Container( VOXEL_CONTAINER_WIDTH, VOXEL_IMAGE_HEIGHT );
-		pc.layout = new AbsoluteLayout();
+        while (1 <= _itemContainer.numElements)
+            _itemContainer.removeElementAt(0);
+        var count:int = 0;
+        var pc:Container = new Container( VOXEL_CONTAINER_WIDTH, VOXEL_IMAGE_HEIGHT );
+        pc.layout = new AbsoluteLayout();
 
-		var countMax:int = VOXEL_CONTAINER_WIDTH / VOXEL_IMAGE_HEIGHT;
-		var box:BoxInventory;
-		var item:TypeInfo;
-		
-		for (var typeId:int=0; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
-		{
-			item = TypeInfo.typeInfo[typeId];
-			if ( 152 == typeId)
-					Log.out( "InventoryPanelVoxel.populateVoxel type ID is VINE");
-			if ( null == item )
-				continue;
-			var voxelCount:int = results[typeId].val;
-			if ( voxelCount <= 0 )
-					voxelCount = 1000000;
-			if ( item.placeable && -1 < voxelCount ) {
-				// Add the filled bar to the container and create a new container
-				if ( countMax == count ) {
-					_itemContainer.addElement( pc );
-					pc = new Container( VOXEL_CONTAINER_WIDTH, VOXEL_IMAGE_HEIGHT );
-					pc.layout = new AbsoluteLayout();
-					count = 0;		
+        var countMax:int = VOXEL_CONTAINER_WIDTH / VOXEL_IMAGE_HEIGHT;
+        var box:BoxInventory;
+        var item:TypeInfo;
+
+        for (var typeId:int=0; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
+        {
+            item = TypeInfo.typeInfo[typeId];
+            if ( 152 == typeId)
+                Log.out( "Voxels.populateVoxel type ID is VINE");
+            if ( null == item )
+                continue;
+            var voxelCount:int = _voxelData[typeId].val;
+            if ( voxelCount <= 0 )
+                voxelCount = 1000000;
+
+			var ti:TypeInfo = TypeInfo.typeInfo[typeId];
+			if ( ti ) {
+				var catData:String = ti.category;
+				if ( $category.toUpperCase() == catData.toUpperCase() || $category == Voxels.VOXEL_CAT_ALL ) {
+					if ( item.placeable && -1 < voxelCount ) {
+						// Add the filled bar to the container and create a new container
+						if ( countMax == count ) {
+							_itemContainer.addElement( pc );
+							pc = new Container( VOXEL_CONTAINER_WIDTH, VOXEL_IMAGE_HEIGHT );
+							pc.layout = new AbsoluteLayout();
+							count = 0;
+						}
+						box = new BoxInventory(VOXEL_IMAGE_WIDTH, VOXEL_IMAGE_HEIGHT, BorderStyle.NONE );
+						box.updateObjectInfo( new ObjectVoxel( box, typeId ) );
+						box.x = count * VOXEL_IMAGE_WIDTH;
+						pc.addElement( box );
+						eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
+
+						count++
+					}
 				}
-				box = new BoxInventory(VOXEL_IMAGE_WIDTH, VOXEL_IMAGE_HEIGHT, BorderStyle.NONE );
-				box.updateObjectInfo( new ObjectVoxel( box, typeId ) );
-				box.x = count * VOXEL_IMAGE_WIDTH;
-				pc.addElement( box );
-				eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
-
-				count++
 			}
-		}
-		_itemContainer.addElement( pc );
-		
+        }
+        _itemContainer.addElement( pc );
 	}
 	
-	private function dropMaterial(e:DnDEvent):void 
-	{
+	private function populateVoxels( e:InventoryVoxelEvent ):void {
+
+        _voxelData = e.result as Vector.<SecureInt>;
+        InventoryVoxelEvent.removeListener(InventoryVoxelEvent.TYPES_RESULT, populateVoxels);
+        displaySelectedCategory(Voxels.VOXEL_CAT_ALL);
+    }
+
+
+	private function dropMaterial(e:DnDEvent):void 	{
 		if ( e.dragOperation.initiator.data is ObjectVoxel )
 		{
 			e.dropTarget.backgroundTexture = e.dragOperation.initiator.backgroundTexture;
@@ -220,8 +200,7 @@ public class InventoryPanelVoxel extends VVContainer
 		}
 	}
 	
-	private function doDrag(e:UIMouseEvent):void 
-	{
+	private function doDrag(e:UIMouseEvent):void {
 		_dragOp.initiator = e.target as UIObject;
 		_dragOp.dragImage = e.target as DisplayObject;
 		// this adds a drop format, which is checked again what the target is expecting
@@ -233,6 +212,5 @@ public class InventoryPanelVoxel extends VVContainer
 		
 		UIManager.dragManager.startDragDrop(_dragOp);
 	}			
-	
 }
 }

@@ -78,7 +78,7 @@ public class ObjectVoxel extends ObjectInfo
 	
 	private function updateCount():void {
 		InventoryVoxelEvent.addListener( InventoryVoxelEvent.COUNT_RESULT, voxelCount ) ;
-		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_REQUEST, Network.userId, _typeId, -1 ) );
+		InventoryVoxelEvent.create( InventoryVoxelEvent.COUNT_REQUEST, Network.userId, _typeId, -1 );
 	}
 
 	private function voxelCount(e:InventoryVoxelEvent):void 

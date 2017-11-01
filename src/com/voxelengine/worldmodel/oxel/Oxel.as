@@ -760,7 +760,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			amountInGrain0 = -amountInGrain0;
 		}
 			
-		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.CHANGE, Network.userId, typeIdToUse, amountInGrain0 ) );
+		InventoryVoxelEvent.create( InventoryVoxelEvent.CHANGE, Network.userId, typeIdToUse, amountInGrain0 );
 	}
 	
 	//public function dispose():void {

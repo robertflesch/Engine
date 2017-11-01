@@ -25,7 +25,7 @@ package com.voxelengine.GUI.inventory {
 		private var _sourceType:String;
 		private var _underline:Box;
 		private var _parentWindow:UIContainer;
-		
+
 		public function InventoryPanelOverview( $windowInventoryNew:UIContainer, $source:String, $tabTokens:String ) {
 			_parentWindow = $windowInventoryNew;
 			super( null );
@@ -36,16 +36,14 @@ package com.voxelengine.GUI.inventory {
 			var index:int = $tabTokens.indexOf( ";" );
 			var startingTabName:String;
 			if ( -1 < index ) {
-				startingTabName = $tabTokens.substr( 0 , index );
-				$tabTokens = $tabTokens.substr( index + 1, $tabTokens.length );
+                startingTabName = $tabTokens.substr( 0 , index );
+			} else {
+                startingTabName = "Models";
 			}
 
 			upperTabsAdd( startingTabName );
-			//addItemContainer();
 			addEventListener( UIOEvent.RESIZED, onResized );
-			
-			
-			displaySelectedContainer( startingTabName, $tabTokens );
+			displaySelectedContainer( startingTabName, _sourceType );
 		}
 		
 		override protected function onResized(e:UIOEvent):void 
@@ -103,11 +101,11 @@ package com.voxelengine.GUI.inventory {
 		private function selectCategory(e:ListEvent):void 
 		{			
 			_s_lastCategory = e.target.data as String;
-			displaySelectedContainer( _s_lastCategory, "" );	
+			displaySelectedContainer( _s_lastCategory,  _sourceType );
 		}
 		
 		private static var _s_lastCategory:String;
-		private function displaySelectedContainer( $category:String, $tabTokens:String ):void
+		private function displaySelectedContainer( $category:String, $dataSource:String ):void
 		{	
 			if ( _panelContainer ) {
 				removeElement( _panelContainer );
@@ -121,11 +119,12 @@ package com.voxelengine.GUI.inventory {
 				$category = _s_lastCategory
 			}
 			if ( WindowInventoryNew.INVENTORY_CAT_VOXELS == $category )
-				_panelContainer = new InventoryPanelVoxel( this );
-			else if ( WindowInventoryNew.INVENTORY_CAT_MODELS == $category )	
-				_panelContainer = new InventoryPanelModel( this );
+				_panelContainer = new InventoryPanelVoxel( this, $dataSource );
+			else if ( WindowInventoryNew.INVENTORY_CAT_MODELS == $category ) {
+                _panelContainer = new InventoryPanelModel(this, $dataSource );
+            }
 			else if ( WindowInventoryNew.INVENTORY_CAT_REGIONS == $category )	
-				_panelContainer = new InventoryPanelRegions( this );
+				_panelContainer = new InventoryPanelRegions( this, $dataSource );
 				
 			addElement( _panelContainer );
 		}
