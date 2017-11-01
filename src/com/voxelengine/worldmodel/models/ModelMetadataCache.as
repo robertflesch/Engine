@@ -56,32 +56,28 @@ public class ModelMetadataCache
 		
 		//Log.out( "ModelMetadataCache.requestType  owner: " + $mme.modelGuid, Log.WARN );
 		// For each one loaded this will send out a new ModelMetadataEvent( ModelBaseEvent.ADDED, $vmm.guid, $vmm ) event
-		if ( Network.PUBLIC == $mme.modelGuid ) {
-			if ( false == _initializedPublic ) {
-				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, ModelMetadata.BIGDB_TABLE_MODEL_METADATA, Network.PUBLIC, null, ModelMetadata.BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
-				_initializedPublic = true;
-			}
+		if ( false == _initializedPublic ) {
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, ModelMetadata.BIGDB_TABLE_MODEL_METADATA, Network.PUBLIC, null, ModelMetadata.BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
+			_initializedPublic = true;
 		}
-			
-		if ( Network.userId == $mme.modelGuid ) {
-			if ( false == _initializedPrivate ) {
-				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, ModelMetadata.BIGDB_TABLE_MODEL_METADATA, Network.userId, null, ModelMetadata.BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
-				_initializedPrivate = true;
-			}
+
+		if ( false == _initializedPrivate ) {
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, ModelMetadata.BIGDB_TABLE_MODEL_METADATA, Network.userId, null, ModelMetadata.BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
+			_initializedPrivate = true;
 		}
-			
+
 		// This will return models already loaded.
 		for each ( var vmm:ModelMetadata in _metadata ) {
-			if ( vmm && vmm.owner == $mme.modelGuid ) {
-				Log.out( "ModelMetadataCache.requestType returning guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
+			if ( vmm && ( vmm.owner == $mme.modelGuid || vmm.owner == Network.PUBLIC ) ) {
+                Log.out( "ModelMetadataCache.requestType RETURN  " +  vmm.owner + " ==" + $mme.modelGuid + "  guid: " + vmm.guid + "  desc: " + vmm.description , Log.WARN );
 				ModelMetadataEvent.create( ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm );
 			}
-//			else {
-//				if ( vmm )
-//                    Log.out( "ModelMetadataCache.requestType REJECTING guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
-//				else
-//                    Log.out( "ModelMetadataCache.requestType REJECTING null object: ", Log.WARN );
-//			}
+			else {
+				if ( vmm )
+                    Log.out( "ModelMetadataCache.requestType REJECTING  " +  vmm.owner + " !=" + $mme.modelGuid + "  guid: " + vmm.guid + "  desc: " + vmm.description , Log.WARN );
+				else
+                    Log.out( "ModelMetadataCache.requestType REJECTING null object: ", Log.WARN );
+			}
 		}
 	}
 	
@@ -99,7 +95,7 @@ public class ModelMetadataCache
 				PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.LOAD_REQUEST, $mme.series, ModelMetadata.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid));
 			}
 			else {
-				//Log.out( "ModelMetadataCache.request returning guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
+				Log.out( "ModelMetadataCache.request returning guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
 				ModelMetadataEvent.create(ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm);
 			}
 		}
@@ -168,7 +164,7 @@ public class ModelMetadataCache
 			_metadata[$vmm.guid] = $vmm;
 			if ( _block.has( $vmm.guid ) )
 				_block.clear( $vmm.guid );
-			//Log.out( "ModelMetadataCache.add returning guid: " + $vmm.guid + "  owner: " + $vmm.owner, Log.WARN );
+			Log.out( "ModelMetadataCache.add returning guid: " + $vmm.guid + "  owner: " + $vmm.owner, Log.WARN );
 			ModelMetadataEvent.create( ModelBaseEvent.ADDED, $series, $vmm.guid, $vmm );
 		}
 	}

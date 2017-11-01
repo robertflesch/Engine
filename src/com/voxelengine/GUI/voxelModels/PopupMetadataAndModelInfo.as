@@ -96,10 +96,14 @@ public class PopupMetadataAndModelInfo extends VVPopup
                 , _mmd.description ? _mmd.description : "No Description"
                 , WIDTH ) );
 
+        addElement( new ComponentTextInput( "HashTags"
+                , function ($e:TextEvent):void { _mmd.hashTags = $e.target.text; setChanged(); }
+                , _mmd.hashTags
+                , WIDTH ) );
         addElement( new ComponentLabel( "Version",  String(_mmd.version), WIDTH ) );
         addElement( new ComponentLabel( "Animation class",  String(_mmd.animationClass), WIDTH ) );
-        addElement( new ComponentLabel( "Child of",  String(_mmd.childOf), WIDTH ) );
-        if ( _mmd.childOf ){
+        if ( _mmd.childOf ) {
+            addElement( new ComponentLabel( "Child of",  String(_mmd.childOf), WIDTH ) );
             if ( null == _mmd.modelPosition )
                 _mmd.modelPosition = {x:0,y:0,z:0};
             if ( null == _mmd.modelScaling )
@@ -107,14 +111,13 @@ public class PopupMetadataAndModelInfo extends VVPopup
             addElement( new ComponentVector3DToObject( setChanged, _mmd.modelPositionInfo, "Position Relative To Parent", "X: ", "Y: ", "Z: ",  _mmd.modelPositionVec3D(), WIDTH, updateVal ) );
             addElement( new ComponentVector3DToObject( setChanged, _mmd.modelScalingInfo, "Model Scaling", "X: ", "Y: ", "Z: ",  _mmd.modelScalingVec3D(), WIDTH, updateVal ) );
         }
-        addElement( new ComponentLabel( "Owner",  String(_mmd.owner), WIDTH ) );
-        addElement( new ComponentTextInput( "HashTags"
-                , function ($e:TextEvent):void { _mmd.hashTags = $e.target.text; setChanged(); }
-                , _mmd.hashTags
-                , WIDTH ) );
         addElement( new ComponentLabel( "Created Date",  String(_mmd.createdDate), WIDTH ) );
+        addElement( new ComponentLabel( "Owner",  String(_mmd.owner), WIDTH ) );
         addElement( new ComponentLabel( "Creator",  String(_mmd.creator), WIDTH ) );
-        addElement( (new Button( "Give To Public", 200, 24 )).addEventListener( MouseEvent.CLICK, giveToPublic ));
+
+//        addElement( new ComponentSpacer( WIDTH ) );
+//        addElement( (new Button( "Give To Public", 200, 24 )).addEventListener( MouseEvent.CLICK, giveToPublic ));
+//        addElement( new ComponentSpacer( WIDTH ) );
 
         addPermissions();
     }

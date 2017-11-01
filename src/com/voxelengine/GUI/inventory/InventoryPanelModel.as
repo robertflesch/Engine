@@ -185,7 +185,7 @@ public class InventoryPanelModel extends VVContainer
 		}
 		_seriesModelMetadataEvent = ModelBaseEvent.seriesCounter;
 		ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId, null );
-		ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.PUBLIC, null );
+		//ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.PUBLIC, null );
 	}
 
 	private function removeModelMetadataEvent($mme:ModelMetadataEvent):void {

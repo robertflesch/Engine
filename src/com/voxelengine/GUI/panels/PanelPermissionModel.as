@@ -7,13 +7,19 @@
 ==============================================================================*/
 
 package com.voxelengine.GUI.panels {
+import com.voxelengine.GUI.VoxelVerseGUI;
 import com.voxelengine.GUI.components.ComponentCheckBox;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.PermissionsModel;
 import com.voxelengine.worldmodel.models.Role;
 import com.voxelengine.worldmodel.models.types.Player;
 
+import flash.external.ExternalInterface;
+import flash.net.URLRequest;
+import flash.net.navigateToURL;
+
 import org.flashapi.swing.*
+import org.flashapi.swing.color.Color;
 import org.flashapi.swing.event.*
 import org.flashapi.swing.constants.*
 import org.flashapi.swing.plaf.spas.VVUI;
@@ -22,6 +28,9 @@ import com.voxelengine.Log;
 import com.voxelengine.GUI.components.*
 import com.voxelengine.GUI.panels.ExpandableBox
 import com.voxelengine.worldmodel.PermissionsBase;
+
+import org.flashapi.swing.util.URLLocator;
+import org.flashapi.swing.wtk.WindowButtonHelp;
 
 public class PanelPermissionModel extends ExpandableBox
 {
@@ -65,18 +74,21 @@ public class PanelPermissionModel extends ExpandableBox
 		return $title + "{" + $vec.x + ":" + $vec.y + ":" + $vec.z + "} "
 	}
 	
-	override protected function hasElements():Boolean {
-		//if ( 0 < _ebco.item.delta.length ) 
-			return true;
-		 
-		return false
-	}
+	override protected function hasElements():Boolean { return true; }
 	
 	override protected function expand():void {
 		super.expand();
 
         _itemBox.addElement( new ComponentSpacer( _itemBox.width, 4 ) );
+		//
+		var b:Button = new Button( "Open help topic in new tab", _itemBox.width, 20 );
+        //var b:WindowButtonHelp = new WindowButtonHelp( "Open help topic in new tab", _itemBox.width, 20 );
+//		b.borderWidth = 0;
+//		b.color = Color.DEFAULT;
+        b.addEventListener( UIMouseEvent.CLICK, function (UIMouseEvent):void { navigateToURL( new URLRequest("http://voxelverse.com/helpPermissions.html"), "_blank"); } );
 
+        // navigateToURL (new URLRequest ("mailto: blog@activetofocus.com"), "_blank");
+		_itemBox.addElement(b);
         // copyCount
         _itemBox.addElement( new ComponentLabelSide( "Copy Count", String( _permissions.copyCount ), _itemBox.width ) );
         // binding

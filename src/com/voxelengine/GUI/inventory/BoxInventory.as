@@ -11,6 +11,7 @@ package com.voxelengine.GUI.inventory {
 import com.voxelengine.GUI.voxelModels.PopupMetadataAndModelInfo;
 import com.voxelengine.GUI.voxelModels.WindowModelDetail;
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.worldmodel.PermissionsModel;
 import com.voxelengine.worldmodel.TextureBank;
 
 import flash.display.Bitmap;
@@ -100,18 +101,17 @@ public class BoxInventory extends VVBox
 		case ObjectInfo.OBJECTINFO_MODEL:
 			var om:ObjectModel = _objectInfo as ObjectModel;
 			if ( om.vmm ) {
-				if ( om.vmm.thumbnailLoaded && om.vmm.thumbnail ) {
+				if ( om.vmm.thumbnailLoaded && om.vmm.thumbnail )
 					backgroundTexture = drawScaled( om.vmm.thumbnail, width, height );
-//					var bmpd:BitmapData = Renderer.renderer.modelShot();
-//					om.vmm.thumbnail = drawScaled( bmpd, width, height );
-				}
 				else
 					ModelMetadataEvent.addListener( ModelMetadataEvent.BITMAP_LOADED, thumbnailLoaded );
 				
 				// listen for changes to this object
 				ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
+
 				_name.text = om.vmm.name;
-				var modelsOfThisGuid:int = om.vmm.permissions.copyCount;
+				var permissions:PermissionsModel = om.vmm.permissions;
+				var modelsOfThisGuid:int = permissions.copyCount;
 				if ( 99999 < modelsOfThisGuid )
 					_count.text = "lots";
 				else if ( -1 == modelsOfThisGuid )
@@ -122,7 +122,7 @@ public class BoxInventory extends VVBox
 				setHelp( "guid: " + om.vmm.guid );
 
 				if ( $displayAddons ) {
-					if (om.vmm.permissions.blueprint) {
+					if ( permissions.blueprint ) {
 						_bpValue = new Image( "blueprint.png");
 						if (128 == width)
 							_bpValue.x = _bpValue.y = 64;
@@ -133,8 +133,8 @@ public class BoxInventory extends VVBox
 						_bpValue = null
 					}
 
-					if (om.vmm.permissions.creator == Network.userId) {
-						_editData = new Image( "editModelData.png");
+					if ( permissions.creator == Network.userId ) {
+						_editData = new Image( "editModelData.png", 40, 40, true);
 						$evtColl.addEvent(_editData, UIMouseEvent.CLICK, editModelData);
 						if (128 == width)
 							_editData.x = _editData.y = 0;
