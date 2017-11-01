@@ -220,6 +220,10 @@ public class Player extends PersistenceObject
                 InventoryEvent.addListener( InventoryEvent.SAVE_REQUEST, savePlayerObject );
 				InventoryEvent.dispatch(new InventoryEvent(InventoryEvent.REQUEST, Network.userId, Player.player.dbo));
             }
+			else {
+				if ( Globals.online )
+					Log.out( "Player.playerModelLoaded - NO PLAYER.player.dbo objectHierarchy: " + $mle.data, Log.ERROR );
+			}
 
 			//_playerModel = $mle.vm as Avatar;
 			if ( null == Region.currentRegion.modelCache.instanceGet( $mle.vm.instanceInfo.instanceGuid ) ) {
