@@ -23,7 +23,10 @@ public class ComponentLabelSide extends Container
 		backgroundColor = VVUI.DEFAULT_COLOR;
 		
 		addElement( new Label( $label, ($width - 20) * 0.40 ) );
-		addElement( new Label( $initialValue, ($width - 20) * 0.60 ) )
+        if ( !$initialValue )
+            addElement( new Label( "UNDEFINED", ($width - 20) * 0.60 ) );
+		else
+			addElement( new Label( $initialValue, ($width - 20) * 0.60 ) );
 	}
 }
 }
