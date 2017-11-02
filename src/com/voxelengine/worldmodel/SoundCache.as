@@ -40,7 +40,6 @@ public class SoundCache
 			Log.out( "SoundCache.request guid requested is NULL: ", Log.WARN );
 			return;
 		}
-		Log.out( "SoundCache.request guid: " + $se.guid, Log.INFO );
 		var snd:AnimationSound = _sounds[$se.guid];
 
 		if ( null == snd ) {
@@ -50,7 +49,8 @@ public class SoundCache
 			}
 			//Log.out( "SoundCache.request add block on : " + $se.guid, Log.WARN )
 			_block.add( $se.guid );
-			
+
+            Log.out( "SoundCache.request guid: " + $se.guid, Log.INFO );
 			if ( true == Globals.online && $se.fromTables )
 				PersistenceEvent.create( PersistenceEvent.LOAD_REQUEST, $se.series, AnimationSound.BIGDB_TABLE_SOUNDS, $se.guid, null, null, URLLoaderDataFormat.BINARY, $se.guid );
 			else
