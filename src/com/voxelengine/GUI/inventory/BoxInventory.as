@@ -9,32 +9,24 @@
 package com.voxelengine.GUI.inventory {
 
 import com.voxelengine.GUI.voxelModels.PopupMetadataAndModelInfo;
-import com.voxelengine.GUI.voxelModels.WindowModelDetail;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.worldmodel.PermissionsModel;
 import com.voxelengine.worldmodel.TextureBank;
-
-import flash.display.Bitmap;
-import flash.display.BitmapData;
-import flash.events.MouseEvent;
-import flash.geom.Matrix;
+import com.voxelengine.worldmodel.models.Role;
+import com.voxelengine.worldmodel.models.types.Player;
 
 import org.flashapi.swing.*;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.layout.AbsoluteLayout;
 
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.events.InventoryVoxelEvent;
 import com.voxelengine.GUI.*;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.inventory.*;
-import com.voxelengine.worldmodel.models.ModelMetadataCache;
 import com.voxelengine.worldmodel.models.ModelMetadata;
-
 
 public class BoxInventory extends VVBox
 {
@@ -42,6 +34,8 @@ public class BoxInventory extends VVBox
 	private var _name:Label;
 	private var _bpValue:Image;
 	private var _editData:Image;
+    private var _salePrice:Image;
+    private var _sellerInfo:Image;
 	private var _objectInfo:ObjectInfo;
 	public function get objectInfo():ObjectInfo { return _objectInfo; }
 	
@@ -56,13 +50,14 @@ public class BoxInventory extends VVBox
 		_count.fontColor = 0xffffff;
 		_count.textAlign = TextAlign.CENTER;
 		//_count.x = 16;
-		_count.y = 20;
+		_count.y = 5;
 
 		_name = new Label( "", $widthParam );
 		_name.fontColor = 0xffffff;
+        _name.fontSize = _name.fontSize + 1;
 		_name.textAlign = TextAlign.CENTER;
 		//_count.x = 16;
-		_name.y = 90;
+		_name.y = 105;
 		addElement(_count);
 		addElement(_name);
 	}
@@ -93,7 +88,10 @@ public class BoxInventory extends VVBox
 		data = $item;
 		_name.text = "";
 
-		switch ( $item.objectType ) {
+        var role:Role = Player.player.role;
+        //if ( role.modelNominate && role.modelPromote ) {
+
+            switch ( $item.objectType ) {
 		case ObjectInfo.OBJECTINFO_EMPTY:
 			reset();
             backgroundTexture = $item.backgroundTexture(width);
@@ -133,7 +131,7 @@ public class BoxInventory extends VVBox
 						_bpValue = null
 					}
 
-					if ( permissions.creator == Network.userId ) {
+					if ( permissions.creator == Network.userId || role.modelPublicEdit ) {
 						_editData = new Image( "editModelData.png", 40, 40, true);
 						$evtColl.addEvent(_editData, UIMouseEvent.CLICK, editModelData);
 						if (128 == width)
@@ -153,8 +151,6 @@ public class BoxInventory extends VVBox
 						_editData = null;
 					}
 				}
-
-
 			}
 			break;
 			
