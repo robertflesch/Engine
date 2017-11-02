@@ -97,7 +97,7 @@ public class Dragon extends Beast
 			//_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, -6, 0 ) ) ); // bottom
 		}
 		else
-			Log.out( "Dragon.collisionPointsAdd - modelInfo.oxelPersistence.oxel not found for guid: " + modelInfo.guid, Log.WARN );
+			Log.out( "Dragon.collisionPointsAdd - modelInfo.oxelPersistence.oxel NOT FOUND for guid: " + modelInfo.guid, Log.WARN );
 	}
 
 	override protected function cameraAddLocations():void {

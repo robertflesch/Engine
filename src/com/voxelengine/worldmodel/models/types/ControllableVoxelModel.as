@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models.types
 {
 import com.voxelengine.Globals;
+import com.voxelengine.events.OxelDataEvent;
 
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
@@ -104,8 +105,15 @@ public class ControllableVoxelModel extends VoxelModel
 		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 		CursorSizeEvent.addListener( CursorSizeEvent.SET, adjustSpeedMultiplier );
 		_ct = new CollisionTest( this );
-		collisionPointsAdd();
+        OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelDataRetrieved );
 	}
+
+    private function oxelDataRetrieved(e:OxelDataEvent):void {
+        if ( e.modelGuid == modelInfo.guid ) {
+            OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelDataRetrieved );
+            collisionPointsAdd();
+        }
+    }
 
 /*	protected function adjustSpeedMultiplier( e:CursorSizeEvent ): void {
 		if ( this == VoxelModel.controlledModel ) {
@@ -124,8 +132,6 @@ public class ControllableVoxelModel extends VoxelModel
 			VoxelModel.controlledModel.instanceInfo.setSpeedMultiplier( 1 );
 		}
 	}
-
-
 
 	override protected function processClassJson():void {
 		super.processClassJson();
