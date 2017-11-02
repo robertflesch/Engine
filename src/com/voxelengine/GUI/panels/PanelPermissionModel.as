@@ -112,9 +112,9 @@ public class PanelPermissionModel extends ExpandableBox
         // creator
         _itemBox.addElement( new ComponentLabelSide( "Creator", _permissions.creator, _itemBox.width ) );
         // createdDate
-        _itemBox.addElement( new ComponentLabelSide( "Created Date", _permissions.createdDate, _itemBox.width ) );
+        _itemBox.addElement( new ComponentLabelSide( "Created Date", _permissions.createdDate , _itemBox.width ) );
         // modifyDate
-        _itemBox.addElement( new ComponentLabelSide( "Modified Date", _permissions.modifiedDate ? _permissions.modifiedDate : "", _itemBox.width ) );
+        _itemBox.addElement( new ComponentLabelSide( "Modified Date", _permissions.modifiedDate, _itemBox.width ) );
 	}
 	
 	private function changeModify(event:UIMouseEvent):void {
