@@ -68,15 +68,15 @@ public class InventoryPanelRegions extends VVContainer
 	}
 	
 	private function regionInfoChanged(e:RegionEvent):void {
-		trace("breakpoint");
-		//displayAllRegions();
+		for ( var i:int =0; i < _listbox1.length; i++ ){
+			var item:ListItem = _listbox1.getItemAt( i );
+			if ( item.data == e.guid ) {
+                var region:Region = e.data as Region;
+                _listbox1.updateItemAt(i, region.name + "\t Owner: " + region.owner + "\t Desc: " + region.desc, region.guid);
+            }
+		}
 	}
 	
-	//private function selectCategory(e:ListEvent):void 
-	//{			
-		//displaySelectedRegionList();	
-	//}
-
     private function displaySelectedSource( $dataSource:String ):void {
         _listbox1.removeAll();
         if ( $dataSource == WindowInventoryNew.SOURCE_PUBLIC )

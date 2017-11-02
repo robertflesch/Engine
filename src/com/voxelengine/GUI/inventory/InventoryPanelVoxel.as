@@ -139,7 +139,7 @@ public class InventoryPanelVoxel extends VVContainer
                 continue;
             var voxelCount:int = _voxelData[typeId].val;
             if ( voxelCount <= 0 )
-                voxelCount = 1000000;
+                continue;
 
 			var ti:TypeInfo = TypeInfo.typeInfo[typeId];
 			if ( ti ) {

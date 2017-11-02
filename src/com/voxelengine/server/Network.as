@@ -19,14 +19,16 @@ public class Network
 {
 	public static const LOCAL:String = "local";
 	public static const PUBLIC:String = "public";
-	
+    public static const PRIVATE:String = "private";
+    public static const STORE:String = "store";
+
 	static private var _client:Client;	
 	static public function get client():Client { return _client; }
 	
 	static private var _userId:String = LOCAL;
 	static public function get userId():String { return _userId; }
 
-    static private var _storeID:String = "store";
+    static private var _storeID:String = STORE;
     static public function get storeId():String { return _storeID; }
 
 	// This was a test to see if I could make a client that didnt need user interaction.

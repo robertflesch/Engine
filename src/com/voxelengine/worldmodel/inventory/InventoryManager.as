@@ -143,12 +143,12 @@ public class InventoryManager
 
 	static private function requestInventoryNPC(e:InventoryEvent):void
 	{
-		Log.out( "InventoryManager.requestInventory - OWNER: " + e.owner );
+		Log.out( "InventoryManager.requestInventoryNPC - OWNER: " + e.owner );
 		if ( e.owner == "Player" )
 			return;
 		var inv:Inventory = objectInventoryGet( e );
 		if ( inv && inv.loaded ) {
-			Log.out( "InventoryManager.requestInventory - InventoryEvent.RESPONSE - OWNER: " + e.owner );
+			Log.out( "InventoryManager.requestInventoryNPC - InventoryEvent.RESPONSE - OWNER: " + e.owner );
 			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, e.owner, inv ) );
 		}
 	}

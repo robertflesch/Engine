@@ -13,6 +13,8 @@ import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.RegionManager;
+import com.voxelengine.worldmodel.models.types.Player;
+
 import flash.geom.Vector3D;
 import flash.events.Event;
 import flash.display.Bitmap;
@@ -76,7 +78,7 @@ public class WindowRegionDetail extends VVPopup
 			_region = new Region( Globals.getUID(), null, {} );
 			_region.owner = Network.PUBLIC;
 			_region.name = Network.userId + "-" + int( Math.random() * 1000 );
-			_region.desc = "Please enter something meaningful here";
+			_region.desc = "Please enter region description here";
 			markDirty();
 
 			collectRegionInfo( new RegionEvent( ModelBaseEvent.ADDED, 0, _region.guid, _region ) );
@@ -104,8 +106,19 @@ public class WindowRegionDetail extends VVPopup
 		addElement( new ComponentTextInput( "Name", changeNameHandler, _region.name, WIDTH ) );
 		addElement( new ComponentTextArea( "Desc", changeDescHandler, _region.desc ? _region.desc : "No Description", WIDTH ) );
 		
-		var ownerArray:Array = [ { label:Globals.MODE_PUBLIC }, { label:Globals.MODE_PRIVATE } ];
-		addElement( new ComponentRadioButtonGroup( "Owner", ownerArray, ownerChange, Network.PUBLIC == _region.owner ? 0 : 1, WIDTH ) );
+
+		if ( Player.player.role.modelPublicEdit ) {
+            var ownerArray:Array = [{label: Globals.MODE_PUBLIC}, {label: Globals.MODE_PRIVATE}, {label: Network.storeId}];
+			var ownerButIndex:int;
+			if ( Network.PUBLIC == _region.owner )
+                ownerButIndex = 0;
+            else if ( Network.PRIVATE == _region.owner )
+                ownerButIndex = 1;
+            else
+                ownerButIndex = 2;
+
+            addElement(new ComponentRadioButtonGroup("Owner", ownerArray, ownerChange, ownerButIndex, WIDTH));
+        }
 		var gravArray:Array = [ { label:"Use Gravity" }, { label:"NO Gravity. " } ];
 		addElement( new ComponentRadioButtonGroup( "Gravity", gravArray, gravChange,  _region.gravity ? 0 : 1, WIDTH ) );
 		

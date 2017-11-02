@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.inventory {
 
 import com.voxelengine.GUI.inventory.InventoryPanelVoxel;
 import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.server.Network;
 
 import flash.utils.ByteArray;
 
@@ -59,8 +60,14 @@ public class Voxels
 	// This returns an Array which holds the typeId and the count of those voxels
 	public function types(e:InventoryVoxelEvent):void 
 	{
-		if ( e.networkId == _owner.ownerGuid ) {
-			const cat:String = (e.result as String);
+		Log.out( "Voxels.types -- WARNING HACKING IN PUBLIC AND STORE INVENTORY", Log.WARN );
+		if ( e.networkId == _owner.ownerGuid || e.networkId == Network.storeId || e.networkId == Network.PUBLIC) {
+            var cat:String = (e.result as String);
+            if ( e.networkId == Network.storeId )
+				cat = VOXEL_CAT_METAL;
+            if ( e.networkId == Network.PUBLIC)
+                cat = VOXEL_CAT_EARTH;
+
 			if ( cat == VOXEL_CAT_ALL ) {
 				InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_RESULT, _owner.ownerGuid, -1, _items );
 				return;
@@ -72,7 +79,7 @@ public class Voxels
 				var ti:TypeInfo = TypeInfo.typeInfo[typeId];
 				if ( ti ) { 
 					var catData:String = ti.category;
-					if ( cat == catData.toUpperCase() ) {
+					if ( cat.toUpperCase() == catData.toUpperCase() ) {
 						if ( 0 < _items[typeId].val )
 							result[typeId].val	= _items[typeId].val;
 						else
@@ -83,9 +90,9 @@ public class Voxels
 				}
 			}
 
-			InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_RESULT, _owner.ownerGuid, -1, result );
+			InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_RESULT, e.networkId, -1, result );
 		}
-	}
+    }
 	
 	public function count(e:InventoryVoxelEvent):void 
 	{
