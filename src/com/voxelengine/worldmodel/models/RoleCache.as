@@ -35,8 +35,10 @@ public class RoleCache {
 
     static public function roleGet( $roleID:String ):Role {
         var role:Role = _roles[ $roleID ];
-        if ( null == role )
-            Log.out( "RoleCache.roleGet ERROR - NO ROLE WITH ID: " + $roleID + " found", Log.ERROR );
+        if ( null == role ) {
+            role = Role.defaultRole;
+            Log.out("RoleCache.roleGet ERROR - NO ROLE WITH ID: " + $roleID + " found", Log.WARN);
+        }
         return role;
     }
 

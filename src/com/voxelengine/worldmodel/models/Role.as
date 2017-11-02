@@ -6,6 +6,8 @@
  Unauthorized reproduction, translation, or display is prohibited.
  ==============================================================================*/
 package com.voxelengine.worldmodel.models {
+import com.voxelengine.server.Network;
+
 import playerio.DatabaseObject;
 
 public class Role  extends PersistenceObject {
@@ -19,17 +21,25 @@ public class Role  extends PersistenceObject {
     private var _modelPrivateDelete:Boolean;
     private var _modelPublicEdit:Boolean;
 
+    static private var _s_defaultRole:Role = null;
+    static public function get defaultRole() :Role {
+        if ( !_s_defaultRole )
+            _s_defaultRole = new Role( Network.LOCAL, null );
+        return _s_defaultRole;
+    }
+
     public function Role( $guid:String, $dbo:DatabaseObject = null ) {
         super( $guid, BIGDB_TABLE_ROLES );
 
-        _modelNominate = $dbo.modelNominate;
-        _modelPromote = $dbo.modelPromote;
+        if ( $dbo ) {
+            _modelNominate = $dbo.modelNominate;
+            _modelPromote = $dbo.modelPromote;
 
-        _modelPublicDelete = $dbo.modelPublicDelete;
-        _modelPrivateDelete = $dbo.modelPrivateDelete;
+            _modelPublicDelete = $dbo.modelPublicDelete;
+            _modelPrivateDelete = $dbo.modelPrivateDelete;
 
-        _modelPublicEdit = $dbo.modelPublicEdit;
-
+            _modelPublicEdit = $dbo.modelPublicEdit;
+        }
     }
 
     public function get modelPublicDelete():Boolean {

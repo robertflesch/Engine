@@ -13,6 +13,7 @@ import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.PlayerInfoEvent;
 import com.voxelengine.events.WindowSplashEvent;
+import com.voxelengine.worldmodel.models.RoleCache;
 
 import flash.geom.Vector3D;
 
@@ -90,7 +91,7 @@ public class Player extends PersistenceObject
 			"Vida",
 			"Lucky" ];
 
-    public function get role():Role { return dbo.role }
+    public function get role():Role { return dbo ? RoleCache.roleGet( dbo.role ) : Role.defaultRole }
 
     private static var _s_player:Player = null;
 	public static function get player():Player { return _s_player; }
