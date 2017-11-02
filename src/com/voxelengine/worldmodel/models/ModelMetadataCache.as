@@ -164,7 +164,7 @@ public class ModelMetadataCache
 			_metadata[$vmm.guid] = $vmm;
 			if ( _block.has( $vmm.guid ) )
 				_block.clear( $vmm.guid );
-			Log.out( "ModelMetadataCache.add returning guid: " + $vmm.guid + "  owner: " + $vmm.owner, Log.WARN );
+			//Log.out( "ModelMetadataCache.add returning guid: " + $vmm.guid + "  owner: " + $vmm.owner, Log.WARN );
 			ModelMetadataEvent.create( ModelBaseEvent.ADDED, $series, $vmm.guid, $vmm );
 		}
 	}
