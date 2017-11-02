@@ -96,6 +96,7 @@ import org.flashapi.swing.*
 			_ownedVsStore.setButtonsWidth( width / _ownedVsStore.length, TAB_BAR_HEIGHT );
 		}
 
+		static private var _s_lastSource:String = INVENTORY_OWNED;
 		private function ownedVsStoreTabsHorizontal( $tabTokens:String ):void {
 			var index:int = $tabTokens.indexOf( ";" );
 			var startingTabName:String;
@@ -110,6 +111,10 @@ import org.flashapi.swing.*
             _ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_OWNED ), INVENTORY_OWNED );
 			_ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_STORE ), INVENTORY_STORE );
 			_ownedVsStore.setButtonsWidth( 728.55 / _ownedVsStore.length, TAB_BAR_HEIGHT );
+
+			if ( startingTabName == "last" )
+                startingTabName = _s_lastSource;
+
 			if ( startingTabName == INVENTORY_STORE )
 				_ownedVsStore.selectedIndex = 2;
             else if ( startingTabName == INVENTORY_PUBLIC )
@@ -146,17 +151,18 @@ import org.flashapi.swing.*
 		
 		private function selectCategory(e:ListEvent):void 
 		{			
-			displaySelectedContainer( e.target.data as String, INVENTORY_CAT_LAST );	
+			displaySelectedContainer( e.target.data as String, INVENTORY_CAT_LAST + ";" );
 		}
 		
-		private function displaySelectedContainer( $category:String, $tabTokens:String ):void
+		private function displaySelectedContainer( $dataSource:String, $tabTokens:String ):void
 		{	
 			if ( _panelContainer ) {
 				removeElement( _panelContainer );
 				_panelContainer.remove();
 			}
-				
-			_panelContainer = new InventoryPanelOverview( this, $category, $tabTokens );
+
+            _s_lastSource = $dataSource;
+			_panelContainer = new InventoryPanelOverview( this, $dataSource, $tabTokens );
 			addElement( _panelContainer );
 		}
 	}

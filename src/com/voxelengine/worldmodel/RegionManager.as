@@ -35,9 +35,8 @@ public class RegionManager
 {
 	private var _regions:Vector.<Region> = null;
 	private var _requestPublic:Boolean;
-	//private var _resultsPublic:Boolean;
 	private var _requestPrivate:Boolean;
-	//private var _resultsPrivate:Boolean;
+	private var _requestStore:Boolean;
 	
 	public function get size():int { return _regions.length; }
 	
@@ -121,9 +120,8 @@ public class RegionManager
 		else	
 			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $re.series, Globals.REGION_EXT, $re.guid, null, null ) );
 	}
-	
+
 	private function regionTypeRequest(e:RegionEvent):void {
-		
 		if ( Network.PUBLIC == e.guid && false == _requestPublic ) {
 			_requestPublic = true;
 			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, e.series, Globals.BIGDB_TABLE_REGIONS, Network.PUBLIC, null, Globals.BIGDB_TABLE_REGIONS_INDEX_OWNER ) );
@@ -132,7 +130,11 @@ public class RegionManager
 			_requestPrivate = true;
 			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, e.series, Globals.BIGDB_TABLE_REGIONS, Network.userId, null, Globals.BIGDB_TABLE_REGIONS_INDEX_OWNER ) );
 		}
-			
+        if ( Network.storeId == e.guid && false == _requestStore ) {
+            _requestStore = true;
+            PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, e.series, Globals.BIGDB_TABLE_REGIONS, Network.storeId, null, Globals.BIGDB_TABLE_REGIONS_INDEX_OWNER ) );
+        }
+
 		// Get a list of what we currently have
 		for each ( var region:Region in _regions ) {
 			if ( region && region.owner == e.guid )

@@ -53,21 +53,7 @@ public class InventoryPanelRegions extends VVContainer
         RegionEvent.addListener( ModelBaseEvent.RESULT, regionLoadedEvent );
         displaySelectedSource( $dataSource );
 	}
-	/*
-	private function upperTabsAdd():void {
-		_barUpper = new TabBar();
-		_barUpper.orientation = ButtonBarOrientation.VERTICAL;
-		_barUpper.name = "upper";
-		// TODO I should really iterate thru the types and collect the categories - RSF
-		_barUpper.addItem( LanguageManager.localizedStringGet( Globals.MODE_PUBLIC ), Globals.MODE_PUBLIC );
-		_barUpper.addItem( LanguageManager.localizedStringGet( Globals.MODE_PRIVATE ), Globals.MODE_PRIVATE );
-		_barUpper.addItem( LanguageManager.localizedStringGet( Globals.MODE_MANAGE ), Globals.MODE_MANAGE );
-		_barUpper.setButtonsWidth( 128 );
-		_barUpper.selectedIndex = 0;
-		eventCollector.addEvent( _barUpper, ListEvent.ITEM_CLICKED, selectCategory );
-		addGraphicElements( _barUpper );
-	}
-*/
+
 	private function addItemContainer():void {
 		_itemContainer = new Container( width, height );
 		_itemContainer.autoSize = true;
@@ -81,9 +67,9 @@ public class InventoryPanelRegions extends VVContainer
 		RegionEvent.addListener( ModelBaseEvent.CHANGED, regionInfoChanged );
 	}
 	
-	private function regionInfoChanged(e:RegionEvent):void 
-	{
-		displayAllRegions();
+	private function regionInfoChanged(e:RegionEvent):void {
+		trace("breakpoint");
+		//displayAllRegions();
 	}
 	
 	//private function selectCategory(e:ListEvent):void 
@@ -92,23 +78,13 @@ public class InventoryPanelRegions extends VVContainer
 	//}
 
     private function displaySelectedSource( $dataSource:String ):void {
-
-	}
-	private function displayAllRegions():void
-	{
-		_listbox1.removeAll();
-
-//        _seriesModelMetadataEvent = ModelBaseEvent.seriesCounter;
-//        if ( $source == WindowInventoryNew.SOURCE_PUBLIC )
-//            ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.PUBLIC, null );
-//        else if ( $source == WindowInventoryNew.SOURCE_BACKPACK )
-//            ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId, null );
-//        else
-//            ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.storeId, null );
-
-		RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId );
-		if ( Globals.isDebug )
-			RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.PUBLIC );
+        _listbox1.removeAll();
+        if ( $dataSource == WindowInventoryNew.SOURCE_PUBLIC )
+            RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.PUBLIC );
+        else if ( $dataSource == WindowInventoryNew.SOURCE_BACKPACK )
+            RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId );
+        else
+            RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.storeId );
 	}
 
 	private function regionLoadedEvent( $re: RegionEvent ):void

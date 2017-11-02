@@ -115,6 +115,7 @@ import flash.geom.Vector3D;
 			dbo.skyColor = {"x": 92, "y": 172, "z": 238};
 			dbo.gravity = false;
 			dbo.worldId = Globals.VOXELVERSE;
+            dbo.owner = "local";
 			dbo.name = "NewRegion";
 			dbo.desc = "Describe what is special about this region";
 			dbo.playerPosition = {};
