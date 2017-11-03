@@ -70,8 +70,8 @@ public class ComponentVector3D extends Box
 		lbl.height = 20;
 		lbl.textAlign = TextAlign.CENTER;
 		
-		var src:TextInput = new TextInput(initialValue);
-		src.width = 50;
+		var src:TextInput = new VVTextInput(initialValue,50);
+		//src.width = 50;
 		src.height = 20;
 		src.addEventListener( TextEvent.EDITED, textChanged );
 		

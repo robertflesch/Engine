@@ -8,6 +8,7 @@
 
 package com.voxelengine.GUI {
 
+import com.voxelengine.GUI.components.VVTextInput;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
@@ -91,7 +92,7 @@ public class WindowPictureImport extends VVPopup {
         lbl.textFormat.size = 12;
         addElement( lbl );
 
-        var ti:TextInput = new TextInput( "", width-4 );
+        var ti:TextInput = new VVTextInput( "", width-4 );
         $evtColl.addEvent( ti, TextEvent.EDITED, urlChanged );
         addElement( ti );
 

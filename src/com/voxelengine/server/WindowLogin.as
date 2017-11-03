@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.server
 {
 import com.voxelengine.GUI.components.ComponentComboBoxWithLabel;
+import com.voxelengine.GUI.components.VVTextInput;
 import com.voxelengine.events.LoadingImageEvent;
 import com.voxelengine.events.VVKeyboardEvent;
 import com.voxelengine.events.WindowSplashEvent;
@@ -109,7 +110,7 @@ public class WindowLogin extends VVPopup
 
 		var password:String = _userInfo.data.password ?  _userInfo.data.password : $password;
 		//_passwordInput = new LabelInput( " Password", password, width );
-		_passwordInput = new TextInput( password, width - 115 ); // Dont use VVTextInput here
+		_passwordInput = new VVTextInput( password, width - 115 ); // Dont use VVTextInput here
 		_passwordInput.displayAsPassword = true;
 		_passwordInput.tabEnabled = true;
 		_passwordInput.tabIndex = 1;
