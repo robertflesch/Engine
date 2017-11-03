@@ -38,6 +38,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
         public static const TASK_PRIORITY:int = 1;
 		
 		public function LandscapeTask( guid:String, layer:LayerInfo, taskType:String = TASK_TYPE, taskPriority:int = TASK_PRIORITY ):void {
+            super(taskType, taskPriority);
 			_modelGuid = guid;
 			_layer = layer;
 			_startTime = getTimer();
@@ -47,7 +48,6 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				Globals.autoFlow = false;
 			}
 			_taskCount++;
-			super(taskType, taskPriority);
 		}
 		
 		override public function complete():void {

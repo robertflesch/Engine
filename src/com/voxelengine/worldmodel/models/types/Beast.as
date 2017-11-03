@@ -121,7 +121,7 @@ public class Beast extends ControllableVoxelModel
 		else
 			_seatLocation.setTo( 0, 0, 0 );
 
-		Log.out( "Beast.processClassJson values: " + JSON.stringify( this.modelInfo.dbo ) );
+		//Log.out( "Beast.processClassJson values: " + JSON.stringify( this.modelInfo.dbo ) );
 	}
 
 	override protected function collisionPointsAdd():void {

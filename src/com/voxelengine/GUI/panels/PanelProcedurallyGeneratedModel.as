@@ -198,7 +198,7 @@ class LayerData extends SimpleContainerBase
 		padding = 0;
 		//var compWidth = $width - 60;
 		addElement( new Label( $label, 140 ) );
-		var ti:TextInput = new TextInput( $value, 60 );
+		var ti:TextInput = new VVTextInput( $value, 60 );
 		ti.data = $label;
 		addElement( ti );
 		//worker.myEventCollector.addEvent( Text
