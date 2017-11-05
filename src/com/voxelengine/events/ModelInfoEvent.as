@@ -58,7 +58,7 @@ public class ModelInfoEvent extends ModelBaseEvent
 		return _eventDispatcher.dispatchEvent( $event );
 	}
 
-	static public  function create( $type:String, $series:int, $guid:String, $vmi:ModelInfo, $fromTable:Boolean = true ):Boolean {
+	static public  function create( $type:String, $series:int, $guid:String, $vmi:ModelInfo = null, $fromTable:Boolean = true ):Boolean {
 		return ModelInfoEvent.dispatch( new ModelInfoEvent( $type, $series, $guid, $vmi, $fromTable ) );
 	}
 	///////////////// Event handler interface /////////////////////////////

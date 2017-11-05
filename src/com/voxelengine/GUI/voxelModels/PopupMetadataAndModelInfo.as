@@ -9,7 +9,9 @@
 package com.voxelengine.GUI.voxelModels
 {
 
+import com.voxelengine.Log;
 import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.models.AssignModelAndChildrenToPublicOwnership;
 import com.voxelengine.worldmodel.models.Role;
 import com.voxelengine.worldmodel.models.types.Player;
 
@@ -86,6 +88,28 @@ public class PopupMetadataAndModelInfo extends VVPopup
         addElement(_photoContainer);
         addPhoto();
         addElement( new ComponentSpacer( WIDTH ) );
+        var role:Role = Player.player.role;
+        if ( _mmd.owner != Network.PUBLIC ) {
+            if (role.modelPromote) {
+                var copyButton:Button = new Button("Make copy available to public", WIDTH, 24);
+                copyButton.addEventListener(MouseEvent.CLICK, copyAndGiveToPublic);
+                addElement(copyButton);
+            }
+            else if (role.modelNominate) {
+                addElement(new ComponentSpacer(WIDTH));
+                var sellButton:Button = new Button("Nominate for public use", WIDTH, 24);
+                sellButton.addEventListener(MouseEvent.CLICK, nominateToPublic);
+                addElement(sellButton);
+            }
+            if (role.modelPutInStore) {
+                addElement(new ComponentSpacer(WIDTH));
+                var sellButton:Button = new Button("Sell Copy in store", WIDTH, 24);
+                sellButton.addEventListener(MouseEvent.CLICK, copyAndPutInStore);
+                addElement(sellButton);
+            }
+        }
+        addElement( new ComponentSpacer( WIDTH, 25 ) );
+
         addElement( new ComponentTextInput( "Model Name "
                 , function ($e:TextEvent):void { _mmd.name = $e.target.text; setChanged(); }
                 , _mmd.name ? _mmd.name : "Unnamed Model"
@@ -115,35 +139,67 @@ public class PopupMetadataAndModelInfo extends VVPopup
         addElement( new ComponentLabel( "Owner",  String(_mmd.owner), WIDTH ) );
         addElement( new ComponentLabel( "Creator",  String(_mmd.creator), WIDTH ) );
 
-//        addElement( new ComponentSpacer( WIDTH ) );
-//        addElement( (new Button( "Give To Public", 200, 24 )).addEventListener( MouseEvent.CLICK, giveToPublic ));
-//        addElement( new ComponentSpacer( WIDTH ) );
-
         addPermissions();
     }
 
-    private function giveToPublic( $me:MouseEvent ):void {
-        if ( _mmd.owner  && _mmd.permissions.creator == Network.userId ){
-            // ASK IF THEY ARE SURE
-            // EVENT
-
-            // Check to make sure they own it and all of the child models permissions
-            var cancelAssignment:Boolean = false;
-            var role:Role = Player.player.role;
-            if ( role.modelNominate && role.modelPromote ) {
-                ModelInfoEvent.addListener( ModelInfoEvent.PERMISSION_FAIL, permissionFailure )
-                _mi.assignToPublic( true );
-            }
-
-            if ( cancelAssignment )
-               return;
-            else
-                _mi.assignToPublic();
+    private function copyAndGiveToPublic( $me:MouseEvent ):void {
+        Log.out( "PopupMetadataAndModelInfo.copyAndGiveToPublic", Log.WARN);
+        if ( _mmd.owner == Network.userId  && _mmd.permissions.creator == Network.userId ) {
+            new AssignModelAndChildrenToPublicOwnership( _mmd.guid, true );
         }
+    }
 
-        function permissionFailure( $mie:ModelInfoEvent ):void {
-            cancelAssignment = true;
-        }
+    private function copyAndPutInStore( $me:MouseEvent ):void {
+        Log.out( "PopupMetadataAndModelInfo.copyAndPutInStore is not operational", Log.ERROR);
+        (new Alert("CopyAndPutInStore is not operational yet")).display( 100, 300);
+//        if ( _mmd.owner  && _mmd.permissions.creator == Network.userId ){
+//            // ASK IF THEY ARE SURE
+//            // EVENT
+//
+//            // Check to make sure they own it and all of the child models permissions
+//            var cancelAssignment:Boolean = false;
+//            var role:Role = Player.player.role;
+//            if ( role.modelNominate && role.modelPromote ) {
+//                ModelInfoEvent.addListener( ModelInfoEvent.PERMISSION_FAIL, permissionFailure )
+//                _mi.assignToPublic( true );
+//            }
+//
+//            if ( cancelAssignment )
+//                return;
+//            else
+//                _mi.assignToPublic();
+//        }
+//
+//        function permissionFailure( $mie:ModelInfoEvent ):void {
+//            cancelAssignment = true;
+//        }
+
+    }
+
+    private function nominateToPublic( $me:MouseEvent ):void {
+        Log.out( "PopupMetadataAndModelInfo.nominateToPublic is not operational", Log.ERROR);
+        (new Alert("NominateToPublic is not operational yet")).display(100, 300);
+//        if ( _mmd.owner  && _mmd.permissions.creator == Network.userId ){
+//            // ASK IF THEY ARE SURE
+//            // EVENT
+//
+//            // Check to make sure they own it and all of the child models permissions
+//            var cancelAssignment:Boolean = false;
+//            var role:Role = Player.player.role;
+//            if ( role.modelNominate && role.modelPromote ) {
+//                ModelInfoEvent.addListener( ModelInfoEvent.PERMISSION_FAIL, permissionFailure )
+//                _mi.assignToPublic( true );
+//            }
+//
+//            if ( cancelAssignment )
+//                return;
+//            else
+//                _mi.assignToPublic();
+//        }
+//
+//        function permissionFailure( $mie:ModelInfoEvent ):void {
+//            cancelAssignment = true;
+//        }
 
     }
 

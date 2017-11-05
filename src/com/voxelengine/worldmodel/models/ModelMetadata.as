@@ -112,7 +112,6 @@ public class ModelMetadata extends PersistenceObject
 		init( $newData );
 
 		if ( "EditCursor" != guid ) {
-			ModelMetadataEvent.addListener( ModelBaseEvent.SAVE, saveEvent);
             ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
 		}
 
@@ -199,7 +198,7 @@ public class ModelMetadata extends PersistenceObject
 		ModelMetadataEvent.removeListener( ModelBaseEvent.SAVE, saveEvent );
 		ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
 	}
-	
+
 	// This was private, force a message to be sent to it.
 	// But the voxelModel has a handle to it, seems silly to have to propgate it every where, so its public
 	private function saveEvent( $mmde:ModelMetadataEvent ):void {
@@ -248,6 +247,8 @@ Log.out( "ModelMetadata.clone - fix thumbnail", Log.WARN );
 
         return newModelMetadata;
 	}
+
+
 }
 }
 

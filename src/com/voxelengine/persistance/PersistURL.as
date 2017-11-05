@@ -91,6 +91,7 @@ public class PersistURL
                 var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
                 resolvedFilePath = fs.getUrl(_filePath);
                 urlLoader.load(new URLRequest(resolvedFilePath));
+				Log.out( "PersistURL.load - loading from path: " + resolvedFilePath );
             } else {
                 Log.out("PersistURL.load - Where am I trying to load from? " + _filePath, Log.WARN );
 

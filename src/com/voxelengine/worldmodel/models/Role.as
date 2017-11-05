@@ -20,6 +20,8 @@ public class Role  extends PersistenceObject {
     private var _modelPromote:Boolean;
     private var _modelPrivateDelete:Boolean;
     private var _modelPublicEdit:Boolean;
+    private var _modelPutInStore:Boolean;
+    public function get modelPutInStore():Boolean { return _modelPutInStore; }
 
     static private var _s_defaultRole:Role = null;
     static public function get defaultRole() :Role {
@@ -39,6 +41,7 @@ public class Role  extends PersistenceObject {
             _modelPrivateDelete = $dbo.modelPrivateDelete;
 
             _modelPublicEdit = $dbo.modelPublicEdit;
+            _modelPutInStore = $dbo.modelPutInStore;
         }
     }
 
@@ -49,6 +52,7 @@ public class Role  extends PersistenceObject {
     public function get modelNominate():Boolean {
         return _modelNominate;
     }
+
 
     public function get modelPromote():Boolean {
         return _modelPromote;

@@ -21,7 +21,10 @@ public class ModelMetadataEvent extends ModelBaseEvent
 {
 	static public const BITMAP_LOADED:String					= "BITMAP_LOADED";
 	static public const DATA_COLLECTED:String					= "DATA_COLLECTED";
-	static public const RESULT_CHILDREN:String					= "RESULT_CHILDREN";
+    static public const REASSIGN_SUCCEED:String					= "REASSIGN_SUCCEED";
+	static public const REASSIGN_FAILED:String					= "REASSIGN_FAILED";
+    static public const REASSIGN_PUBLIC:String					= "REASSIGN_PUBLIC";
+    static public const REASSIGN_STORE:String					= "REASSIGN_STORE";
 
 	private var _modelMetadata:ModelMetadata;
 	private var _modelGuid:String;

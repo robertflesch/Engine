@@ -78,10 +78,12 @@ public class InventoryPanelModel extends VVContainer
 	private var _itemContainer:ScrollPane;
 	private var _currentRow:Container;
 	private var _seriesModelMetadataEvent:int;
+    private var _source:String;
 	private var _category:String = MODEL_CAT_ALL;
 	
 	public function InventoryPanelModel( $parent:VVContainer, $source:String ) {
 		super( $parent );
+		_source = $source;
 		layout.orientation = LayoutOrientation.HORIZONTAL;
 		
 		FunctionRegistry.functionAdd( createNewObjectIPM, "createNewObjectIPM" );
@@ -90,13 +92,14 @@ public class InventoryPanelModel extends VVContainer
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, addModelMetadataEvent );
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, addModelMetadataEvent );
 		ModelMetadataEvent.addListener( ModelBaseEvent.DELETE, removeModelMetadataEvent );
+        ModelMetadataEvent.addListener( ModelMetadataEvent.REASSIGN_PUBLIC, reassignPublicModelMetadataEvent );
 		// This was causing model to be added twice when importing.
 		//ModelMetadataEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, addModelMetadataEvent );
 
 		upperTabsAdd();
 		addItemContainer();
 		addTrashCan();
-        displaySelectedSource( $source );
+        displaySelectedSource();
 		
 		// This forces the window into a multiple of MODEL_IMAGE_WIDTH width
 		var count:int = width / MODEL_IMAGE_WIDTH;
@@ -176,18 +179,18 @@ public class InventoryPanelModel extends VVContainer
 	
 	// TODO I see problem here when language is different then what is in TypeInfo RSF - 11.16.14
 	// That is if I use the target "Name"
-	private function displaySelectedSource( $source:String ):void {
+	private function displaySelectedSource():void {
 		//Log.out( "InventoryPanelModels.displaySelectedCategory - Not implemented", Log.WARN );
 		// The series makes it so that I dont see results from other objects requests
 		// This grabs the current series counter which will be used on the REQUEST_TYPE call
-		if ( WindowInventoryNew.SOURCE_BACKPACK == $source ) {
+		if ( WindowInventoryNew.SOURCE_BACKPACK == _source ) {
 			addTools();
 		}
 
 		_seriesModelMetadataEvent = ModelBaseEvent.seriesCounter;
-		if ( $source == WindowInventoryNew.SOURCE_PUBLIC )
+		if ( _source == WindowInventoryNew.SOURCE_PUBLIC )
             ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.PUBLIC, null );
-		else if ( $source == WindowInventoryNew.SOURCE_BACKPACK )
+		else if ( _source == WindowInventoryNew.SOURCE_BACKPACK )
 			ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId, null );
 		else
             ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.storeId, null );
@@ -198,6 +201,12 @@ public class InventoryPanelModel extends VVContainer
     private function displaySelectedCategory( $category:String ):void {
         Log.out( "InventoryPanelModels.displaySelectedCategory - Not implemented", Log.WARN );
 		throw new Error( "Not implemented");
+    }
+
+    private function reassignPublicModelMetadataEvent($mme:ModelMetadataEvent):void {
+		// For this to happen I have to be on the backpack page!
+        if ( _source == WindowInventoryNew.SOURCE_BACKPACK )
+        	removeModel( $mme.modelGuid );
     }
 
     private function removeModelMetadataEvent($mme:ModelMetadataEvent):void {

@@ -39,8 +39,11 @@ public class ModelMetadataCache
 		ModelMetadataEvent.addListener( ModelBaseEvent.DELETE, 			deleteHandler );
 		ModelMetadataEvent.addListener( ModelBaseEvent.GENERATION, 		generationComplete );
 		ModelMetadataEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, importComplete );
+        ModelMetadataEvent.addListener( ModelBaseEvent.SAVE, 			saveEvent );
+        ModelMetadataEvent.addListener( ModelMetadataEvent.REASSIGN_PUBLIC, reassignToPublic );
 
-		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );		
+
+        ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );
 		
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed );
@@ -144,6 +147,15 @@ public class ModelMetadataCache
 		}
 	}
 
+
+    static private function reassignToPublic( $mme:ModelMetadataEvent ):void {
+        var vmm:ModelMetadata = _metadata[$mme.modelGuid];
+		if ( vmm ) {
+			vmm.owner = Network.PUBLIC;
+			vmm.save();
+		}
+    }
+
 	static private function importComplete( $mme:ModelMetadataEvent ):void {
 		add( $mme.series, $mme.modelMetadata );
 	}
@@ -225,7 +237,15 @@ public class ModelMetadataCache
 		Log.out( "ModelMetadataCache.loadNotFound PersistenceEvent: " + $pe.toString(), Log.WARN );
 		ModelMetadataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 	}
-	/////////////////////////////////////////////////////////////////////////////////////////////
+
+    static private function saveEvent( $pe:ModelMetadataEvent ):void {
+        for each ( var vmm:ModelMetadata in _metadata ) {
+			vmm.save();
+		}
+	}
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
 	//  End - Persistence Events
 	/////////////////////////////////////////////////////////////////////////////////////////////
 
