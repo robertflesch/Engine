@@ -15,7 +15,7 @@ import org.flashapi.swing.plaf.spas.VVUI;
 
 public class ComponentTextArea extends Box
 {
-	public function ComponentTextArea( $label:String, $changeHandler:Function, $initialValue:String, $width:int, $height:int = 90, $padding:int = 5 )
+	public function ComponentTextArea( $label:String, $changeHandler:Function, $initialValue:String, $width:int, $height:int = 70, $padding:int = 5 )
 	{
 		super( $width, $height );
 		

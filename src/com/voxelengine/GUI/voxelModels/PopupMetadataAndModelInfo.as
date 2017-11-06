@@ -95,113 +95,7 @@ public class PopupMetadataAndModelInfo extends VVPopup
                 , _mmd.hashTags
                 , WIDTH ) );
 
-        var panel1:Container = new Container(width, 40);
-        panel1.addElement( new ComponentLabel( "Version",  String(_mmd.version), (WIDTH/2-2) ) );
-        panel1.addElement( new ComponentLabel( "Animation class",  String(_mmd.animationClass), (WIDTH/2-2) ) );
-        addElement( panel1 );
-
-        if ( _mmd.childOf ) {
-            addElement( new ComponentLabel( "Child of",  String(_mmd.childOf), WIDTH ) );
-            if ( null == _mmd.modelPosition )
-                _mmd.modelPosition = {x:0,y:0,z:0};
-            if ( null == _mmd.modelScaling )
-                _mmd.modelScaling = {x:1,y:1,z:1};
-            addElement( new ComponentVector3DToObject( setChanged, _mmd.modelPositionInfo, "Position Relative To Parent", "X: ", "Y: ", "Z: ",  _mmd.modelPositionVec3D(), WIDTH, updateVal ) );
-            addElement( new ComponentVector3DToObject( setChanged, _mmd.modelScalingInfo, "Model Scaling", "X: ", "Y: ", "Z: ",  _mmd.modelScalingVec3D(), WIDTH, updateVal ) );
-        }
-        //addElement( new ComponentLabel( "Created Date",  String(_mmd.createdDate), WIDTH ) );
-
-        var panel2:Container = new Container(width, 40);
-        panel2.addElement( new ComponentLabel( "Owner",  String(_mmd.owner), (WIDTH/2-2) ) );
-        panel2.addElement( new ComponentLabel( "Creator",  String(_mmd.creator), (WIDTH/2-2) ) );
-        addElement( panel2 );
     }
-
-    private function addButtons():void {
-        var role:Role = Player.player.role;
-        if ( _mmd.owner != Network.PUBLIC ) {
-            if (role.modelPromote) {
-                var copyButton:Button = new Button("Make copy available to public", WIDTH, 24);
-                copyButton.addEventListener(MouseEvent.CLICK, copyAndGiveToPublic);
-                addElement(copyButton);
-            }
-            else if (role.modelNominate) {
-                addElement(new ComponentSpacer(WIDTH));
-                var sellButton:Button = new Button("Nominate for public use", WIDTH, 24);
-                sellButton.addEventListener(MouseEvent.CLICK, nominateToPublic);
-                addElement(sellButton);
-            }
-            if (role.modelPutInStore) {
-                addElement(new ComponentSpacer(WIDTH));
-                var sellButton:Button = new Button("Sell Copy in store", WIDTH, 24);
-                sellButton.addEventListener(MouseEvent.CLICK, copyAndPutInStore);
-                addElement(sellButton);
-            }
-        }
-        addElement( new ComponentSpacer( WIDTH ) );
-    }
-
-    private function copyAndGiveToPublic( $me:MouseEvent ):void {
-        Log.out( "PopupMetadataAndModelInfo.copyAndGiveToPublic", Log.WARN);
-        if ( _mmd.owner == Network.userId  && _mmd.permissions.creator == Network.userId ) {
-            new AssignModelAndChildrenToPublicOwnership( _mmd.guid, true );
-        }
-    }
-
-    private function copyAndPutInStore( $me:MouseEvent ):void {
-        Log.out( "PopupMetadataAndModelInfo.copyAndPutInStore is not operational", Log.ERROR);
-        (new Alert("CopyAndPutInStore is not operational yet")).display( 100, 300);
-//        if ( _mmd.owner  && _mmd.permissions.creator == Network.userId ){
-//            // ASK IF THEY ARE SURE
-//            // EVENT
-//
-//            // Check to make sure they own it and all of the child models permissions
-//            var cancelAssignment:Boolean = false;
-//            var role:Role = Player.player.role;
-//            if ( role.modelNominate && role.modelPromote ) {
-//                ModelInfoEvent.addListener( ModelInfoEvent.PERMISSION_FAIL, permissionFailure )
-//                _mi.assignToPublic( true );
-//            }
-//
-//            if ( cancelAssignment )
-//                return;
-//            else
-//                _mi.assignToPublic();
-//        }
-//
-//        function permissionFailure( $mie:ModelInfoEvent ):void {
-//            cancelAssignment = true;
-//        }
-
-    }
-
-    private function nominateToPublic( $me:MouseEvent ):void {
-        Log.out( "PopupMetadataAndModelInfo.nominateToPublic is not operational", Log.ERROR);
-        (new Alert("NominateToPublic is not operational yet")).display(100, 300);
-//        if ( _mmd.owner  && _mmd.permissions.creator == Network.userId ){
-//            // ASK IF THEY ARE SURE
-//            // EVENT
-//
-//            // Check to make sure they own it and all of the child models permissions
-//            var cancelAssignment:Boolean = false;
-//            var role:Role = Player.player.role;
-//            if ( role.modelNominate && role.modelPromote ) {
-//                ModelInfoEvent.addListener( ModelInfoEvent.PERMISSION_FAIL, permissionFailure )
-//                _mi.assignToPublic( true );
-//            }
-//
-//            if ( cancelAssignment )
-//                return;
-//            else
-//                _mi.assignToPublic();
-//        }
-//
-//        function permissionFailure( $mie:ModelInfoEvent ):void {
-//            cancelAssignment = true;
-//        }
-
-    }
-
 
     private function addModelInfo():void {
         addElement( new ComponentSpacer( WIDTH, 10 ) );
@@ -213,8 +107,9 @@ public class PopupMetadataAndModelInfo extends VVPopup
         panel.addElement( new ComponentLabel( "Grain Size",  String(_mi.grainSize), (WIDTH/2-2) ) );
         panel.addElement( new ComponentLabel( "Model Class",  _mi.modelClass, (WIDTH/2-2) ) );
         addElement( panel );
+        addAdvanced();
         addPermissions();
-        addButtons();
+       // addButtons();
         // TODO need to be able to handle an array of scripts.
 //            var scriptsPanel:PanelModelScripts = new PanelModelScripts( this, width, 20, 200);
 
@@ -236,6 +131,15 @@ public class PopupMetadataAndModelInfo extends VVPopup
         ebco.paddingTop = 7;
         ebco.width = WIDTH;
         addElement( new PanelPermissionModel( null, ebco ) );
+    }
+
+    private function addAdvanced():void {
+        var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
+        ebco.rootObject = _mmd;
+        ebco.title = " advanced ";
+        ebco.paddingTop = 7;
+        ebco.width = WIDTH;
+        addElement( new PanelAdvancedModel( null, ebco ) );
     }
 
     static private const PHOTO_WIDTH:int = 128;
