@@ -8,8 +8,8 @@
 
 package com.voxelengine.GUI 
 {
-import org.flashapi.swing.*
-import org.flashapi.swing.event.*;
+import org.flashapi.swing.Button;
+import org.flashapi.swing.HorizontalSeparator;
 import org.flashapi.swing.constants.LayoutOrientation;
 import org.flashapi.swing.button.RadioButtonGroup;
 import org.flashapi.swing.databinding.DataProvider;
@@ -19,6 +19,7 @@ import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.GUI.components.VVLabelInput;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.PermissionsModel;
@@ -26,13 +27,16 @@ import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 
+import org.flashapi.swing.event.ButtonsGroupEvent;
+import org.flashapi.swing.event.UIMouseEvent;
+
 public class WindowModelMetadata extends VVPopup
 {
-	private var _name:LabelInput;
-	private var _desc:LabelInput;
-	private var _hashTags:LabelInput;
+	private var _name:VVLabelInput;
+	private var _desc:VVLabelInput;
+	private var _hashTags:VVLabelInput;
 
-	private var _copies:LabelInput;
+	private var _copies:VVLabelInput;
 	private var _vmm:ModelMetadata;
 	private var _type:int;
 	
@@ -83,35 +87,35 @@ public class WindowModelMetadata extends VVPopup
 		_vmm = $mme.modelMetadata;
 		
 		if ( TYPE_IMPORT == _type ) {
-			var creatorI:LabelInput = new LabelInput( "Creator: ", _vmm.permissions.creator );
+			var creatorI:VVLabelInput = new VVLabelInput( "Creator: ", _vmm.permissions.creator );
 			creatorI.editable = false;
 			creatorI.selectable = false;
 			creatorI.enabled = false;
 			addElement( creatorI );
 			
-			_name = new LabelInput( "Name: ", _vmm.name );
+			_name = new VVLabelInput( "Name: ", _vmm.name );
 			addElement( _name );
 
-			_desc = new LabelInput( "Description: ", _vmm.description );
+			_desc = new VVLabelInput( "Description: ", _vmm.description );
 			addElement( _desc );
 
-			_hashTags = new LabelInput( "HashTags: ", "#imported" );
+			_hashTags = new VVLabelInput( "HashTags: ", "#imported" );
 			addElement( _hashTags );
 
 		} else {
-			var creator:LabelInput = new LabelInput( "Creator: ", _vmm.permissions.creator );
+			var creator:VVLabelInput = new VVLabelInput( "Creator: ", _vmm.permissions.creator );
 			creator.editable = false;
 			creator.selectable = false;
 			creator.enabled = false;
 			addElement( creator );
 			
-			_name = new LabelInput( "Name: ", _vmm.name );
+			_name = new VVLabelInput( "Name: ", _vmm.name );
 			addElement( _name );
 
-			_desc = new LabelInput( "Description: ", _vmm.description );
+			_desc = new VVLabelInput( "Description: ", _vmm.description );
 			addElement( _desc );
 
-			_hashTags = new LabelInput( "HashTags: ", "#imported" );
+			_hashTags = new VVLabelInput( "HashTags: ", _vmm.hashTags );
 			addElement( _hashTags );
 
 			addElement( new HorizontalSeparator( width ) );
@@ -172,7 +176,7 @@ Log.out( "WindowModelMetadata - need drop down list of Bind types", Log.WARN );
 			
 			addElement( new HorizontalSeparator( width ) );
 			
-			_copies = new LabelInput( "Num of copies : ", "1" );
+			_copies = new VVLabelInput( "Num of copies : ", "1" );
 			_copies.labelControl.width = 40;
 			addElement( _copies );
 			

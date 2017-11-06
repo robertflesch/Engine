@@ -9,6 +9,7 @@
 package com.voxelengine.GUI.voxelModels
 {
 
+import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.models.AssignModelAndChildrenToPublicOwnership;
@@ -63,7 +64,7 @@ public class PopupMetadataAndModelInfo extends VVPopup
         _s_currentInstance = this;
 
         _mmd = $mmd;
-        addMetadata();
+
         ModelInfoEvent.addListener( ModelBaseEvent.ADDED, modelInfoRetreived );
         ModelInfoEvent.addListener( ModelBaseEvent.RESULT, modelInfoRetreived );
         ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, _mmd.guid, null );
@@ -77,17 +78,46 @@ public class PopupMetadataAndModelInfo extends VVPopup
     }
 
     private function addMetadata():void {
-        addElement( new ComponentSpacer( WIDTH ) );
-        _photoContainer.layout.orientation = LayoutOrientation.VERTICAL;
-        _photoContainer.layout.horizontalAlignment = HorizontalAlignment.CENTER;
-        _photoContainer.autoSize = false;
-        _photoContainer.width = WIDTH;
-        _photoContainer.height = PHOTO_WIDTH + 35;
-        _photoContainer.padding = 0;
-        _photoContainer.name = "pc";
-        addElement(_photoContainer);
-        addPhoto();
-        addElement( new ComponentSpacer( WIDTH ) );
+        //addElement( new ComponentSpacer( WIDTH, 25 ) );
+
+        addElement( new ComponentTextInput( "Model Name "
+                , function ($e:TextEvent):void { _mmd.name = $e.target.text; setChanged(); }
+                , _mmd.name ? _mmd.name : "Unnamed Model"
+                , WIDTH ) );
+
+        addElement( new ComponentTextArea( "Description "
+                , function ($e:TextEvent):void { _mmd.description = $e.target.text; setChanged(); }
+                , _mmd.description ? _mmd.description : "No Description"
+                , WIDTH ) );
+
+        addElement( new ComponentTextInput( "HashTags"
+                , function ($e:TextEvent):void { _mmd.hashTags = $e.target.text; setChanged(); }
+                , _mmd.hashTags
+                , WIDTH ) );
+
+        var panel1:Container = new Container(width, 40);
+        panel1.addElement( new ComponentLabel( "Version",  String(_mmd.version), (WIDTH/2-2) ) );
+        panel1.addElement( new ComponentLabel( "Animation class",  String(_mmd.animationClass), (WIDTH/2-2) ) );
+        addElement( panel1 );
+
+        if ( _mmd.childOf ) {
+            addElement( new ComponentLabel( "Child of",  String(_mmd.childOf), WIDTH ) );
+            if ( null == _mmd.modelPosition )
+                _mmd.modelPosition = {x:0,y:0,z:0};
+            if ( null == _mmd.modelScaling )
+                _mmd.modelScaling = {x:1,y:1,z:1};
+            addElement( new ComponentVector3DToObject( setChanged, _mmd.modelPositionInfo, "Position Relative To Parent", "X: ", "Y: ", "Z: ",  _mmd.modelPositionVec3D(), WIDTH, updateVal ) );
+            addElement( new ComponentVector3DToObject( setChanged, _mmd.modelScalingInfo, "Model Scaling", "X: ", "Y: ", "Z: ",  _mmd.modelScalingVec3D(), WIDTH, updateVal ) );
+        }
+        //addElement( new ComponentLabel( "Created Date",  String(_mmd.createdDate), WIDTH ) );
+
+        var panel2:Container = new Container(width, 40);
+        panel2.addElement( new ComponentLabel( "Owner",  String(_mmd.owner), (WIDTH/2-2) ) );
+        panel2.addElement( new ComponentLabel( "Creator",  String(_mmd.creator), (WIDTH/2-2) ) );
+        addElement( panel2 );
+    }
+
+    private function addButtons():void {
         var role:Role = Player.player.role;
         if ( _mmd.owner != Network.PUBLIC ) {
             if (role.modelPromote) {
@@ -108,38 +138,7 @@ public class PopupMetadataAndModelInfo extends VVPopup
                 addElement(sellButton);
             }
         }
-        addElement( new ComponentSpacer( WIDTH, 25 ) );
-
-        addElement( new ComponentTextInput( "Model Name "
-                , function ($e:TextEvent):void { _mmd.name = $e.target.text; setChanged(); }
-                , _mmd.name ? _mmd.name : "Unnamed Model"
-                , WIDTH ) );
-
-        addElement( new ComponentTextArea( "Description "
-                , function ($e:TextEvent):void { _mmd.description = $e.target.text; setChanged(); }
-                , _mmd.description ? _mmd.description : "No Description"
-                , WIDTH ) );
-
-        addElement( new ComponentTextInput( "HashTags"
-                , function ($e:TextEvent):void { _mmd.hashTags = $e.target.text; setChanged(); }
-                , _mmd.hashTags
-                , WIDTH ) );
-        addElement( new ComponentLabel( "Version",  String(_mmd.version), WIDTH ) );
-        addElement( new ComponentLabel( "Animation class",  String(_mmd.animationClass), WIDTH ) );
-        if ( _mmd.childOf ) {
-            addElement( new ComponentLabel( "Child of",  String(_mmd.childOf), WIDTH ) );
-            if ( null == _mmd.modelPosition )
-                _mmd.modelPosition = {x:0,y:0,z:0};
-            if ( null == _mmd.modelScaling )
-                _mmd.modelScaling = {x:1,y:1,z:1};
-            addElement( new ComponentVector3DToObject( setChanged, _mmd.modelPositionInfo, "Position Relative To Parent", "X: ", "Y: ", "Z: ",  _mmd.modelPositionVec3D(), WIDTH, updateVal ) );
-            addElement( new ComponentVector3DToObject( setChanged, _mmd.modelScalingInfo, "Model Scaling", "X: ", "Y: ", "Z: ",  _mmd.modelScalingVec3D(), WIDTH, updateVal ) );
-        }
-        addElement( new ComponentLabel( "Created Date",  String(_mmd.createdDate), WIDTH ) );
-        addElement( new ComponentLabel( "Owner",  String(_mmd.owner), WIDTH ) );
-        addElement( new ComponentLabel( "Creator",  String(_mmd.creator), WIDTH ) );
-
-        addPermissions();
+        addElement( new ComponentSpacer( WIDTH ) );
     }
 
     private function copyAndGiveToPublic( $me:MouseEvent ):void {
@@ -205,32 +204,20 @@ public class PopupMetadataAndModelInfo extends VVPopup
 
 
     private function addModelInfo():void {
-        addElement( new ComponentLabel( "Model GUID",  _mi.guid, WIDTH ) );
-        addElement( new ComponentLabel( "Model Class",  _mi.modelClass, WIDTH ) );
-//        addElement( new ComponentLabel( "Created Date",  _mi.createdDate, WIDTH ) );
-//        addElement( new ComponentLabel( "Creator",  _mi.creator, WIDTH ) );
-
-//        if (  _mi.oxelPersistence ) {
-//            var lc:Container = new Container(WIDTH, 30);
-//            lc.padding = 0;
-//            lc.layout.orientation = LayoutOrientation.HORIZONTAL;
-//
-//            lc.addElement(new ComponentLabelInput("Light(0-255)"
-//                    , function ($e:TextEvent):void {
-//                        _mi.oxelPersistence.baseLightLevel = Math.max(Math.min(uint($e.target.label), 255), 0);
-//                    }
-//                    , String(_mi.oxelPersistence.baseLightLevel)
-//                    , WIDTH - 120));
-//
-//            addElement(lc);
-//        }
-
+        addElement( new ComponentSpacer( WIDTH, 10 ) );
+        addPhoto();
+        addMetadata();
+        if ( Globals.isDebug )
+            addElement( new ComponentLabel( "Model GUID",  _mi.guid, WIDTH ) );
+        var panel:Container = new Container(width, 30);
+        panel.addElement( new ComponentLabel( "Grain Size",  String(_mi.grainSize), (WIDTH/2-2) ) );
+        panel.addElement( new ComponentLabel( "Model Class",  _mi.modelClass, (WIDTH/2-2) ) );
+        addElement( panel );
+        addPermissions();
+        addButtons();
         // TODO need to be able to handle an array of scripts.
 //            var scriptsPanel:PanelModelScripts = new PanelModelScripts( this, width, 20, 200);
 
-        addElement( new ComponentLabel( "Grain Size",  String(_mi.grainSize), WIDTH ) );
-//        if ( _mi.oxelPersistence && _mi.oxelPersistence.bound )
-//            addElement( new ComponentLabel( "Size in Meters", String( (_mi.oxelPersistence.bound ^ 2)/GRAINS_PER_METER ), WIDTH ) );
     }
 
     private function modelInfoRetreived( $mie:ModelInfoEvent ):void {
@@ -270,6 +257,14 @@ public class PopupMetadataAndModelInfo extends VVPopup
         return bmpd;
     }
     private function addPhoto():void {
+        _photoContainer.layout.orientation = LayoutOrientation.VERTICAL;
+        _photoContainer.layout.horizontalAlignment = HorizontalAlignment.CENTER;
+        _photoContainer.autoSize = false;
+        _photoContainer.width = WIDTH;
+        _photoContainer.height = PHOTO_WIDTH + 35;
+        _photoContainer.padding = 0;
+        _photoContainer.name = "pc";
+        addElement(_photoContainer);
         _photoContainer.removeElements();
         var bmd:BitmapData = null;
         if ( _mmd.thumbnail )
@@ -280,6 +275,7 @@ public class PopupMetadataAndModelInfo extends VVPopup
         var btn:Button = new Button( "Take New Picture", WIDTH , 24 );
         $evtColl.addEvent( btn, UIMouseEvent.CLICK, newPhoto );
         _photoContainer.addElement(btn);
+        addElement( new ComponentSpacer( WIDTH, 10 ) );
     }
 
 //    private function updateScaleVal( $e:SpinButtonEvent ):Number {

@@ -8,12 +8,12 @@
 
 package com.voxelengine.GUI.components {
 import com.voxelengine.Log;
-import org.flashapi.swing.Box;
+
 import org.flashapi.swing.TextInput;
-import org.flashapi.swing.event.TextEvent;
-import org.flashapi.swing.constants.BorderStyle;
-import org.flashapi.swing.plaf.spas.VVUI;
 import com.voxelengine.Globals;
+
+import org.flashapi.swing.event.TextEvent;
+
 public class VVTextInput extends TextInput
 {
 	public function VVTextInput( $label:String, $width:int )

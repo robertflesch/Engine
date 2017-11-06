@@ -8,14 +8,12 @@
 
 package com.voxelengine.GUI.components {
 
-import org.flashapi.swing.*;
-import org.flashapi.swing.event.*;
-import org.flashapi.swing.constants.*;
+import org.flashapi.swing.event.TextEvent;
 import org.flashapi.swing.plaf.spas.VVUI;
 
-public class ComponentLabelInput extends LabelInput
+public class ComponentLabelInput extends VVLabelInput
 {
-	public function ComponentLabelInput( $label:String, $changeHandler:Function, $initialValue:String, $width:int, $height:int = 20, $padding:int = 15 )
+	public function ComponentLabelInput( $label:String, $changeHandler:Function, $initialValue:String, $width:int )
 	{
 		super( $label, $initialValue, $width );
 		backgroundColor = VVUI.DEFAULT_COLOR;

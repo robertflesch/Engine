@@ -24,7 +24,9 @@ public class PanelModelTransform extends ExpandableBox
 	private var _ani:Animation;
 	private var _mt:ModelTransform;
 	
-	public function PanelModelTransform( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {		
+	public function PanelModelTransform( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {
+        // just moved this to correct error, or was it? 11.5.2017 RSF
+		super( $parent, $ebco );
 		_ani = $ebco.rootObject;
 		_mt = $ebco.item;
 		if ( null == _mt ) {
@@ -34,7 +36,7 @@ public class PanelModelTransform extends ExpandableBox
 		}
 		
 		$ebco.itemBox.showNew = false;
-		super( $parent, $ebco )
+//		super( $parent, $ebco )  11.5.2017 RSF
 	}
 	
 	override protected function yesDelete():void {

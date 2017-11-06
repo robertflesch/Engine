@@ -7,13 +7,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.server
 {
-import com.voxelengine.GUI.components.ComponentComboBoxWithLabel;
-import com.voxelengine.GUI.components.VVTextInput;
-import com.voxelengine.events.LoadingImageEvent;
-import com.voxelengine.events.VVKeyboardEvent;
-import com.voxelengine.events.WindowSplashEvent;
-import com.voxelengine.GUI.VoxelVerseGUI;
-import com.voxelengine.renderer.Renderer;
 
 import org.flashapi.swing.list.ListItem;
 
@@ -30,13 +23,20 @@ import org.flashapi.swing.plaf.spas.VVUI;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.LoginEvent;
+import com.voxelengine.GUI.components.ComponentComboBoxWithLabel;
+import com.voxelengine.GUI.components.VVLabelInput;
+import com.voxelengine.GUI.components.VVTextInput;
+import com.voxelengine.events.LoadingImageEvent;
+import com.voxelengine.events.VVKeyboardEvent;
+import com.voxelengine.GUI.VoxelVerseGUI;
+import com.voxelengine.renderer.Renderer;
 
 import com.voxelengine.GUI.VVPopup;
 
 
 public class WindowLogin extends VVPopup
 {
-	private var _emailInput:LabelInput;
+	private var _emailInput:VVLabelInput;
 	private var _passwordInput:TextInput;
 	private var _errorText:Label;
 	private var _userInfo:SharedObject;
@@ -92,7 +92,7 @@ public class WindowLogin extends VVPopup
 		// otherwise use empty
 
 		var emailAddy:String = _userInfo.data.email ?  _userInfo.data.email : $email;
-		_emailInput = new LabelInput( " Email", emailAddy, width - 5 );
+		_emailInput = new VVLabelInput( " Email", emailAddy, width - 5 );
 		_emailInput.labelControl.width = 80;
 		_emailInput.tabEnabled = true;
 		_emailInput.tabIndex = 0;

@@ -646,9 +646,10 @@ public class ModelInfo extends PersistenceObject
 	public function childrenGet():Object {
 		// Same code that is in modelCache to build models in region
 		// this is just models in models
-		delete dbo.children;
-		if ( 0 == _childVoxelModels.length )
-			return null;
+		//delete dbo.children;
+		// Child models have not been loaded, so just return the lists of child Objects
+		if ( 0 == _childVoxelModels.length)
+			return dbo.children;
 
 		var children:Object = {};
 		for ( var i:int=0; i < _childVoxelModels.length; i++ ) {

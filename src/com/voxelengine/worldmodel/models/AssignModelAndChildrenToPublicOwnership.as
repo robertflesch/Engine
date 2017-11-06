@@ -24,7 +24,6 @@ public class AssignModelAndChildrenToPublicOwnership {
     private var _mi:ModelInfo;
     // This hold a list of guids and the result for that guid
     private var _resultObject:Object = {};
-    private var _resultObjectSize:int;
     // The guid and result of all objects in the hierarchy
     private static var _s_resultAllObjects:Object = {};
     private var _topLevel:Boolean;
@@ -107,16 +106,16 @@ public class AssignModelAndChildrenToPublicOwnership {
         // If we have the data, check ownership
         if ( _mi && _mmd ) {
             if (  _mmd.owner == Network.userId || _mmd.owner == Network.PUBLIC ) {
+                ModelMetadataEvent.addListener(ModelMetadataEvent.REASSIGN_FAILED, modelReassignmentResult);
+                ModelMetadataEvent.addListener(ModelMetadataEvent.REASSIGN_SUCCEED, modelReassignmentResult);
                 var children:Object = _mi.childrenGet();
                 if (children) {
-                    if (0 < children.length) {
-                        ModelMetadataEvent.addListener(ModelMetadataEvent.REASSIGN_FAILED, modelReassignmentResult);
-                        ModelMetadataEvent.addListener(ModelMetadataEvent.REASSIGN_SUCCEED, modelReassignmentResult);
-                        for (var i:int = 0; i < children.length; i++) {
+                    var ol:int = objectLength( children );
+                    if (0 < ol ) {
+                        for (var i:int = 0; i < ol; i++) {
                             var oi:Object = children[i];
                             var childGuid:String = oi.modelGuid;
                             _resultObject[childGuid] = RESULT_UNDETERMINED;
-                            _resultObjectSize = i;
                             new AssignModelAndChildrenToPublicOwnership(childGuid);
                         }
                     }
@@ -131,6 +130,12 @@ public class AssignModelAndChildrenToPublicOwnership {
         }
     }
 
+    private function objectLength($o:Object):int {
+        var cnt:int=0;
+        for (var s:String in $o) cnt++;
+        return cnt;
+    }
+
     private function taskStatus( $result:Boolean ):void {
         switch ( _taskResult ) {
             case RESULT_UNDETERMINED:
@@ -141,37 +146,41 @@ public class AssignModelAndChildrenToPublicOwnership {
                 } else {
                     _s_resultAllObjects[_guid] = ModelMetadataEvent.REASSIGN_SUCCEED;
                     // it worked, send result and null members
-                    ModelMetadataEvent.create(ModelMetadataEvent.REASSIGN_SUCCEED, 0, _guid);
                 }
                 break;
             case RESULT_FAILURE:
                 _s_resultAllObjects[_guid] = ModelMetadataEvent.REASSIGN_FAILED;
                 // both failed, sent result
-                ModelMetadataEvent.create(ModelMetadataEvent.REASSIGN_FAILED, 0, _guid);
                 break;
         }
-        // if no children we are done, otherwise wait for children
-        if ( 0 == _resultObjectSize) {
-            if ( _topLevel )
-                ModelMetadataEvent.create( ModelMetadataEvent.REASSIGN_PUBLIC, 0, _guid );
-            _mmd = null;
-            _mi = null;
-        }
+        finalCheck();
     }
 
     private function modelReassignmentResult( $mmd:ModelMetadataEvent ):void {
-        // this object has children since we are listen for this event
-        var childGuid:String = $mmd.modelGuid;
+        // this might be our guid, or childs guid, or some other branches child guid
+        var guid:String = $mmd.modelGuid;
 
-        // Is this one of our children? if not return
-        if ( !_resultObject[childGuid] )
-                return;
+        // is this us?
+        var childCount:int = objectLength(_resultObject);
+        if (_guid != guid) {
+            // is this a child object?
+            if (0 < childCount ) {
+                // is it one of our children's guid?
+                if (_resultObject[guid]) {
+                    _resultObject[guid] = $mmd.type;
+                } else {
+                    // not us, not one of our direct descendants
+                    return;
+                }
+            }
+        }
 
-        // set the key in result object to the type returned by this event
-        if ( _resultObject[childGuid] )
-            _resultObject[childGuid] = $mmd.type;
+        finalCheck();
+    }
 
-        // now check if all the results are in, if not, just wait
+    private function finalCheck():void {
+
+        // now check if all the children's results are in, if not, just wait
         var finalResult:Boolean = true;
         for each ( var result:String in _resultObject ){
             // if there are results yet to be determined, hold off until all have completed
@@ -181,6 +190,10 @@ public class AssignModelAndChildrenToPublicOwnership {
                 finalResult = false;
             }
         }
+
+        // all child models have been resolved
+        ModelMetadataEvent.removeListener(ModelMetadataEvent.REASSIGN_SUCCEED, modelReassignmentResult);
+        ModelMetadataEvent.removeListener(ModelMetadataEvent.REASSIGN_FAILED, modelReassignmentResult);
 
         // if we get here, then all children have been reassigned
         if ( finalResult ) {
