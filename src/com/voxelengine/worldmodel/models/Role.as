@@ -15,13 +15,22 @@ public class Role  extends PersistenceObject {
     static public const USER:String = "User";
     static public const ADMIN:String = "Admin";
 
-    private var _modelPublicDelete:Boolean;
-    private var _modelNominate:Boolean;
-    private var _modelPromote:Boolean;
     private var _modelPrivateDelete:Boolean;
+    public function get modelPrivateDelete():Boolean { return _modelPrivateDelete; }
+    private var _modelNominate:Boolean;
+    public function get modelNominate():Boolean { return _modelNominate; }
+    private var _modelApprove:Boolean;
+    public function get modelApprove():Boolean { return _modelApprove; }
     private var _modelPublicEdit:Boolean;
+    public function get modelPublicEdit():Boolean { return _modelPublicEdit; }
+    private var _modelPublicDelete:Boolean;
+    public function get modelPublicDelete():Boolean { return _modelPublicDelete; }
     private var _modelPutInStore:Boolean;
     public function get modelPutInStore():Boolean { return _modelPutInStore; }
+    private var _modelStoreEdit:Boolean;
+    public function get modelStoreEdit():Boolean { return _modelStoreEdit; }
+    private var _modelStoreDelete:Boolean;
+    public function get modelStoreDelete():Boolean { return _modelStoreDelete; }
 
     static private var _s_defaultRole:Role = null;
     static public function get defaultRole() :Role {
@@ -35,7 +44,7 @@ public class Role  extends PersistenceObject {
 
         if ( $dbo ) {
             _modelNominate = $dbo.modelNominate;
-            _modelPromote = $dbo.modelPromote;
+            _modelApprove = $dbo.modelApprove;
 
             _modelPublicDelete = $dbo.modelPublicDelete;
             _modelPrivateDelete = $dbo.modelPrivateDelete;
@@ -45,25 +54,13 @@ public class Role  extends PersistenceObject {
         }
     }
 
-    public function get modelPublicDelete():Boolean {
-        return _modelPublicDelete;
-    }
-
-    public function get modelNominate():Boolean {
-        return _modelNominate;
+    // This table is read only
+    override public function save( $validateGuid:Boolean = true ):Boolean {
+            return false;
     }
 
 
-    public function get modelPromote():Boolean {
-        return _modelPromote;
-    }
 
-    public function get modelPrivateDelete():Boolean {
-        return _modelPrivateDelete;
-    }
 
-    public function get modelPublicEdit():Boolean {
-        return _modelPublicEdit;
-    }
 }
 }
