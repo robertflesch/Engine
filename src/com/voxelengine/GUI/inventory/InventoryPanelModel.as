@@ -8,10 +8,11 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.GUI.inventory {
 
 import com.voxelengine.worldmodel.models.ModelCacheUtils;
-import com.voxelengine.worldmodel.models.ModelCacheUtils;
+import com.voxelengine.worldmodel.models.Role;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
+import com.voxelengine.worldmodel.models.types.Player;
 
 import flash.display.DisplayObject;
 import flash.events.Event;
@@ -80,7 +81,7 @@ public class InventoryPanelModel extends VVContainer
 	private var _seriesModelMetadataEvent:int;
     private var _source:String;
 	private var _category:String = MODEL_CAT_ALL;
-	
+
 	public function InventoryPanelModel( $parent:VVContainer, $source:String ) {
 		super( $parent );
 		_source = $source;
@@ -98,7 +99,10 @@ public class InventoryPanelModel extends VVContainer
 
 		upperTabsAdd();
 		addItemContainer();
-		addTrashCan();
+		var role:Role = Player.player.role;
+		if ( _source == WindowInventoryNew.INVENTORY_OWNED || true == role.modelPublicDelete )
+			addTrashCan();
+
         displaySelectedSource();
 		
 		// This forces the window into a multiple of MODEL_IMAGE_WIDTH width
@@ -199,8 +203,10 @@ public class InventoryPanelModel extends VVContainer
     // TODO I see problem here when language is different then what is in TypeInfo RSF - 11.16.14
     // That is if I use the target "Name"
     private function displaySelectedCategory( $category:String ):void {
-        Log.out( "InventoryPanelModels.displaySelectedCategory - Not implemented", Log.WARN );
-		throw new Error( "Not implemented");
+		// does this make me leak? do I need to reassign boxes to empty?
+        _itemContainer.removeElements();
+        _category = $category;
+        displaySelectedSource();
     }
 
     private function reassignPublicModelMetadataEvent($mme:ModelMetadataEvent):void {
@@ -222,7 +228,7 @@ public class InventoryPanelModel extends VVContainer
 			var om:ObjectModel = new ObjectModel(null, $mme.modelGuid);
 			om.vmm = $mme.modelMetadata;
 			var cat:String = _category.toLowerCase();
-			//Log.out( "IPM.addModelMetadataEvent cat: " + cat + "  hasTags: " + $mme.modelMetadata.hashTags + "  found? " + $mme.modelMetadata.hashTags.indexOf(cat));
+			Log.out( "IPM.addModelMetadataEvent cat: " + cat + "  hasTags: " + $mme.modelMetadata.hashTags + "  found? " + $mme.modelMetadata.hashTags.indexOf(cat));
 			if ( "all" == cat )
 				addModel(om);
 			else if ( 0 <= $mme.modelMetadata.hashTags.indexOf(cat))
@@ -397,9 +403,7 @@ public class InventoryPanelModel extends VVContainer
 
 
 
-
 	private function removeModel( $modelGuid:String ):void {
-		
 		var countMax:int = MODEL_CONTAINER_WIDTH / MODEL_IMAGE_WIDTH;
 		var column:int = 0;
 		var rows:int = _itemContainer.numElements;
