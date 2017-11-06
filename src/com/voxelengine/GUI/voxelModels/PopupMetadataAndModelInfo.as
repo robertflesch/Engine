@@ -8,23 +8,15 @@
 
 package com.voxelengine.GUI.voxelModels
 {
-
-import com.voxelengine.Globals;
-import com.voxelengine.Log;
-import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.models.AssignModelAndChildrenToPublicOwnership;
-import com.voxelengine.worldmodel.models.Role;
-import com.voxelengine.worldmodel.models.types.Player;
-
 import flash.display.Bitmap;
 import flash.display.BitmapData;
-import flash.events.MouseEvent;
 import flash.geom.Matrix;
 
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 
+import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelMetadataEvent;
@@ -109,10 +101,8 @@ public class PopupMetadataAndModelInfo extends VVPopup
         addElement( panel );
         addAdvanced();
         addPermissions();
-       // addButtons();
         // TODO need to be able to handle an array of scripts.
 //            var scriptsPanel:PanelModelScripts = new PanelModelScripts( this, width, 20, 200);
-
     }
 
     private function modelInfoRetreived( $mie:ModelInfoEvent ):void {
@@ -182,31 +172,12 @@ public class PopupMetadataAndModelInfo extends VVPopup
         addElement( new ComponentSpacer( WIDTH, 10 ) );
     }
 
-//    private function updateScaleVal( $e:SpinButtonEvent ):Number {
-//        var ival:Number = Number( $e.target.data.text );
-//        if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival = ival/2;
-//        else 											ival = ival*2;
-//        $e.target.data.text = ival.toString();
-//        setChanged();
-//        return ival;
-//    }
-
-    private function updateVal( $e:SpinButtonEvent ):int {
-        var ival:int = int( $e.target.data.text );
-        if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival--;
-        else 											ival++;
-        setChanged();
-        $e.target.data.text = ival.toString();
-        return ival;
-    }
-
     private function setChanged():void {
 		_mmd.changed = true;
 		_mi.changed = true;
     }
 
-    private function closeFunction():void
-    {
+    private function closeFunction():void {
         _s_inExistance--;
         _s_currentInstance = null;
 

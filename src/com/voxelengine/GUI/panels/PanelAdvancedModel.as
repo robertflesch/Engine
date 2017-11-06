@@ -87,30 +87,21 @@ public class PanelAdvancedModel extends ExpandableBox
                 copyButton.addEventListener(MouseEvent.CLICK, copyAndGiveToPublic);
                 _itemBox.addElement(copyButton);
             }
-            else if (role.modelNominate) {
-                _itemBox.addElement( new ComponentSpacer( WIDTH, 10 ) );
-                var nominateButton:Button = new Button("Nominate for public use", WIDTH, 24);
-                nominateButton.addEventListener(MouseEvent.CLICK, nominateToPublic);
-                addElement(nominateButton);
-            }
-            if (role.modelPutInStore) {
-                _itemBox.addElement( new ComponentSpacer( WIDTH, 10 ) );
-                var sellButton:Button = new Button("Sell Copy in store", WIDTH, 24);
-                sellButton.addEventListener(MouseEvent.CLICK, copyAndPutInStore);
-                _itemBox.addElement(sellButton);
-            }
+//            else if (role.modelNominate) {
+//                _itemBox.addElement( new ComponentSpacer( WIDTH, 10 ) );
+//                var nominateButton:Button = new Button("Nominate for public use", WIDTH, 24);
+//                nominateButton.addEventListener(MouseEvent.CLICK, nominateToPublic);
+//                addElement(nominateButton);
+//            }
+//            if (role.modelPutInStore) {
+//                _itemBox.addElement( new ComponentSpacer( WIDTH, 10 ) );
+//                var sellButton:Button = new Button("Sell Copy in store", WIDTH, 24);
+//                sellButton.addEventListener(MouseEvent.CLICK, copyAndPutInStore);
+//                _itemBox.addElement(sellButton);
+//            }
         }
         _itemBox.addElement( new ComponentSpacer( WIDTH ) );
     }
-
-    private function changeModify(event:UIMouseEvent):void {
-//        if ( Network.userId == _permissions.creator ) {
-//            _permissions.modify = (event.target as CheckBox).selected;
-//        }
-//        else
-//            (new Alert("You do not have permission to change the 'modify' permission on this object")).display();
-    }
-
 
     private function copyAndGiveToPublic( $me:MouseEvent ):void {
         Log.out( "PopupMetadataAndModelInfo.copyAndGiveToPublic", Log.WARN);
@@ -149,28 +140,6 @@ public class PanelAdvancedModel extends ExpandableBox
     private function nominateToPublic( $me:MouseEvent ):void {
         Log.out( "PopupMetadataAndModelInfo.nominateToPublic is not operational", Log.ERROR);
         (new Alert("NominateToPublic is not operational yet")).display(100, 300);
-//        if ( _mmd.owner  && _mmd.permissions.creator == Network.userId ){
-//            // ASK IF THEY ARE SURE
-//            // EVENT
-//
-//            // Check to make sure they own it and all of the child models permissions
-//            var cancelAssignment:Boolean = false;
-//            var role:Role = Player.player.role;
-//            if ( role.modelNominate && role.modelPromote ) {
-//                ModelInfoEvent.addListener( ModelInfoEvent.PERMISSION_FAIL, permissionFailure )
-//                _mi.assignToPublic( true );
-//            }
-//
-//            if ( cancelAssignment )
-//                return;
-//            else
-//                _mi.assignToPublic();
-//        }
-//
-//        function permissionFailure( $mie:ModelInfoEvent ):void {
-//            cancelAssignment = true;
-//        }
-
     }
 
 
@@ -178,4 +147,3 @@ public class PanelAdvancedModel extends ExpandableBox
     }
 }
 }
-

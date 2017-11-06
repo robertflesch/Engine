@@ -210,7 +210,7 @@ public class AssignModelAndChildrenToPublicOwnership {
                 // This reassigns all object in hierarchy and saves them
                 for ( var i:String in _s_resultAllObjects ){
                     // Do I need to be able to specify PUBLIC OR STORE HERE?
-                    ModelMetadataEvent.create( ModelMetadataEvent.REASSIGN_PUBLIC, 0, _guid );
+                    ModelMetadataEvent.create( ModelMetadataEvent.REASSIGN_PUBLIC, 0, i );
                 }
             } else {
                 // nothings been changed at this point, so if anything fails we are ok

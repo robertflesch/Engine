@@ -228,7 +228,7 @@ public class InventoryPanelModel extends VVContainer
 			var om:ObjectModel = new ObjectModel(null, $mme.modelGuid);
 			om.vmm = $mme.modelMetadata;
 			var cat:String = _category.toLowerCase();
-			Log.out( "IPM.addModelMetadataEvent cat: " + cat + "  hasTags: " + $mme.modelMetadata.hashTags + "  found? " + $mme.modelMetadata.hashTags.indexOf(cat));
+			//Log.out( "IPM.addModelMetadataEvent cat: " + cat + "  hasTags: " + $mme.modelMetadata.hashTags + "  found? " + $mme.modelMetadata.hashTags.indexOf(cat));
 			if ( "all" == cat )
 				addModel(om);
 			else if ( 0 <= $mme.modelMetadata.hashTags.indexOf(cat))
