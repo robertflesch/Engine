@@ -1,24 +1,12 @@
-People to bring into voxelverse
-http://pennycow.blogspot.com/
 
 VoxelVerse todo
 
-DONE - make sure model inventory gets reset
-DONE - make sure duplicated model gets added to inventory window
-DONE - make sure permissions are correct on duplicated model.
-Do modify check on model
+Copy of Avatar when starting
+Promotion system
+FB integration?
+Payvault integration?
 
-UI Bugs to be fixed after moving to TypeScript
-The "Edit Data" button on the model inventory needs to be a MapAreaButton(triangular). Otherwise clicks on on transparent part of button get intercepted.
-
---Collision
-Camera needs to collide with world!
-When side of the avatar is touching an oxel it get pushed up over and over again.
-what happens to vines when sub oxels are created?
-
-
-https://medium.com/@solkimicreb/the-react-stack-challenge-5fd166e1245f
-
+Lower
 need to display ammo for gun models in voxel model panel - Or just allow infinity ammo
 HashTag not set in import
 SoundRange not set on import?
@@ -28,10 +16,28 @@ if model is deleted from region models, the animation and script panels are not 
 adding -inline to the release compiler options causes function initializeDataBeforeSplash() to throw exceptions
 check collision for objects, make sure they are not all check everything every frame. Only selected object should do that, or ones that have collision.
 could use a bitmapdisplacement filter on water overlay to give it the moving water effect.
-
 need to add clipVelocity and speedMultiplier to animation editor
-
 When deleting a model that has inventory, make sure to delete its inventory.
+Language Manager sometimes does not find file, DefaultProviderManager - loadFail line 110, how to inform app and what to do?
+
+UI Bugs to be fixed after moving to TypeScript
+The "Edit Data" button on the model inventory needs to be a MapAreaButton(triangular). Otherwise clicks on on transparent part of button get intercepted.
+
+--Collision
+Camera needs to collide with world!
+When side of the avatar is touching an oxel it get pushed up over and over again.
+what happens to vines when sub oxels are created?
+
+DONE - make sure model inventory gets reset
+DONE - make sure duplicated model gets added to inventory window
+DONE - make sure permissions are correct on duplicated model.
+Do modify check on model
+
+
+
+
+
+
 
 ! 12.1.16 need to add clipVelocity and speedMultiplier to rest of the animations, and to the setState, so that they are not hard coded.
 ! 12.4.16 static lighting on head of dragon
@@ -47,6 +53,7 @@ this allowed me to import assets
 For voice
 https://wiki.mumble.info/wiki/Main_Page
 
+https://medium.com/@solkimicreb/the-react-stack-challenge-5fd166e1245f
 
 https://news.ycombinator.com/item?id=14149570
 https://voodoomfg.com/jobs/product-manager
@@ -54,6 +61,9 @@ https://increment.com/
 https://www.susanjfowler.com/blog/2016/8/13/so-you-want-to-learn-physics
 https://en.wikipedia.org/wiki/CAP_theorem
 https://www.linkedin.com/jobs/view/296843203/
+
+People to bring into voxelverse
+http://pennycow.blogspot.com/
 
 ABD7501A-8ECE-4571-10ED-9D33ACF0DCFD - Torch
 C9389DB5-7A87-A5D8-2495-445D8391CDC1 - Pistol
@@ -66,23 +76,17 @@ User created content
 User rated content
 User sellable content
 AI powered NPC's
-User created regions
+User created regions, models, animations, adventures
 PvP action in Zeppelins, Dragons, etc
 Destruction of other users content (temp or perm?)
 PvP area's are buildable and destructable, private or shared common area's require permission.
 New adventures created by user everyday
 Very low cost per user.
+Anything is destructable
+User friendly, 
 
 
-3 tbsp soy sauce
-out - 1 tbsp worcestershire sauce
-1 tsp ground black pepper
-1 tsp ground lemon pepper
-1 tsp curry powder (red)
-1 tsp garlic powder
-1 tsp onion powder
-
-1 What do you do?
+1 What is VoxelVerse
 
 VoxelVerse is a 3D content and game generation tool for everyone.
 
