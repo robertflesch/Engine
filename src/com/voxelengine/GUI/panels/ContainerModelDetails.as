@@ -42,7 +42,18 @@ public class ContainerModelDetails extends PanelBase
 
 	private var _selectedModel:VoxelModel;
 	public function get selectedModel():VoxelModel { return _selectedModel; }
-	public function set selectedModel( $vm:VoxelModel ):void { _selectedModel = $vm; }
+	public function set selectedModel( $vm:VoxelModel ):void {
+		if ( 0 == _level ) {
+            VoxelModel.selectedModel = $vm;
+			if ( $vm )
+            	VoxelModel.selectedModel.selected = true;
+			else {
+                if ( VoxelModel.selectedModel )
+					VoxelModel.selectedModel.selected = false;
+            }
+        }
+		_selectedModel = $vm;
+	}
 
 	public function ContainerModelDetails($parent:PanelBase, $level:int ) {
 		super( $parent, WIDTH_DEFAULT, HEIGHT_DEFAULT );

@@ -242,10 +242,10 @@ public class InventoryPanelModel extends VVContainer
 			var om:ObjectModel = $oi as ObjectModel;
 			// dont show child models
 			//if ( !WindowInventoryNew._s_hackShowChildren )
-			if ( VoxelModel.selectedModel ) {
-				var bound:int = VoxelModel.selectedModel.modelInfo.oxelPersistence.bound;
+			if ( WindowInventoryNew.parentModel ) {
+				var bound:int = WindowInventoryNew.parentModel.modelInfo.oxelPersistence.bound;
 				if ( null != om.vmm.childOf && "" != om.vmm.childOf ) {
-					if ( VoxelModel.selectedModel.metadata.name != om.vmm.childOf ) {
+					if ( WindowInventoryNew.parentModel.metadata.name != om.vmm.childOf ) {
 						Log.out( "InventoryPanelModel.addModel - child model of wrong parent: " + om.vmm.name, Log.INFO );
 						return null;
 					}
@@ -294,10 +294,10 @@ public class InventoryPanelModel extends VVContainer
 			var ii:InstanceInfo = new InstanceInfo();
 			ii.modelGuid = om.modelGuid;
 			ii.instanceGuid = Globals.getUID();
-			if ( VoxelModel.selectedModel ) {
-                ii.controllingModel = VoxelModel.selectedModel;
+			if ( WindowInventoryNew.parentModel ) {
+                ii.controllingModel = WindowInventoryNew.parentModel;
                 if (!PopupMetadataAndModelInfo.inExistance)
-                    new ModelMakerClone( VoxelModel.selectedModel, ii );
+                    new ModelMakerClone( WindowInventoryNew.parentModel, ii );
             }
 			else {
 				// Only do this for top level models.

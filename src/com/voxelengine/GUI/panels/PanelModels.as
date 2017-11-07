@@ -9,6 +9,10 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.GUI.panels
 {
 
+import com.voxelengine.GUI.panels.ContainerModelDetails;
+import com.voxelengine.GUI.panels.ContainerModelDetails;
+import com.voxelengine.GUI.panels.ContainerModelDetails;
+import com.voxelengine.GUI.panels.ContainerModelDetails;
 import com.voxelengine.events.InstanceInfoEvent;
 import com.voxelengine.worldmodel.models.types.Avatar;
 
@@ -48,6 +52,8 @@ public class PanelModels extends PanelBase
 	private var _dupButton:Button;
 	private var _detailButton:Button;
 	private var _deleteButton:Button;
+
+	private function get myParent():ContainerModelDetails { return (_parent as ContainerModelDetails); }
 	
 	public function PanelModels($parent:ContainerModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number, $level:int )	{
 		super( $parent, $widthParam, $heightParam );
@@ -102,7 +108,6 @@ public class PanelModels extends PanelBase
                 break;
             }
         }
-
     }
 
     private function instanceInfoChanged( $iie:InstanceInfoEvent ):void {
@@ -110,11 +115,11 @@ public class PanelModels extends PanelBase
             var li:ListItem = _listModels.getItemAt( i );
             var item:Object = li.data; // This is an object with instanceGuid and modelGuid
             if ( $iie.instanceGuid == item.instanceGuid ) {
+                if ( $iie.instanceInfo.name != "" )
 				_listModels.updateItemAt( i, $iie.instanceInfo.name, item );
                 break;
             }
         }
-//		_listModels.redraw();
     }
 
 
@@ -127,8 +132,7 @@ public class PanelModels extends PanelBase
 				_listModels.removeItemAt( i );
 				modelFound = true;
 				if ( VoxelModel.selectedModel && VoxelModel.selectedModel.modelInfo == guids.modelInfo ) {
-					VoxelModel.selectedModel = null;
-					_selectedText.text = "Previous Model Deleted";
+					myParent.selectedModel = null;
 				}
 			}
 		}
@@ -169,29 +173,42 @@ public class PanelModels extends PanelBase
 				if ( !Globals.isDebug && vm is Avatar )
 					continue;
 
-				addItem( determineObjectName(vm), vm.instanceInfo.instanceGuid, vm.modelInfo.guid );
+				addItem( vm );
 				countAdded++;
 			}
 		}
 		buttonsDisable();
 
-        if ( VoxelModel.selectedModel ) {
-            _selectedText.text = determineObjectName( VoxelModel.selectedModel );
-            var ig:String = VoxelModel.selectedModel.instanceInfo.instanceGuid;
-            for ( var i:int = 0; i < _listModels.length; i++ ) {
-                var guids:Object = getItemData( i );
-                if ( ig == guids.instanceGuid ) {
-                    _listModels.selectedIndex = i;
-					break;
-                }
-            }
-        }
-        else
-            _selectedText.text = "Nothing Selected";
+        var levelSelectedModel:VoxelModel;
+		if ( 0 == _level )
+            levelSelectedModel = VoxelModel.selectedModel;
+		else
+            levelSelectedModel = null;
+        setSelectedModel( levelSelectedModel );
 
 		return countAdded;
 	}
 
+
+	private function setSelectedModel( $vm:VoxelModel ):void {
+        myParent.selectedModel = $vm;
+        if ( $vm ) {
+            _selectedText.text = determineObjectName( $vm );
+            var ig:String = $vm.instanceInfo.instanceGuid;
+            for ( var i:int = 0; i < _listModels.length; i++ ) {
+//                var li:ListItem = _listModels.getItemAt( i )
+                var guids:Object = getItemData( i );
+                if ( ig == guids.instanceGuid ) {
+                    //_listModels.selectedIndex = i;
+                    break;
+                }
+            }
+            _listModels.selectedIndex = i;
+        }
+        else
+            _selectedText.text = "Nothing Selected";
+
+	}
 	private function determineObjectName( $vm:VoxelModel ):String {
         var itemName:String = "";
         if ( $vm.instanceInfo.name )
@@ -204,8 +221,8 @@ public class PanelModels extends PanelBase
 		return itemName;
 	}
 
-	private function addItem( $name:String, $instanceGuid:String, $modelGuid:String ):void {
-		_listModels.addItem( $name, { "instanceGuid" : $instanceGuid, "modelGuid" : $modelGuid } );
+	private function addItem( $vm:VoxelModel ):void {
+		_listModels.addItem( determineObjectName( $vm ), { "instanceGuid" : $vm.instanceInfo.instanceGuid, "modelGuid" : $vm.modelInfo.guid } );
 	}
 
 	private function getItemData( $index:int ):Object {
@@ -326,16 +343,16 @@ public class PanelModels extends PanelBase
 		}
 		
 		function addModel(event:UIMouseEvent):void {
-			if ( VoxelModel.selectedModel && null != VoxelModel.selectedModel.instanceInfo.controllingModel )
+			if ( myParent.selectedModel && null != myParent.selectedModel.instanceInfo.controllingModel )
 				WindowInventoryNew._s_hackShowChildren = true;
 			else
 				WindowInventoryNew._s_hackShowChildren = false;
 			WindowInventoryNew._s_hackSupportClick = true;
 			var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );
 			var title:String = "All items";
-            if ( VoxelModel.selectedModel )
-                title = "Showing possible children of " + VoxelModel.selectedModel.metadata.name;
-			WindowInventoryNew.toggle( startingTab, title );
+            if ( myParent.selectedModel )
+                title = "Showing possible children of " + myParent.selectedModel.metadata.name;
+			WindowInventoryNew.toggle( startingTab, title, myParent.selectedModel );
 		}
 	}
 
@@ -343,8 +360,7 @@ public class PanelModels extends PanelBase
         if ( VoxelModel.selectedModel && $me.instanceGuid == VoxelModel.selectedModel.instanceInfo.instanceGuid ) {
             ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved );
             if ( null == _parentModel ) {
-                VoxelModel.selectedModel.selected = false;
-                VoxelModel.selectedModel = null
+                myParent.selectedModel = null
             }
         }
     }
@@ -360,19 +376,18 @@ public class PanelModels extends PanelBase
 //	}
 
 	private function selectModel(event:ListEvent):void {
-			//Log.out("PanelModels.selectModel");
-			if (event.target.data) {
-				var instanceGuid:String = event.target.data.instanceGuid;
-				Log.out("PanelModels.selectModel has TARGET DATA: " + event.target.data as String);
-				displayModelData( instanceGuid );
-			}
-			else {
-				Log.out("PanelModels.selectModel has NO target data");
-				buttonsDisable();
-				VoxelModel.selectedModel = null;
-				_selectedText.text = "Nothing Selected";
-				UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, null, _level);
-			}
+		Log.out("PanelModels.selectModel");
+		if (event.target.data) {
+			var instanceGuid:String = event.target.data.instanceGuid;
+			Log.out("PanelModels.selectModel has TARGET DATA: " + event.target.data as String);
+			displayModelData( instanceGuid );
+		}
+		else {
+			Log.out("PanelModels.selectModel has NO target data");
+			buttonsDisable();
+			setSelectedModel( null );
+			UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, null, _level);
+		}
 	}
 
 	private function displayModelData( $instanceGuid:String ):void {
@@ -384,13 +399,8 @@ public class PanelModels extends PanelBase
 			vm = _parentModel.childFindInstanceGuid( $instanceGuid );
 		Log.out("PanelModels.selectModel vm: " + vm );
 		if ( vm ) {
-			VoxelModel.selectedModel = vm;
-			_selectedText.text = vm.metadata.name;
-			Log.out("PanelModels.selectModel vm.metadata.name: " + vm.metadata.name );
-			// TO DO this is the right path, but probably need a custom event for this...
+			setSelectedModel( vm );
 			UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, vm, _parentModel, _level);
-			//_parent.childPanelAdd( _selectedModel );
-			//_parent.animationPanelAdd( _selectedModel );
 		} else
 			buttonsDisable();
 	}
@@ -428,7 +438,7 @@ public class PanelModels extends PanelBase
 		var ig:String = $me.instanceGuid;
 		var vm:VoxelModel = $me.vm;
 		if ( vm && _parentModel && pig == _parentModel.instanceInfo.instanceGuid )
-			addItem( vm.metadata.name, vm.instanceInfo.instanceGuid, vm.modelInfo.guid );
+			addItem( vm );
 	}
 
 	private function parentModelAdded( $me:ModelEvent ):void {
@@ -437,7 +447,7 @@ public class PanelModels extends PanelBase
 		var ig:String = $me.instanceGuid;
 		var vm:VoxelModel = $me.vm;
 		if ( vm )
-			addItem( vm.metadata.name, vm.instanceInfo.instanceGuid, vm.modelInfo.guid );
+			addItem( vm );
 
 	}
 	//private function rollOverHandler(e:UIMouseEvent):void

@@ -68,9 +68,7 @@ public class InventoryIcon extends VVCanvas
 	private function pressShape( $e:UIMouseEvent ):void {
 		var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_LAST, WindowInventoryNew.INVENTORY_CAT_LAST );
         var title:String = "All items";
-        if ( VoxelModel.selectedModel )
-            title = "Showing possible children of " + VoxelModel.selectedModel.metadata.name;
-        WindowInventoryNew.toggle( startingTab, title );
+        WindowInventoryNew.toggle( startingTab, title, null );
 	}
 	
 	

@@ -8,6 +8,7 @@
 package com.voxelengine.GUI.inventory {
 
 import com.voxelengine.renderer.Renderer;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 import org.flashapi.swing.*
 	import org.flashapi.swing.core.UIObject;
@@ -60,18 +61,22 @@ import org.flashapi.swing.*
 		static public var _s_hackSupportClick:Boolean;
 		static public var _s_instance:WindowInventoryNew;
 		
-		static public function toggle( $startingTab:String, $label:String ):void {
+		static public function toggle( $startingTab:String, $label:String, $parentModel:VoxelModel ):void {
 			if ( null == _s_instance )
-				_s_instance = new WindowInventoryNew( $startingTab, $label );
+				_s_instance = new WindowInventoryNew( $startingTab, $label, $parentModel );
 			else {
 				_s_instance.remove();
 				_s_instance = null
 			}
 		}
 		
-		public function WindowInventoryNew( $startingTab:String, $label:String )
+		static private var _parentModel:VoxelModel;
+        static public function get parentModel():VoxelModel { return _parentModel; }
+
+		public function WindowInventoryNew( $startingTab:String, $label:String, $parentModel:VoxelModel )
 		{
 			super( $label );
+            _parentModel = $parentModel;
 			autoSize = true;
 			layout.orientation = LayoutOrientation.VERTICAL;
 			
