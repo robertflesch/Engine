@@ -12,7 +12,8 @@ package com.voxelengine.worldmodel.weapons
 	import com.voxelengine.events.SoundEvent;
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.worldmodel.models.*;
 	import com.voxelengine.pools.GrainCursorPool;
@@ -38,8 +39,8 @@ package com.voxelengine.worldmodel.weapons
 			super( instanceInfo );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-			super.init( $mi, $vmm );
+		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
+			super.init( $mi, $vmm, $buildState );
 			
 			_bombHolder = _instanceInfo.controllingModel;
 			//SoundCache.getSound( _soundFile ); // Preload the animationSound file

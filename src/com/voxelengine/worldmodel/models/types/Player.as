@@ -11,12 +11,16 @@ package com.voxelengine.worldmodel.models.types
 import com.voxelengine.Globals;
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.PlayerInfoEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.worldmodel.models.RoleCache;
 import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 
+import flash.events.TimerEvent;
+
 import flash.geom.Vector3D;
+import flash.utils.Timer;
 
 import playerio.DatabaseObject;
 import playerio.PlayerIOError;
@@ -150,39 +154,41 @@ public class Player extends PersistenceObject
 
 
 	static public const DEFAULT_PLAYER:String = "DefaultPlayer";
-	public function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
+    static private const REFERENCE_AVATAR:String = "778D6895-A44D-D8C7-B003-870D4973AEB7";
+    public function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
 		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 		dbo = $dbo;
 		if ( $dbo ) {
 			guid = dbo.key;
 			if ( null == $dbo.modelGuid ) {
 				// Assign the Avatar the default avatar
-				$dbo.modelGuid = DEFAULT_PLAYER;
-                $dbo.instanceID = Globals.getUID();
+				dbo.modelGuid = REFERENCE_AVATAR;
+                dbo.instanceGuid = Globals.getUID();
 
-//				var userName:String = $dbo.key.substring( 6 );
+//				var userName:String = dbo.key.substring( 6 );
 //				var firstChar:String = userName.substr(0, 1);
 //				var restOfString:String = userName.substr(1, userName.length);
-//				$dbo.userName = firstChar.toUpperCase() + restOfString.toLowerCase();
-                $dbo.userName = _nameArray[ (_nameArray.length - 1) * Math.random() ];
-				$dbo.description = "New Player Avatar";
-				$dbo.modifiedDate = new Date().toUTCString();
-				$dbo.createdDate = new Date().toUTCString();
-				$dbo.role = Role.USER;
-				$dbo.save();
+//				dbo.userName = firstChar.toUpperCase() + restOfString.toLowerCase();
+                dbo.userName = _nameArray[ (_nameArray.length - 1) * Math.random() ];
+				dbo.description = "New Player Avatar";
+				dbo.modifiedDate = new Date().toUTCString();
+				dbo.createdDate = new Date().toUTCString();
+				dbo.role = Role.USER;
+Log.out( "onPlayerLoadedAction - HACK TO NOT SAVE NEW PLAYER DATA", Log.WARN );
+//				dbo.save();
 			}
 			// Don't modify the modelGuid, change it in the DB if needed
 			var pi:PlayerInfo = new PlayerInfo( instanceGuid, null );
 			pi.modelGuid = dbo.modelGuid;
 			PlayerInfoEvent.create( ModelBaseEvent.SAVE, instanceGuid, pi );
-			createPlayer( $dbo.modelGuid, instanceGuid );
+			createPlayer( dbo.modelGuid, instanceGuid );
 		}
 		else {
 			Log.out( "Avatar.onPlayerLoadedAction - ERROR, failed to create new record for new players?" );
 		}
 	}
 
-	static public function createPlayer( $modelGuid:String, $instanceID:String ):void {
+	static public function createPlayer( $modelGuid:String, $instanceGuid:String ):void {
 
 		if ( null == _s_player ) {
 			_s_player = new Player();
@@ -190,7 +196,7 @@ public class Player extends PersistenceObject
 
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.modelGuid = $modelGuid;
-        ii.instanceGuid = $instanceID;
+        ii.instanceGuid = $instanceGuid;
 		//ii.centerSetComp(7.5, 0, 7.5);
 		ii.centerSetComp(8, 0, 8);
 		ii.lockCenter = true;
@@ -205,7 +211,9 @@ public class Player extends PersistenceObject
 			new ModelMakerGenerate(ii, model, true);
 		}
 		else {
-			new ModelMaker(ii, false, false);
+            var addToRegion:Boolean = true;
+			var addToCount:Boolean = false;
+			new ModelMaker(ii, addToRegion, addToCount);
 		}
 	}
 
@@ -227,21 +235,37 @@ public class Player extends PersistenceObject
 					Log.out( "Player.playerModelLoaded - NO PLAYER.player.dbo objectHierarchy: " + $mle.data, Log.ERROR );
 			}
 
-			//_playerModel = $mle.vm as Avatar;
-			if ( null == Region.currentRegion.modelCache.instanceGet( $mle.vm.instanceInfo.instanceGuid ) ) {
-				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, $mle.vm );
-
-				// We dont want to remove this listener for the generated event.
-				// Only for the model loaded from the DB.
-				ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded);
-			}
-			$mle.vm.takeControl( VoxelModel.controlledModel, false );
-			_vm = $mle.vm as Avatar;
+//			if ( REFERENCE_AVATAR == $mle.vm.modelInfo.guid ) {
+//				_vm = $mle.vm as Avatar;
+//				// new player, and we are using the reference avatar to create a duplicate from.
+//				// I am finding that this model is not FULLY loaded, oxel data is still loading.
+//                ModelEvent.addListener( ModelEvent.CLONE_COMPLETE, cloneComplete );
+//                new ModelMakerClone( _vm, _vm.instanceInfo, true );
+//			} else {
+                  setAvatar( $mle.vm );
+//			}
 		}
 	}
 
+	static private function cloneComplete ( $me:ModelEvent ): void {
+        setAvatar( $me.vm );
+    }
+
+    static private function setAvatar ( $vm:VoxelModel ): void {
+        if ( null == Region.currentRegion.modelCache.instanceGet( $vm.instanceInfo.instanceGuid ) ) {
+            RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, $vm );
+
+            // We dont want to remove this listener for the generated event.
+            // Only for the model loaded from the DB.
+            ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded);
+        }
+        $vm.takeControl( VoxelModel.controlledModel, false );
+        _vm = $vm as Avatar;
+	}
+
     static private function savePlayerObject ( $e:InventoryEvent ): void {
-		Player.player.save( false );
+		Log.out( "Player.savePlayerObject - DISABLED", Log.WARN );
+		//Player.player.save( false );
 	}
 
 	static private function defaultSlotDataRequest( $ise:InventorySlotEvent ):void {
@@ -251,7 +275,7 @@ public class Player extends PersistenceObject
 			InventorySlotEvent.removeListener( InventorySlotEvent.DEFAULT_REQUEST, defaultSlotDataRequest );
 			Log.out( "Player.getDefaultSlotData - Loading default data into slots" , Log.WARN );
 
-			var ot:ObjectTool = new ObjectTool( null, "D0D49F95-706B-0E76-C187-DCFD920B8883", "pickToolSlots", "pick.png", "pick" );
+			var ot:ObjectTool = new ObjectTool( null, "INVALID_ID", "pickToolSlots", "pick.png", "pick" );
 			InventorySlotEvent.create( InventorySlotEvent.CHANGE, Network.userId, Network.userId, 0, ot );
 			var oa:ObjectAction = new ObjectAction( null, "noneSlots", "none.png", "Do nothing" );
 			InventorySlotEvent.create( InventorySlotEvent.CHANGE, Network.userId, Network.userId, 1, oa );

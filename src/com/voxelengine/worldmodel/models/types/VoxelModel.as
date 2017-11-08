@@ -16,6 +16,7 @@ import com.voxelengine.renderer.lamps.RainbowLight;
 import com.voxelengine.renderer.lamps.ShaderLight;
 import com.voxelengine.renderer.lamps.Torch;
 import com.voxelengine.renderer.shaders.Shader;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 import com.voxelengine.worldmodel.oxel.GrainCursorUtils;
 import com.voxelengine.worldmodel.oxel.Lighting;
@@ -145,7 +146,7 @@ public class VoxelModel {
 		_cameraContainer = new CameraContainer( this );
 	}
 	
-	public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
+	public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
 		_modelInfo = $mi;
 		_modelInfo.owner = this;
 		_metadata = $vmm;
@@ -166,7 +167,7 @@ public class VoxelModel {
 		cameraAddLocations();
 
 		// I think this should be before we do the setStage
-		processClassJson();
+		processClassJson( $buildState );
 
 		if (instanceInfo.state != "")
 			stateSet(instanceInfo.state);
@@ -182,8 +183,8 @@ public class VoxelModel {
 
 
 
-	protected function processClassJson():void {
-		modelInfo.childrenLoad( this );
+	protected function processClassJson( $buildState:String ):void {
+		modelInfo.childrenLoad( this, $buildState );
 		modelInfo.scriptsLoad( instanceInfo );
 		modelInfo.animationsLoad();
 	}

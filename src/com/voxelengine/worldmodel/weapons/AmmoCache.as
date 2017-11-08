@@ -121,7 +121,7 @@ public class AmmoCache {
 			return;
 		// maybe this ammo has not been loaded into the table yet, try loading it from json file
 		if ( Globals.BIGDB_TABLE_AMMO == $pe.table ) {
-            if ( ModelMakerBase.state == ModelMakerBase.IMPORTING )
+            if ( ModelMakerBase.isImporting )
                 Log.out( "AmmoCache.loadNotFound - retrying from local object " + $pe.toString(), Log.WARN );
 			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST, $pe.series, $pe.guid, null, ModelBaseEvent.USE_FILE_SYSTEM ) );
 		}

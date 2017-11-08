@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.oxel.OxelBad;
 
 import flash.display3D.Context3D;
@@ -65,8 +66,8 @@ public class Beast extends ControllableVoxelModel
 		inventoryBitmap = "beastToolbar.png";
 	}
 
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-		super.init( $mi, $vmm );
+	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
+		super.init( $mi, $vmm, $buildState );
 
 		//MouseKeyboardHandler.backwardEnabled = false;
 
@@ -85,8 +86,8 @@ public class Beast extends ControllableVoxelModel
 		modelInfo.dbo.beast.seatLocation 		= { x:int(_seatLocation.x), y:int(_seatLocation.y), z:int(_seatLocation.z) };
 	}
 
-	override protected function processClassJson():void {
-		super.processClassJson();
+	override protected function processClassJson( $buildState:String ):void {
+		super.processClassJson( $buildState );
 
 		if ( modelInfo.dbo.beast )
 			var beastInfo:Object = modelInfo.dbo.beast;

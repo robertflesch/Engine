@@ -11,7 +11,9 @@ package com.voxelengine.worldmodel.models.types
 	import com.voxelengine.Log;
 	import com.voxelengine.pools.ParticlePool;
 	import com.voxelengine.worldmodel.models.*;
-	import flash.display3D.Context3D;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+
+import flash.display3D.Context3D;
 	
 	/**
 	 * ...
@@ -25,8 +27,8 @@ package com.voxelengine.worldmodel.models.types
 			super( instanceInfo );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-			super.init( $mi, $vmm );
+		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
+			super.init( $mi, $vmm, $buildState );
 		}
 
 		override public function update(context:Context3D, elapsedTimeMS:int):void 

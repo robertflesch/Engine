@@ -15,7 +15,8 @@ package com.voxelengine.worldmodel.weapons
 	import com.voxelengine.pools.ProjectilePool;
 	import com.voxelengine.worldmodel.models.ModelCacheUtils;
 	import com.voxelengine.worldmodel.models.ModelMetadata;
-	import com.voxelengine.worldmodel.scripts.ImpactScript;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+import com.voxelengine.worldmodel.scripts.ImpactScript;
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.events.ImpactEvent;
 	import com.voxelengine.worldmodel.scripts.ScriptLibrary;
@@ -52,8 +53,8 @@ package com.voxelengine.worldmodel.weapons
 			super( $instanceInfo );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-			super.init( $mi, $vmm );
+		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
+			super.init( $mi, $vmm, $buildState );
 			
 			instanceInfo.dynamicObject = true;
 		}

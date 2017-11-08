@@ -44,9 +44,8 @@ public class ModelMakerImport extends ModelMakerBase {
 
 	public function ModelMakerImport( $ii:InstanceInfo, $prompt:Boolean = true ) {
 		// This should never happen in a release version, so dont worry about setting it to false when done
-		state = IMPORTING;
 		_prompt = $prompt;
-		super( $ii );
+		super( $ii, IMPORTING );
 		Log.out( "ModelMakerImport - ii: " + ii.toString(), Log.DEBUG );
 		// First request the modelInfo
 		requestModelInfo();

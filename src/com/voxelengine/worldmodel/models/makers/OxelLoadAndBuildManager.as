@@ -51,9 +51,10 @@ public class OxelLoadAndBuildManager {
         if ( $ode.modelGuid == _guid ) {
             OxelDataEvent.removeListener(OxelDataEvent.OXEL_FBA_COMPLETE, fromByteArrayComplete );
             OxelDataEvent.removeListener(OxelDataEvent.OXEL_FBA_FAILED, fromByteArrayFailed );
-            var forceFaces:Boolean = false;
-            var forceQuads:Boolean = false;
-            _op.oxel.chunkGet().faceAndQuadsBuild( forceFaces, forceQuads );
+            // trying to let the normal update cycle handle it
+//            var forceFaces:Boolean = false;
+//            var forceQuads:Boolean = true; // should force quads first time thru
+//            _op.oxel.chunkGet().faceAndQuadsBuild( forceFaces, forceQuads );
         }
     }
 }

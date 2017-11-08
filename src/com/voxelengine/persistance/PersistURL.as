@@ -83,7 +83,7 @@ public class PersistURL
 		urlLoader.addEventListener(IOErrorEvent.IO_ERROR, loadError);
         var resolvedFilePath:String;
 		try {
-			if ( ModelMakerBase.state == ModelMakerBase.IMPORTING ) {
+			if ( ModelMakerBase.isImporting ) {
 				resolvedFilePath = "E:/dev/VoxelVerse/Resources/bin" + _filePath;
                 urlLoader.load( new URLRequest( resolvedFilePath ) );
             }

@@ -22,8 +22,8 @@ package com.voxelengine.worldmodel.weapons
 			super( instanceInfo );
 		}
 		
-		override protected function processClassJson():void {
-			super.processClassJson();
+		override protected function processClassJson( $buildState:String ):void {
+			super.processClassJson( $buildState );
 			
 			if ( modelInfo.dbo.barrel ) {
 				var barrelInfo:Object = modelInfo.dbo.barrel;

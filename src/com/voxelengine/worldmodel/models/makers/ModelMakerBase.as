@@ -40,12 +40,14 @@ public class ModelMakerBase {
     static public const IMPORTING:String = "IMPORTING";
     static public const CLONING:String = "CLONING";
     static public const MAKING:String = "MAKING";
-	static private var _s_state:String;
-    static public function get state():String { return _s_state; }
-    static public function set state( $newState:String ):void { _s_state = $newState; }
+
+    // hack to allow import state to be read, cleaned up from everywhere else.
+	static private var _s_importing:Boolean = false;
+    static public function get isImporting():Boolean { return _s_importing;}
 
     static private var _makerCount:int;
-	
+
+    protected 		var _buildState:String = MAKING;
 	protected   	var _modelMetadata:ModelMetadata;
 	
 	protected 	       var _modelInfo:ModelInfo;
@@ -72,7 +74,10 @@ public class ModelMakerBase {
 	//   event
 	*/
 
-	public function ModelMakerBase( $ii:InstanceInfo ) {
+	public function ModelMakerBase( $ii:InstanceInfo, $buildState:String = MAKING ) {
+		_buildState = $buildState;
+        if ( _buildState == IMPORTING )
+			_s_importing = true;
 		if ( null == $ii )
 			throw new Error( "ModelMakerBase - NO instanceInfo received in constructor" );
 		_ii = $ii;
@@ -179,7 +184,7 @@ public class ModelMakerBase {
 			Log.out( "ModelMakerBase.make - Model failed in creation - modelAsset: " + modelAsset + "  modelClass: " + modelClass, Log.ERROR );
 			return null
 		}
-		vm.init( _modelInfo, _modelMetadata );
+		vm.init( _modelInfo, _modelMetadata, _buildState );
 		return vm;
 
 	}

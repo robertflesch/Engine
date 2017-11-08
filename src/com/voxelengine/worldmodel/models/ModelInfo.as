@@ -344,7 +344,7 @@ public class ModelInfo extends PersistenceObject
 		return count;
 	}
 
-	public function childrenLoad( $vm:VoxelModel ):void {
+	public function childrenLoad( $vm:VoxelModel, $buildState:String ):void {
 		childrenLoaded	= true;
 		_childCount = 0;
 		if ( !dbo || !dbo.children )
@@ -373,16 +373,16 @@ public class ModelInfo extends PersistenceObject
 			//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
 			_childCount++;
 			//Log.out( "VoxelModel.childrenLoad - calling load on ii: " + ii + "  childCount: " + _childCount );
-            if ( ModelMakerBase.state == ModelMakerBase.IMPORTING )
+            if ( $buildState == ModelMakerBase.IMPORTING )
                 new ModelMakerImport( ii, false );
-            if ( ModelMakerBase.state == ModelMakerBase.CLONING )
-                new ModelMakerClone( owner, ii, null, null, false );
+            if ( $buildState == ModelMakerBase.CLONING )
+                new ModelMakerClone( owner, ii, false );
 			else
 				new ModelMaker( ii, true, false );
 		}
 		//Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
 		//Log.out( "VoxelModel.childrenLoad - loading child models END" );
-		if ( ModelMakerBase.state == ModelMakerBase.IMPORTING )
+		if ( $buildState== ModelMakerBase.IMPORTING )
 			delete dbo.children;
 	}
 

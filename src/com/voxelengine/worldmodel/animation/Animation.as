@@ -147,7 +147,7 @@ public class Animation extends PersistenceObject
 	}
 
     private function soundAdded( $se:SoundEvent ):void {
-        if ( ModelMakerBase.state == ModelMakerBase.IMPORTING )
+        if ( ModelMakerBase.isImporting )
             SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID_COMPLETE, updateSoundGuid );
         SoundEvent.removeListener( ModelBaseEvent.ADDED, soundAdded );
         SoundEvent.removeListener( ModelBaseEvent.RESULT, soundAdded );

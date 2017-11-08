@@ -120,8 +120,10 @@ public class ModelCache
 		//Log.out( "ModelCache.add - name: " + vm.metadata.name + "  guid: " + vm.instanceInfo.modelGuid + "  instanceGuid: " + vm.instanceInfo.instanceGuid, Log.WARN );
 		if ( null == vm || null == vm.instanceInfo )
 			Log.out( "ModelCache.add - trying to add NULL model to cache", Log.ERROR );
-        if ( vm.modelInfo.guid == EditCursor.EDIT_CURSOR )
-            Log.out( "ModelCache.add - WHO IS DOING THIS", Log.ERROR );
+        if ( vm.modelInfo.guid == EditCursor.EDIT_CURSOR && Globals.online ) {
+			// If we are offline it is ok, since we need to build the editCursor the first time.
+            Log.out("ModelCache.add - WHO IS DOING THIS", Log.ERROR);
+        }
 
 		if ( vm.instanceInfo.controllingModel )
 		{

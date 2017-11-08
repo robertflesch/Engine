@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
@@ -47,8 +48,8 @@ public class Ship extends ControllableVoxelModel
 		super( ii );
 	}
 
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-		super.init( $mi, $vmm );
+	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
+		super.init( $mi, $vmm, $buildState );
 		// TODO These should be loading from the json file
 		clipVelocityFactor = SHIP_CLIP_FACTOR;
 		//_turnRate = 20;
@@ -63,8 +64,8 @@ public class Ship extends ControllableVoxelModel
 		modelInfo.dbo.ship = {};
 	}
 
-	override protected function processClassJson():void {
-		super.processClassJson();
+	override protected function processClassJson( $buildState:String ):void {
+        super.processClassJson( $buildState );
 		if ( modelInfo.dbo.ship ) {
 			var info:Object = modelInfo.dbo.ship;
 		}

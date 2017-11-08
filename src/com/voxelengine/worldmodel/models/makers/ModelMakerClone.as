@@ -7,12 +7,6 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
-
-import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.ModelInfo;
-import com.voxelengine.worldmodel.models.ModelMetadata;
-
 import flash.display.BitmapData;
 import flash.geom.Matrix;
 
@@ -26,10 +20,15 @@ import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.events.ModelMetadataEvent
+import com.voxelengine.events.ModelEvent;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.models.types.VoxelModel
 import com.voxelengine.worldmodel.oxel.GrainCursor;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.ModelInfo;
+import com.voxelengine.worldmodel.models.ModelMetadata;
 
 public class ModelMakerClone extends ModelMakerBase {
 
@@ -39,34 +38,40 @@ public class ModelMakerClone extends ModelMakerBase {
     private var _oldModelMetadata:ModelMetadata;
     private var _parentModel:VoxelModel;
 
-    public function ModelMakerClone( $parentModel:VoxelModel, $instanceInfo:InstanceInfo, $modelInfo:ModelInfo = null, $modelMetadata:ModelMetadata = null, $killOldModel:Boolean = true ) {
-		super($instanceInfo.clone());
+    public function ModelMakerClone( $parentModel:VoxelModel, $instanceInfo:InstanceInfo, $killOldModel:Boolean = true ) {
+        super($instanceInfo.clone(), CLONING );
+
         _parentModel = $parentModel;
-        state = CLONING;
-        Log.out("ModelMakerClone - clone model with instanceGuid: " + $instanceInfo.instanceGuid + "  modelGuid: " + $instanceInfo.modelGuid);
         _newModelGuid = Globals.getUID();
-		Log.out("ModelMakerClone - clone model with NEW instanceGuid: " + ii.instanceGuid + "  NEW modelGuid: " + ii.modelGuid);
-		if ($killOldModel) {
-            var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( ii.instanceGuid );
-			if ( vm )
+        Log.out("ModelMakerClone - clone model with modelGuid: " + $instanceInfo.modelGuid + "  instanceGuid: " + $instanceInfo.instanceGuid + "  NEW modelGuid: " + _newModelGuid );
+        if ($killOldModel) {
+            var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet(ii.instanceGuid);
+            if (vm)
                 vm.dead = true;
-		} else {
-			// Only do this for top level models.
-			if ( null == $instanceInfo.controllingModel ) {
-				var size:int = GrainCursor.two_to_the_g( $modelInfo.oxelPersistence.oxel.gc.grain );
-				var v:Vector3D = ii.positionGet.clone();
-				ii.positionSetComp(v.x + size / 4, v.y + size / 4, v.z + size / 4);
-			}
-		}
+        } else {
+            // Only do this for top level models.
+            if (null == $instanceInfo.controllingModel) {
+                var size:int = GrainCursor.two_to_the_g($parentModel.modelInfo.oxelPersistence.oxel.gc.grain);
+                var v:Vector3D = ii.positionGet.clone();
+                ii.positionSetComp(v.x + size / 4, v.y + size / 4, v.z + size / 4);
+            }
+        }
 
-        _oldModelInfo = $modelInfo;
-        _oldModelMetadata = $modelMetadata;
+        _oldModelInfo = $parentModel.modelInfo;
+        _oldModelMetadata = $parentModel.metadata;
 
-        if ( _oldModelInfo )
-            processModelInfo();
-        else
-            requestModelInfo();
-	}
+        if ($parentModel.modelInfo.oxelPersistence && ( 0 < $parentModel.modelInfo.oxelPersistence.oxelCount )) {
+            Log.out( "ModelMakerClone OXEL READY go with ii.modelGuid: " + ii.modelGuid + "  newModelGuid: " + _newModelGuid );
+            if (_oldModelInfo)
+                processModelInfo();
+            else
+                requestModelInfo();
+        } else {
+            // wait on oxel to finish!
+            Log.out( "ModelMakerCLone OXEL NOT READY wait for ii.modelGuid: " + ii.modelGuid + "  newModelGuid: " + _newModelGuid );
+            OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_COMPLETE, onOxelBuildComplete );
+        }
+    }
 
     override protected function retrievedModelInfo($mie:ModelInfoEvent):void  {
         if ( ii.modelGuid == $mie.modelGuid ) {
@@ -85,6 +90,16 @@ public class ModelMakerClone extends ModelMakerBase {
             ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null );
         }
     }
+
+    private function onOxelBuildComplete( $ode:OxelDataEvent ):void {
+        // oxel s loaded, we can go!
+        if ($ode.modelGuid == ii.modelGuid ) {
+            Log.out( "ModelMakerClone.onOxelBuildComplete ode.modelGuid: " + $ode.modelGuid + "  ii.modelGuid: " + ii.modelGuid + "  newModelGuid: " + _newModelGuid );
+            OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, onOxelBuildComplete );
+            processModelInfo();
+        }
+    }
+
 
     override protected function retrievedMetadata( $mme:ModelMetadataEvent):void {
         if ( ii.modelGuid == $mme.modelGuid ) {
@@ -181,14 +196,14 @@ public class ModelMakerClone extends ModelMakerBase {
     private	function quadsComplete( $ode:OxelDataEvent ):void {
         if ( _modelMetadata.guid == $ode.modelGuid ) {
 
-            if ( !ii.controllingModel ) {
+            if ( !ii.controllingModel && VoxelModel.controlledModel ) {
                 // Only do this for top level models.
                 var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 16)/2;
                 // this gives me corner.
                 var msCamPos:Vector3D = VoxelModel.controlledModel.cameraContainer.current.position;
-                var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld( msCamPos );
+                var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld(msCamPos);
 
-                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector( new Vector3D( -(radius + 8), adjCameraPos.y-radius, -radius * 3 ) );
+                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector(new Vector3D(-(radius + 8), adjCameraPos.y - radius, -radius * 3));
                 var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet();
                 diffPos = diffPos.add(lav);
                 _vm.instanceInfo.positionSet = diffPos;
@@ -209,6 +224,7 @@ public class ModelMakerClone extends ModelMakerBase {
 
             Log.out("ModelMakerClone.quadsComplete - needed info found: " + _modelMetadata.description );
             super.markComplete(true);
+            ModelEvent.create( ModelEvent.CLONE_COMPLETE, modelInfo.guid, null, null, "", _vm );
 
             _parentModel = null;
             _oldModelInfo = null;

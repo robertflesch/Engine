@@ -20,8 +20,8 @@ public class Stand extends VoxelModel
 		super( $ii );
 	}
 
-	override protected function processClassJson():void {
-		super.processClassJson();
+	override protected function processClassJson( $buildState:String ):void {
+		super.processClassJson( $buildState );
 
 		if ( modelInfo.dbo && modelInfo.dbo.stand )
 		{

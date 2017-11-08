@@ -28,8 +28,8 @@ public class Trigger extends VoxelModel
 		super.buildExportObject();
 	}
 
-	override protected function processClassJson():void {
-		super.processClassJson();
+	override protected function processClassJson( $buildState:String ):void {
+		super.processClassJson( $buildState );
 
 		if ( modelInfo.dbo.trigger ) {
 			var standInfo:Object = modelInfo.dbo.trigger;

@@ -7,7 +7,9 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-	import flash.geom.Vector3D;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+
+import flash.geom.Vector3D;
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
@@ -34,8 +36,8 @@ package com.voxelengine.worldmodel.models.types
 			super( instanceInfo );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-			super.init( $mi, $vmm );
+		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
+			super.init( $mi, $vmm, $buildState );
 			
 			Globals.g_app.dispatchEvent( new TargetEvent( TargetEvent.CREATED, instanceInfo.instanceGuid, _pointValue ) );
 		}

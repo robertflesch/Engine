@@ -8,6 +8,8 @@
 package com.voxelengine.worldmodel.models.types
 {
 
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
 import flash.geom.Vector3D;
@@ -113,8 +115,8 @@ public class Avatar extends ControllableVoxelModel
 		}
 	}
 
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-		super.init( $mi, $vmm );
+	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
+		super.init( $mi, $vmm, $buildState );
 		// should just do this for the players avatar
 		hasInventory = true;
 		instanceInfo.usesCollision = true;

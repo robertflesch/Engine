@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.weapons
 {
 import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.types.ControllableVoxelModel;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
@@ -53,8 +54,8 @@ public class Gun extends ControllableVoxelModel
 		// give the gun a unique series
 	}
 	
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-		super.init( $mi, $vmm );
+	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
+		super.init( $mi, $vmm, $buildState );
 		if ( $mi.oxelPersistence && $mi.oxelPersistence.bound ) {
 			var centerLoc:int = 2 << ( $mi.oxelPersistence.bound - 2);
 			calculateCenter( centerLoc );
@@ -105,8 +106,8 @@ public class Gun extends ControllableVoxelModel
 	}
 
 	private var _ammoCount:int;
-	override protected function processClassJson():void {
-		super.processClassJson();
+	override protected function processClassJson( $buildState:String):void {
+		super.processClassJson( $buildState );
 		
 		if ( modelInfo.dbo.gun )
 			var gunInfo:Object = modelInfo.dbo.gun;

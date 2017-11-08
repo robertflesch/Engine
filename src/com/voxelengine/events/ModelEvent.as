@@ -23,7 +23,8 @@ public class ModelEvent extends Event {
 	static public const AVATAR_MODEL_ADDED:String		= "AVATAR_MODEL_ADDED";
 	static public const PARENT_MODEL_REMOVED:String		= "PARENT_MODEL_REMOVED";
 	static public const CRITICAL_MODEL_DETECTED:String	= "CRITICAL_MODEL_DETECTED";
-	
+    static public const CLONE_COMPLETE:String			= "CLONE_COMPLETE";
+
 	private var _parentInstanceGuid:String;
 	public function get parentInstanceGuid():String { return _parentInstanceGuid; }
 	

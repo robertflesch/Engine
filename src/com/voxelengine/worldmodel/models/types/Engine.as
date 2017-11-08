@@ -55,8 +55,8 @@ package com.voxelengine.worldmodel.models.types
 			modelInfo.dbo.engine.maxThrust = _maxThrust;
 		}
 
-		override protected function processClassJson():void {
-			super.processClassJson();
+		override protected function processClassJson( $buildState:String ):void {
+			super.processClassJson( $buildState );
 			if ( modelInfo.dbo && modelInfo.dbo.engine )
 			{
 				var engineInfo:Object = modelInfo.dbo.engine;

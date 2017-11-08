@@ -13,6 +13,7 @@ import com.voxelengine.events.VVKeyboardEvent;
 import com.voxelengine.events.VVMouseEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.ModelPlacementType;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
@@ -86,7 +87,7 @@ public class EditCursor extends VoxelModel
 		creationInfo.modelClass = EDIT_CURSOR;
 		creationInfo.name = EDIT_CURSOR;
 		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, buildComplete );
-		new ModelMakerGenerate( ii, creationInfo, true, false );
+		new ModelMakerGenerate( ii, creationInfo, true, true );
 
 		function buildComplete( $mle:ModelLoadingEvent ):void {
 			var ohd:ObjectHierarchyData = $mle.data;
@@ -152,8 +153,8 @@ public class EditCursor extends VoxelModel
 		super( instanceInfo );
 	}
 
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-		super.init( $mi, $vmm );
+	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
+		super.init( $mi, $vmm, $buildState );
 		addListeners();
 	}
 

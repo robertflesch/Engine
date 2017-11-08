@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models.types
 {
 import com.voxelengine.Globals;
 import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
@@ -99,8 +100,8 @@ public class ControllableVoxelModel extends VoxelModel
 		super( ii );
 	}
 	
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-		super.init( $mi, $vmm );
+	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
+		super.init( $mi, $vmm, $buildState );
 		Globals.g_app.addEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent, false, 0, true );
 		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 		CursorSizeEvent.addListener( CursorSizeEvent.SET, adjustSpeedMultiplier );
@@ -133,8 +134,8 @@ public class ControllableVoxelModel extends VoxelModel
 		}
 	}
 
-	override protected function processClassJson():void {
-		super.processClassJson();
+	override protected function processClassJson( $buildState:String ):void {
+		super.processClassJson( $buildState );
 		clipVelocityFactor = DEFAULT_CLIP_VELOCITY/100; // setting it to 0.95
 		if ( modelInfo.dbo && modelInfo.dbo.controllableVoxelModel ) {
 			var cmInfo:Object = modelInfo.dbo.controllableVoxelModel;

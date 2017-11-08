@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import flash.geom.Vector3D;
 import flash.utils.getQualifiedClassName;
@@ -36,8 +37,8 @@ public class Dragon extends Beast
 		super( ii );
 	}
 	
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-		super.init( $mi, $vmm );
+	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
+		super.init( $mi, $vmm, $buildState );
 		
 		// TODO reimplement in handler
 		//MouseKeyboardHandler.backwardEnabled = false;
@@ -55,8 +56,8 @@ public class Dragon extends Beast
 		super.buildExportObject();
 	}
 	
-	override protected function processClassJson():void {
-		super.processClassJson();
+	override protected function processClassJson( $buildState:String ):void {
+		super.processClassJson( $buildState );
 		// no unique items at this level
 		if ( modelInfo.dbo && modelInfo.dbo.dragon )
 			var dragonInfo:Object = modelInfo.dbo.dragon;

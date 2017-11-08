@@ -37,7 +37,7 @@ import flash.geom.Vector3D;
 			var iiR:InstanceInfo = new InstanceInfo();
 			iiR.modelGuid = ControllableVoxelModel.COLLISION_MARKER;
 			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
-			new ModelMakerGenerate( iiR, GenerateCube.script( 0, TypeInfo.RED, true ), true, false );
+			new ModelMakerGenerate( iiR, GenerateCube.script( 0, TypeInfo.RED, true ), true, true );
 
 			function modelLoadComplete ( $mle:ModelLoadingEvent ):void {
 				if ($mle.data.modelGuid == ControllableVoxelModel.COLLISION_MARKER) {
