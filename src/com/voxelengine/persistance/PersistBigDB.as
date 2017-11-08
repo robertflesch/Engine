@@ -173,7 +173,7 @@ public class PersistBigDB
 		}
 		else
 		{
-			Log.out( "PersistBigDB.create - creating object in table: " + $pe.table + "  guid:" + $pe.guid + "" );
+			Log.out( "PersistBigDB.save - creating object in table: " + $pe.table + "  guid:" + $pe.guid + "" );
 			Persistence.createObject( $pe.table
 									, $pe.guid
 									, $pe.dbo
