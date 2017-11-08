@@ -236,10 +236,10 @@ public class Chunk {
 			priority = vm.distanceFromPlayerToModel(); // This should really be done on a per chuck basis
 		else
 			priority = 100; // high but not too high?
-		OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete );
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildTaskComplete );
 		quadsBuildDirtyRecursively( _guid, priority, $forceAll );
 		if ( 0 == _quadTasks) {
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete );
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildTaskComplete );
 			OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, null);
 		}
 	}
@@ -268,10 +268,10 @@ public class Chunk {
 			priority = vm.distanceFromPlayerToModel(); // This should really be done on a per chuck basis
 		else
 			priority = 100; // high but not too high?
-		OxelDataEvent.addListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildPartialComplete );
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildTaskComplete );
 		buildFacesRecursively( _guid, priority, $firstTime );
 		if ( 0 == _faceTasks) {
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildPartialComplete );
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildTaskComplete );
 			OxelDataEvent.create(OxelDataEvent.OXEL_FACES_BUILT_COMPLETE, 0, _guid, null);
 		}
 	}
@@ -310,16 +310,16 @@ public class Chunk {
 			priority = vm.distanceFromPlayerToModel(); // This should really be done on a per chuck basis
 		else
 			priority = 100; // high but not too high?
-		OxelDataEvent.addListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildPartialComplete );
-		OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete );
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildTaskComplete );
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildTaskComplete );
 		faceAndQuadsBuildRecursively( priority, $buildFaces, $forceFaces ,$forceQuads );
 		// When would either of these happen? Answer: Trying to build a clean model
 		if ( 0 == faceTasks) {
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildPartialComplete );
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildTaskComplete );
 			OxelDataEvent.create(OxelDataEvent.OXEL_FACES_BUILT_COMPLETE, 0, _guid, _op);
 		}
 		if ( 0 == quadTasks) {
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete );
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildTaskComplete );
 			OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, _op);
 			OxelDataEvent.create(OxelDataEvent.OXEL_BUILD_COMPLETE, 0, _guid, _op);
 		}
@@ -339,6 +339,8 @@ public class Chunk {
 				// This adjusts the order so that the larger grains draw first.
 				// This makes the overall object appear faster.
 				var adjustedPriority:int = $priority - gc.grain;
+                if ( 0 > adjustedPriority )
+                    adjustedPriority = 1;
 				if (( _oxel.dirty && $buildFaces ) || $forceFaces ) {
 					//Log.out("--Chunk addFaceTask - guid: "  + _guid + " gc: " + gc + " buildFaces?: " + ( _oxel.dirty || $buildFaces ) + "  forceFaces: " + $forceFaces, Log.WARN);
 					addFaceTask( adjustedPriority, $forceFaces );
@@ -360,25 +362,25 @@ public class Chunk {
 		BuildQuads.addTask( _guid, this, $forceQuads, $priority )
 	}
 
-	private function facesBuildPartialComplete( $ode:OxelDataEvent ):void {
-		//Log.out( "Chunk.facesBuildPartialComplete - Partial - guid: " + _guid + "  $ode.modelGuid: " + $ode.modelGuid, Log.WARN );
+	private function facesBuildTaskComplete( $ode:OxelDataEvent ):void {
+		//Log.out( "Chunk.facesBuildTaskComplete - Partial - guid: " + _guid + "  $ode.modelGuid: " + $ode.modelGuid, Log.WARN );
 		if ( $ode.modelGuid == _guid ) {
 			faceTasksDec();
 			if (0 == faceTasks) {
-				//Log.out("Chunk.facesBuildPartialComplete - COMPLETE - guid: " + _guid + "  $ode.modelGuid: " + $ode.modelGuid, Log.WARN);
-				OxelDataEvent.removeListener(OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildPartialComplete);
+				//Log.out("Chunk.facesBuildTaskComplete - COMPLETE - guid: " + _guid + "  $ode.modelGuid: " + $ode.modelGuid, Log.WARN);
+				OxelDataEvent.removeListener(OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildTaskComplete);
 				OxelDataEvent.create(OxelDataEvent.OXEL_FACES_BUILT_COMPLETE, 0, _guid, _op);
 			}
 		}
 	}
 
-	private function quadsBuildPartialComplete( $ode:OxelDataEvent ):void {
-		//Log.out( "Chunk.quadsBuildPartialComplete - Partial - guid: " + _guid + "  $ode.modelGuid: " + $ode.modelGuid, Log.WARN );
+	private function quadsBuildTaskComplete( $ode:OxelDataEvent ):void {
+		//Log.out( "Chunk.quadsBuildTaskComplete - Partial - guid: " + _guid + "  $ode.modelGuid: " + $ode.modelGuid, Log.WARN );
 		if ( $ode.modelGuid == _guid ) {
 			quadTasksDec();
 			if (0 == quadTasks) {
-				//Log.out("Chunk.quadsBuildPartialComplete - COMPLETE - guid: " + _guid + "  $ode.modelGuid: " + $ode.modelGuid, Log.WARN);
-				OxelDataEvent.removeListener(OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete);
+				Log.out("Chunk.quadsBuildTaskComplete - ALL TASKS COMPLETE - guid: " + _guid, Log.WARN);
+				OxelDataEvent.removeListener(OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildTaskComplete);
 				OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, _op);
 				OxelDataEvent.create(OxelDataEvent.OXEL_BUILD_COMPLETE, 0, _guid, _op);
 			}
