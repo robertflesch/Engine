@@ -17,10 +17,13 @@ import com.voxelengine.renderer.Renderer;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
+import com.voxelengine.worldmodel.models.Role;
 import com.voxelengine.worldmodel.models.makers.ModelDestroyer;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.models.types.Player;
+
 import flash.events.DataEvent;
 import flash.utils.ByteArray;
 import org.flashapi.swing.*;
@@ -122,9 +125,9 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 
     private function metaDataResult( $mmde:ModelMetadataEvent ):void {
         if ( _modelGuid == $mmde.modelGuid ) {
-
-			var mmd:ModelMetadata =  $mmde.modelMetadata;
-			if ( mmd.owner == Network.userId )
+			var role:Role = Player.player.role;
+            var mmd:ModelMetadata =  $mmde.modelMetadata;
+			if ( mmd.owner == Network.userId || ( mmd.owner == Network.PUBLIC && role.modelPublicDelete ) )
 				canDelete();
 			else
 				canNOTDelete();

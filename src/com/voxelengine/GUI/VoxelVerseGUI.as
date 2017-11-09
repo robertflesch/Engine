@@ -9,6 +9,7 @@
 package com.voxelengine.GUI
 {
 
+import com.voxelengine.GUI.crafting.WindowCrafting;
 import com.voxelengine.worldmodel.TextureBank;
 
 import flash.display.Sprite;
@@ -396,11 +397,11 @@ public class VoxelVerseGUI extends EventDispatcher
 				if ( VoxelModel.selectedModel )
 					new WindowModelDetail( VoxelModel.selectedModel );
 				
-			if ( Keyboard.C == e.keyCode ) {
-//				new WindowCrafting();
-//				new WindowInventory();
+			if ( Keyboard.C == e.keyCode )
 				new WindowCharacter();
-			}
+
+            if ( Keyboard.K == e.keyCode )
+				new WindowCrafting();
 //			// allows for saving of ivm to disk
 //			if ( Globals.isDebug ) {
 //				if (Keyboard.O == e.keyCode) {

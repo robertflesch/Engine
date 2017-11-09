@@ -7,7 +7,10 @@
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
 
-	import org.flashapi.swing.*
+import com.voxelengine.worldmodel.models.Role;
+import com.voxelengine.worldmodel.models.types.Player;
+
+import org.flashapi.swing.*
 	import org.flashapi.swing.containers.UIContainer;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
@@ -79,13 +82,16 @@ package com.voxelengine.GUI.inventory {
 			_barUpper = new TabBar();
 			_barUpper.name = "upper";
 			// TODO I should really iterate thru the types and collect the categories - RSF
-            _barUpper.addItem( LanguageManager.localizedStringGet( WindowInventoryNew.INVENTORY_CAT_VOXELS ), WindowInventoryNew.INVENTORY_CAT_VOXELS );
-			_barUpper.addItem( LanguageManager.localizedStringGet( WindowInventoryNew.INVENTORY_CAT_MODELS ), WindowInventoryNew.INVENTORY_CAT_MODELS );
-            _barUpper.addItem( LanguageManager.localizedStringGet( WindowInventoryNew.INVENTORY_CAT_REGIONS ), WindowInventoryNew.INVENTORY_CAT_REGIONS );
-//            _barUpper.addItem( LanguageManager.localizedStringGet( "Animations" ) );
-//            _barUpper.addItem( LanguageManager.localizedStringGet( "Recipes" ) );
-            //var li:ListItem = _barUpper.addItem( LanguageManager.localizedStringGet( "All" ) );
-			_barUpper.setButtonsWidth( 192 );
+            _barUpper.addItem( LanguageManager.localizedStringGet( WindowInventoryNew.INVENTORY_CAT_VOXELS ),		WindowInventoryNew.INVENTORY_CAT_VOXELS );
+			_barUpper.addItem( LanguageManager.localizedStringGet( WindowInventoryNew.INVENTORY_CAT_MODELS ), 		WindowInventoryNew.INVENTORY_CAT_MODELS );
+            _barUpper.addItem( LanguageManager.localizedStringGet( WindowInventoryNew.INVENTORY_CAT_REGIONS ), 		WindowInventoryNew.INVENTORY_CAT_REGIONS );
+            _barUpper.addItem( LanguageManager.localizedStringGet( WindowInventoryNew.INVENTORY_CAT_ANIMATIONS ), 	WindowInventoryNew.INVENTORY_CAT_ANIMATIONS );
+            _barUpper.addItem( LanguageManager.localizedStringGet( WindowInventoryNew.INVENTORY_CAT_RECIPES ), 		WindowInventoryNew.INVENTORY_CAT_RECIPES );
+            var role:Role = Player.player.role;
+            if ( role.modelGetFromAttic )
+                _barUpper.addItem( LanguageManager.localizedStringGet( WindowInventoryNew.INVENTORY_CAT_ATTIC ), WindowInventoryNew.INVENTORY_CAT_ATTIC );
+
+			_barUpper.setButtonsWidth( 115 );
 			_barUpper.height = 40;
 			if ( WindowInventoryNew.INVENTORY_CAT_VOXELS == $startingTabName )
 				_s_lastSelectedIndex = _barUpper.selectedIndex = 0;
@@ -93,6 +99,10 @@ package com.voxelengine.GUI.inventory {
 				_s_lastSelectedIndex = _barUpper.selectedIndex = 1;
 			else if ( WindowInventoryNew.INVENTORY_CAT_REGIONS == $startingTabName )
 				_s_lastSelectedIndex = _barUpper.selectedIndex = 2;
+            else if ( WindowInventoryNew.INVENTORY_CAT_ATTIC == $startingTabName )
+                _s_lastSelectedIndex = _barUpper.selectedIndex = 3;
+            else if ( WindowInventoryNew.INVENTORY_CAT_ANIMATIONS == $startingTabName )
+                _s_lastSelectedIndex = _barUpper.selectedIndex = 4;
 			else if ( WindowInventoryNew.INVENTORY_CAT_LAST )
 				_barUpper.selectedIndex = _s_lastSelectedIndex;
 
@@ -123,8 +133,13 @@ package com.voxelengine.GUI.inventory {
 			else if ( WindowInventoryNew.INVENTORY_CAT_MODELS == $category ) {
                 _panelContainer = new InventoryPanelModel(this, $dataSource );
             }
+            else if ( WindowInventoryNew.INVENTORY_CAT_ANIMATIONS == $category ) {
+                _panelContainer = new InventoryPanelAnimations(this, $dataSource );
+            }
 			else
 				_panelContainer = new InventoryPanelRegions( this, $dataSource );
+
+
 				
 			addElement( _panelContainer );
 		}

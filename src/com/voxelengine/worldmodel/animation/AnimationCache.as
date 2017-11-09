@@ -7,17 +7,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.animation
 {
-import com.voxelengine.events.SoundEvent;
-import com.voxelengine.worldmodel.models.Block;
-import com.voxelengine.worldmodel.models.makers.ModelLibrary;
-import com.voxelengine.worldmodel.models.types.Avatar;
 
-import flash.events.DataEvent;
-import flash.utils.ByteArray;
 import flash.net.URLLoaderDataFormat;
 import flash.utils.Dictionary;
-
-import playerio.DatabaseObject;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -25,6 +17,10 @@ import com.voxelengine.utils.JSONUtil;
 import com.voxelengine.events.AnimationEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.PersistenceEvent;
+import com.voxelengine.events.SoundEvent;
+import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.models.Block;
+import com.voxelengine.worldmodel.models.makers.ModelLibrary;
 import com.voxelengine.utils.StringUtils;
 
 /**
@@ -38,7 +34,11 @@ public class AnimationCache
 	static public const MODEL_PROPELLER:String =  "MODEL_PROPELLER";
 	static public const MODEL_QUADRUPED:String =  "MODEL_QUADRUPED";
 
-	static public const MODEL_UNKNOWN:String =  "MODEL_UNKNOWN";
+    static public const BIGDB_TABLE_ANIMATIONS:String = "animations";
+    static public const BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER:String = "owner";
+
+
+    static public const MODEL_UNKNOWN:String =  "MODEL_UNKNOWN";
 	
 	// this acts as a holding spot for all model objects loaded from persistance
 	// dont use weak keys since this is THE spot that holds things.
@@ -49,6 +49,7 @@ public class AnimationCache
 	
 	static public function init():void {
 		AnimationEvent.addListener( ModelBaseEvent.REQUEST, 		request );
+        AnimationEvent.addListener( ModelBaseEvent.REQUEST_TYPE,	requestType );
 		AnimationEvent.addListener( ModelBaseEvent.DELETE, 			deleteHandler );
 		AnimationEvent.addListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );		
 		AnimationEvent.addListener( ModelBaseEvent.SAVE, 			save );
@@ -62,6 +63,42 @@ public class AnimationCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  public function AnimationEvent( $type:String, $series:int, $modelGuid:String, , $aniGuid:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	/////////////////////////////////////////////////////////////////////////////////////////////
+    static private var _initializedPublic:Boolean;
+    static private var _initializedPrivate:Boolean;
+
+    // This loads the first 100 objects from the users inventory OR the public inventory
+    // TODO - NEED TO ADD HANDLER WHEN MORE THAN 100 ARE NEEDED - RSF 9.14.2017
+    static private function requestType( $mme:AnimationEvent ):void {
+
+        //Log.out( "ModelMetadataCache.requestType  owner: " + $mme.modelGuid, Log.WARN );
+        // For each one loaded this will send out a new ModelMetadataEvent( ModelBaseEvent.ADDED, $vmm.guid, $vmm ) event
+        if ( false == _initializedPublic && $mme.modelGuid == Network.PUBLIC ) {
+            PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, BIGDB_TABLE_ANIMATIONS, Network.PUBLIC, null, BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
+            _initializedPublic = true;
+        }
+
+        if ( false == _initializedPrivate && $mme.modelGuid == Network.userId ) {
+            PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, BIGDB_TABLE_ANIMATIONS, Network.userId, null, BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
+            _initializedPrivate = true;
+        }
+
+        // This will return models already loaded.
+        for each ( var ani:Animation in _animations ) {
+            if ( ani && ani.owner == $mme.modelGuid ) {
+                Log.out( "ModelMetadataCache.requestType RETURN  " +  ani.owner + " ==" + $mme.modelGuid + "  guid: " + ani.guid + "  desc: " + ani.description , Log.WARN );
+                AnimationEvent.create( ModelBaseEvent.RESULT, $mme.series, "", ani.guid, ani );
+            }
+            else {
+                if ( ani )
+                    Log.out( "AnimationCache.requestType REJECTING  " +  ani.owner + " !=" + $mme.modelGuid + "  guid: " + ani.guid + "  desc: " + ani.description , Log.WARN );
+                else
+                    Log.out( "AnimationCache.requestType REJECTING null object: ", Log.WARN );
+            }
+        }
+    }
+
+
+
 	static private function request( $ame:AnimationEvent ):void 
 	{   
 		if ( null == $ame.aniGuid || null == $ame.modelGuid ) {
@@ -76,7 +113,7 @@ public class AnimationCache
 			_block.add($ame.aniGuid);
 
 			if ( true == Globals.online && $ame.fromTable )
-				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $ame.series, Globals.BIGDB_TABLE_ANIMATIONS, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.modelGuid ) );
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $ame.series, BIGDB_TABLE_ANIMATIONS, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.modelGuid ) );
 			else	
 				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $ame.series, Globals.ANI_EXT, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.modelGuid ) );
 		}
@@ -86,7 +123,7 @@ public class AnimationCache
 
 	static private function loadSucceed( $pe:PersistenceEvent):void
 	{
-		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
+		if ( Globals.ANI_EXT != $pe.table && BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
 
 		var ani:Animation =  _animations[$pe.guid];
@@ -135,6 +172,8 @@ public class AnimationCache
 			Log.out( "AnimationCache.Add trying to add NULL animations or guid", Log.WARN );
 			return;
 		}
+        trace( $ani.name + "\t Owner: " + $ani.owner + "\t Desc: " + $ani.description  + "\t Class: " + $ani.animationClass + "  guid: " + $ani.guid );
+
 		var ani:Animation =  _animations[$ani.guid];
 		if ( null == ani ) {
 			_animations[$ani.guid] = $ani;
@@ -144,7 +183,7 @@ public class AnimationCache
 	
 	static private function loadFailed( $pe:PersistenceEvent ):void
 	{
-		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
+		if ( Globals.ANI_EXT != $pe.table && BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid );
@@ -154,7 +193,7 @@ public class AnimationCache
 	
 	static private function loadNotFound( $pe:PersistenceEvent):void
 	{
-		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
+		if ( Globals.ANI_EXT != $pe.table && BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid );
@@ -182,7 +221,7 @@ public class AnimationCache
 				SoundEvent.create( ModelBaseEvent.DELETE, 0, anim.animationSound.guid, null );
 			}
 		}
-		PersistenceEvent.create( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_ANIMATIONS, $ae.aniGuid, null );
+		PersistenceEvent.create( PersistenceEvent.DELETE_REQUEST, 0, BIGDB_TABLE_ANIMATIONS, $ae.aniGuid, null );
 	}
 
 	static private function updateGuid( $ae:AnimationEvent ):void {

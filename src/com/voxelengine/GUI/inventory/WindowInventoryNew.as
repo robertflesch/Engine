@@ -33,15 +33,17 @@ import org.flashapi.swing.*
         static public const INVENTORY_STORE:String = "store";
         static public const INVENTORY_LAST:String = "last";
 
-        static public const SOURCE_BACKPACK:String = "backpack";
-        static public const SOURCE_PUBLIC:String = "public";
-        static public const SOURCE_STORE:String = "store";
+//        static public const SOURCE_BACKPACK:String = "backpack";
+//        static public const SOURCE_PUBLIC:String = "public";
 
 		
 		// TODO need a more central location for these
         static public const INVENTORY_CAT_VOXELS:String = "Voxels";
         static public const INVENTORY_CAT_MODELS:String = "Models";
+    	static public const INVENTORY_CAT_ATTIC:String = "Attic";
         static public const INVENTORY_CAT_REGIONS:String = "Regions";
+    	static public const INVENTORY_CAT_ANIMATIONS:String = "Animations";
+    	static public const INVENTORY_CAT_RECIPES:String = "Recipes";
         static public const INVENTORY_CAT_LAST:String = "Last";
 		
         private var _ownedVsStore:TabBar;

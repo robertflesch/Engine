@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
 
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.Role;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
@@ -187,14 +189,14 @@ public class InventoryPanelModel extends VVContainer
 		//Log.out( "InventoryPanelModels.displaySelectedCategory - Not implemented", Log.WARN );
 		// The series makes it so that I dont see results from other objects requests
 		// This grabs the current series counter which will be used on the REQUEST_TYPE call
-		if ( WindowInventoryNew.SOURCE_BACKPACK == _source ) {
+		if ( WindowInventoryNew.INVENTORY_OWNED == _source ) {
 			addTools();
 		}
 
 		_seriesModelMetadataEvent = ModelBaseEvent.seriesCounter;
-		if ( _source == WindowInventoryNew.SOURCE_PUBLIC )
+		if ( _source == WindowInventoryNew.INVENTORY_PUBLIC )
             ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.PUBLIC, null );
-		else if ( _source == WindowInventoryNew.SOURCE_BACKPACK )
+		else if ( _source == WindowInventoryNew.INVENTORY_OWNED )
 			ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId, null );
 		else
             ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.storeId, null );
@@ -211,7 +213,7 @@ public class InventoryPanelModel extends VVContainer
 
     private function reassignPublicModelMetadataEvent($mme:ModelMetadataEvent):void {
 		// For this to happen I have to be on the backpack page!
-        if ( _source == WindowInventoryNew.SOURCE_BACKPACK )
+        if ( _source == WindowInventoryNew.INVENTORY_OWNED )
         	removeModel( $mme.modelGuid );
     }
 
@@ -446,8 +448,8 @@ public class InventoryPanelModel extends VVContainer
 			if ( e.dropTarget is BoxTrashCan ) {
 				//var btc:BoxTrashCan = e.dropTarget as BoxTrashCan;
 				var droppedItem:ObjectModel = e.dragOperation.initiator.data;
-
-				new WindowModelDeleteChildrenQuery( droppedItem.modelGuid, removeModel );
+                ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, checkModelMetadataPermissions );
+                ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, droppedItem.modelGuid );
 			}
 
 			if ( e.dropTarget is BoxCharacterSlot ) {
@@ -473,8 +475,19 @@ public class InventoryPanelModel extends VVContainer
 				}
 			}
 		}
+
+        function checkModelMetadataPermissions( $mmd:ModelMetadataEvent ):void {
+            var role:Role = Player.player.role;
+            if ( $mmd.modelMetadata.owner == Network.PUBLIC && role.modelPublicDelete )
+                new WindowModelDeleteChildrenQuery( droppedItem.modelGuid, removeModel );
+			else {
+				(new Alert( "You do not have permission to delete this").display());
+			}
+
+        }
 	}
-	
+
+
 	private function doDrag(e:UIMouseEvent):void {
 		_dragOp.initiator = e.target as UIObject;
 		_dragOp.dragImage = e.target as DisplayObject;
