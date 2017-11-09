@@ -8,7 +8,11 @@
 
 package com.voxelengine.worldmodel.tasks.flowtasks
 {
-	import flash.utils.Timer;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.oxel.OxelBad;
+
+import flash.utils.Timer;
 	import flash.utils.getTimer;
 	import flash.events.TimerEvent;
 
@@ -29,7 +33,8 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	 * @author Robert Flesch
 	 */
 	public class FlowLimited extends FlowTask
-	{		
+	{
+		private var _flowInfo:FlowInfo;
 		static public function addTask( $instanceGuid:String, gc:GrainCursor, $type:int, $flowInfo:FlowInfo, $taskPriority:int ):void 
 		{
 			Globals.taskController.addTask( new FlowLimited( $instanceGuid, gc, $type, $flowInfo, "FlowLimited", FlowTask.TASK_PRIORITY + $taskPriority ) );
@@ -65,7 +70,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _guid );
 			main:if ( vm )
 			{
-				var flowOxel:Oxel = vm.oxel.childGetOrCreate( _gc );
+				var flowOxel:Oxel = vm.modelInfo.oxelPersistence.oxel.childGetOrCreate( _gc );
 				if ( null == flowOxel.gc )
 					//Log.out( "FlowLimited.start - oxel released" );
 					break main; 
@@ -86,8 +91,8 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					if ( OxelBad.INVALID_OXEL != flowIntoTarget && TypeInfo.AIR == flowIntoTarget.type )
 					{
 						flowIntoTarget.flowInfo = _flowInfo; // flowInfo has to be present when write is performed
-						flowIntoTarget.write( _guid, flowIntoTarget.gc, _type );
-						flowOxel.write( _guid, flowOxel.gc, TypeInfo.AIR );
+						flowIntoTarget.change( _guid, flowIntoTarget.gc, _type );
+						flowOxel.change( _guid, flowOxel.gc, TypeInfo.AIR );
 						FlowLimited.addTask( _guid, flowIntoTarget.gc, _type, flowIntoTarget.flowInfo, FlowTask.TASK_PRIORITY );
 						break main;
 					}
@@ -112,10 +117,10 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					if ( OxelBad.INVALID_OXEL != flowIntoTarget && TypeInfo.AIR == flowIntoTarget.type )
 					{
 						flowIntoTarget.flowInfo = _flowInfo; // flowInfo has to be present when write is performed
-						flowIntoTarget.write( _guid, flowIntoTarget.gc, _type );
+						flowIntoTarget.change( _guid, flowIntoTarget.gc, _type );
 						//flowIntoTarget.flowInfo.direction = _flowInfo.direction;
 						flowIntoTarget.flowInfo.flowScaling.calculate( flowIntoTarget );
-						flowOxel.write( _guid, flowOxel.gc, TypeInfo.AIR );
+						flowOxel.change( _guid, flowOxel.gc, TypeInfo.AIR );
 						FlowLimited.addTask( _guid, flowIntoTarget.gc, _type, flowIntoTarget.flowInfo, FlowTask.TASK_PRIORITY );
 					}
 					else
