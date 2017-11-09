@@ -23,16 +23,16 @@ public class CraftingEvent extends Event
 	private var _name:String;
 	private var _recipe:Recipe;
 	
-	public function CraftingEvent( $type:String, $name:String, $recipe:Recipe, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function CraftingEvent( $type:String, $name:String, $recipe:Recipe )
 	{
-		super( $type, $bubbles, $cancellable );
+		super( $type );
 		_recipe = $recipe;
 		_name = $name;
 	}
 	
 	public override function clone():Event
 	{
-		return new CraftingEvent(type, _name, _recipe, bubbles, cancelable);
+		return new CraftingEvent(type, _name, _recipe );
 	}
    
 	public override function toString():String
@@ -66,7 +66,10 @@ public class CraftingEvent extends Event
 	static public function dispatch( $event:CraftingEvent ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
-	
+
+    static public function create( $type:String, $name:String, $recipe:Recipe ) : Boolean {
+        return _eventDispatcher.dispatchEvent( new  CraftingEvent( $type, $name, $recipe ) );
+    }
 	///////////////// Event handler interface /////////////////////////////
 	
 }

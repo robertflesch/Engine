@@ -8,6 +8,7 @@
 package com.voxelengine.GUI.crafting {
 import com.voxelengine.GUI.VVBox;
 import org.flashapi.swing.constants.BorderStyle;
+import org.flashapi.swing.dnd.DnDFormat;
 
 public class BoxCraftingBase extends VVBox {
 
@@ -19,8 +20,8 @@ public class BoxCraftingBase extends VVBox {
         dropEnabled = true;
         dragEnabled = true;
         borderStyle = $borderStyle;
-        //var dndFmt:DnDFormat = new DnDFormat( _acceptsCategory, _acceptsSubCat );
-        //addDropFormat( dndFmt );
+        var dndFmt:DnDFormat = new DnDFormat( _acceptsCategory, _acceptsSubCat );
+        addDropFormat( dndFmt );
     }
 }
 }

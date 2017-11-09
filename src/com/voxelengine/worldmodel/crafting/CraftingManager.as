@@ -6,6 +6,12 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.crafting {
+import com.voxelengine.events.CraftingEvent;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.PersistenceEvent;
+import com.voxelengine.utils.JSONUtil;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+
 import flash.events.Event;
 import flash.events.EventDispatcher;
 import flash.events.IOErrorEvent;
@@ -48,24 +54,61 @@ public class CraftingManager
 	static private var _recipes:Vector.<Recipe> = new Vector.<Recipe>;
 	
 	public function CraftingManager() {
+        PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
+        PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed );
+        PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, 	loadNotFound );
 		CraftingEvent.addListener( CraftingEvent.RECIPE_LOAD_PUBLIC, loadRecipes );
 	}
 	
 	static private function loadRecipes(e:CraftingEvent):void 
 	{
 		if ( !_initialized ) {
-			loadRecipeLocal( "basic_pick.cjson" );		
-			loadRecipeLocal( "pick.cjson" );		
-			loadRecipeLocal( "shovel.cjson" );		
+            PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.LOAD_REQUEST, 0, CRAFTING_EXT, "basicPick"));
+            PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.LOAD_REQUEST, 0, CRAFTING_EXT, "pick"));
+            PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.LOAD_REQUEST, 0, CRAFTING_EXT, "shovel"));
 		}
 		else {
 			for each ( var recipe:Recipe in _recipes ) {
-				CraftingEvent.dispatch( new CraftingEvent( CraftingEvent.RECIPE_LOADED, recipe.name, recipe ) );	
+				CraftingEvent.dispatch( new CraftingEvent( CraftingEvent.RECIPE_LOADED, recipe.name, recipe ) );
 			}
 		}
 		
-		_initialized = true;
+//		_initialized = true;
 	}
+
+	static public const CRAFTING_EXT:String = ".cjson";
+	static public const BIGDB_TABLE_CRAFTING:String = "crafting";
+	static private function loadSucceed( $pe:PersistenceEvent):void {
+		if ( BIGDB_TABLE_CRAFTING != $pe.table && CRAFTING_EXT != $pe.table )
+			return;
+
+		var fileData:String = String( $pe.data );
+		var jsonString:String = StringUtils.trim(fileData);
+		var newObjData:Object = JSONUtil.parse( jsonString, $pe.guid + $pe.table, "CraftingManager.loadSucceed" );
+		var _r:Recipe = new Recipe();
+		if ( newObjData.recipe ) {
+			_r.fromJSON( newObjData.recipe );
+			_recipes.push( _r );
+			CraftingEvent.dispatch( new CraftingEvent( CraftingEvent.RECIPE_LOADED, _r.name, _r ) );
+		}
+		else
+			Log.out("CraftingManager.onRecipeLoaded - ERROR recipe data not found in fileName: " + $pe.guid + "  data: " + fileData, Log.ERROR );
+	}
+
+	static private function loadFailed( $pe:PersistenceEvent ):void {
+        if ( BIGDB_TABLE_CRAFTING != $pe.table && CRAFTING_EXT != $pe.table )
+			return;
+		Log.out( "ModelInfoCache.loadFailed PersistenceEvent: " + $pe.toString(), Log.WARN );
+        CraftingEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.guid, null );
+	}
+
+	static private function loadNotFound( $pe:PersistenceEvent):void {
+        if ( BIGDB_TABLE_CRAFTING != $pe.table && CRAFTING_EXT != $pe.table )
+			return;
+		Log.out( "ModelInfoCache.loadNotFound PersistenceEvent: " + $pe.toString(), Log.WARN );
+        CraftingEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.guid, null );
+	}
+
 	
 	static private function loadRecipeLocal( $Recipe:String ):void {
 		var loader:CustomURLLoader = new CustomURLLoader( new URLRequest( Globals.appPath + "assets/crafting/" + $Recipe ) );

@@ -111,9 +111,9 @@ public class InventoryPanelVoxel extends VVContainer
 	}
 
     private function displaySelectedSource( $source:String ):void {
-        if ( $source == WindowInventoryNew.SOURCE_PUBLIC )
+        if ( $source == WindowInventoryNew.INVENTORY_PUBLIC )
             InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.PUBLIC, -1, Voxels.VOXEL_CAT_ALL );
-        else if ( $source == WindowInventoryNew.SOURCE_BACKPACK )
+        else if ( $source == WindowInventoryNew.INVENTORY_OWNED )
             InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.userId, -1, Voxels.VOXEL_CAT_ALL );
         else
             InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.storeId, -1, Voxels.VOXEL_CAT_ALL );
@@ -180,12 +180,14 @@ public class InventoryPanelVoxel extends VVContainer
 		{
 			e.dropTarget.backgroundTexture = e.dragOperation.initiator.backgroundTexture;
 			e.dropTarget.data = e.dragOperation.initiator.data;
+			var ti:TypeInfo = TypeInfo.typeInfo[e.dragOperation.initiator.data.type];
+
 			
 			if ( e.dropTarget.target is PanelMaterials ) {
-				CraftingItemEvent.create( CraftingItemEvent.MATERIAL_DROPPED, e.dragOperation.initiator.data as TypeInfo );
+				CraftingItemEvent.create( CraftingItemEvent.MATERIAL_DROPPED, ti );
 			}
 			else if ( e.dropTarget.target is PanelBonuses ) {
-				CraftingItemEvent.create( CraftingItemEvent.BONUS_DROPPED, e.dragOperation.initiator.data as TypeInfo );
+				CraftingItemEvent.create( CraftingItemEvent.BONUS_DROPPED, ti );
 				e.dropTarget.backgroundTextureManager.resize( 32, 32 );
 			}
 			else if ( e.dropTarget.target is QuickInventory ) {

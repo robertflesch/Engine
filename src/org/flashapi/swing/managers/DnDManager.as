@@ -29,8 +29,10 @@ package org.flashapi.swing.managers {
 	* @version 1.0.0, 29/06/2009 16:49
 	* @see http://www.flashapi.org/
 	*/
-	
-	import flash.display.DisplayObject;
+
+import com.voxelengine.worldmodel.TypeInfo;
+
+import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.display.Stage;
 	import flash.events.MouseEvent;
@@ -650,10 +652,11 @@ package org.flashapi.swing.managers {
 						for (; l >= 0; l--) {
 							if (fmt == tgtFormat[l].format)
 							{
+								var subCat:* = opFormat[i].data;
 								// The higher level format agree, now check the data.
-								if ( !tgtFormat[l].data || !opFormat[i].data )
+								if ( !tgtFormat[l].data || !subCat )
 									return true;
-								if ( tgtFormat[l].data == opFormat[i].data )
+								if ( tgtFormat[l].data == subCat )
 									return true;
 							}
 						}

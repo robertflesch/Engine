@@ -49,7 +49,7 @@ package com.voxelengine.GUI.crafting {
 			// reset the material
 			var mb:Box = e.target as Box;
 			mb.backgroundTexture = null;
-			var ti:TypeInfo = mb.data;
+			var ti:TypeInfo = TypeInfo.typeInfo[mb.data.type];
 			CraftingItemEvent.create( CraftingItemEvent.BONUS_REMOVED, ti );
 		}			
 

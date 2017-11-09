@@ -62,6 +62,8 @@ public class WindowCrafting extends VVPopup
 	{
 		autoSize = true;
 		_selectedRecipe = e.target.data;
+		if ( null == _selectedRecipe )
+				return;
 		if ( _panelRecipe ) {
 			_panelRecipe.remove();
 			_panelRecipe = null;

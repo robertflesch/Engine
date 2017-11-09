@@ -198,10 +198,10 @@ use namespace spas_internal;
 		 * 						additional parameters for loading the external asset.
 		 */
 		public function load(url:String, parameters:LoaderParameters = null):void {
-            //Log.out( "UILoader.loadAndAddChild - loading: " + url );
+            Log.out( "UILoader.loadAndAddChild - loading: " + url );
 
             var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
-            var resolvedFilePath:String = fs.getUrl( "/VoxelVerse/" + Globals.texturePath + url );
+            var resolvedFilePath:String = fs.getUrl( "/VoxelVerse" + Globals.texturePath + url );
             //Log.out( "UILoader.loadAndAddChild - loading: " + resolvedFilePath );
             var request:URLRequest = new URLRequest(resolvedFilePath);
 			if (parameters != null) {
@@ -395,11 +395,13 @@ use namespace spas_internal;
 		
 		private function ioErrorHandler(e:IOErrorEvent):void {
 			_evtColl.removeAllEvents();
+			Log.out( "UILoader.ioErrorHandler - ERROR: " + e.toString(), Log.ERROR );
 			_obj.dispatchEvent(new LoaderEvent(LoaderEvent.IO_ERROR, null, this));
 		}
 		
 		private function onSecurityError(e:SecurityErrorEvent):void {
 			_evtColl.removeAllEvents();
+            Log.out( "UILoader.onSecurityError - ERROR: " + e.toString(), Log.ERROR );
 			_obj.dispatchEvent(new LoaderEvent(LoaderEvent.SECURITY_ERROR, e.text, this));
 		}
 		

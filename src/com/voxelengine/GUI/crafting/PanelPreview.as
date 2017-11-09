@@ -31,7 +31,7 @@ package com.voxelengine.GUI.crafting {
 			
 			addElement( new Label( "Preview" ) );
 			if ( $recipe ) {
-				var path:String = Globals.appPath + "assets/crafting/" + $recipe.preview;
+				var path:String = $recipe.preview;
 				var image:Image = new Image( path, 128, 128 );
 				addElement( image );
 				_damageLabel = new Label( "Requirements not met", 128 );
