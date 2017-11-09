@@ -79,9 +79,9 @@ public class InventoryPanelRegions extends VVContainer
 	
     private function displaySelectedSource( $dataSource:String ):void {
         _listbox1.removeAll();
-        if ( $dataSource == WindowInventoryNew.SOURCE_PUBLIC )
+        if ( $dataSource == WindowInventoryNew.INVENTORY_PUBLIC )
             RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.PUBLIC );
-        else if ( $dataSource == WindowInventoryNew.SOURCE_BACKPACK )
+        else if ( $dataSource == WindowInventoryNew.INVENTORY_OWNED )
             RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId );
         else
             RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.storeId );

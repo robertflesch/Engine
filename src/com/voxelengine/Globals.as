@@ -23,7 +23,6 @@ public class Globals  {
 	static public const BIGDB_TABLE_MODEL_INFO:String = "modelInfo";
 	static public const BIGDB_TABLE_TREE_INFO:String = "treeInfo";
 	static public const BIGDB_TABLE_OXEL_DATA:String = "oxelData";
-	static public const BIGDB_TABLE_ANIMATIONS:String = "animations";
 	static public const BIGDB_TABLE_AMMO:String = "ammo";
 	static public const BIGDB_TABLE_REGIONS:String = "regions";
 

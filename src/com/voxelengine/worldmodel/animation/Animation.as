@@ -13,6 +13,7 @@ import com.voxelengine.events.SoundEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.PermissionsBase;
 import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.animation.AnimationSound;
 import com.voxelengine.worldmodel.models.SecureNumber;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
@@ -78,7 +79,7 @@ public class Animation extends PersistenceObject
 	}
 
 	public function Animation( $guid:String, $dbo:DatabaseObject, $importedData:Object, $animationSound:AnimationSound = null ):void {
-		super( $guid, Globals.BIGDB_TABLE_ANIMATIONS );
+		super( $guid, AnimationCache.BIGDB_TABLE_ANIMATIONS );
 		if ( null == $dbo ) {
 			assignNewDatabaseObject();
 		} else {

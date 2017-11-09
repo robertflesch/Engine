@@ -31,6 +31,10 @@ public class Role  extends PersistenceObject {
     public function get modelStoreEdit():Boolean { return _modelStoreEdit; }
     private var _modelStoreDelete:Boolean;
     public function get modelStoreDelete():Boolean { return _modelStoreDelete; }
+    private var _modelPutInAttic:Boolean;
+    public function get modelPutInAttic():Boolean { return _modelPutInAttic; }
+    private var _modelGetFromAttic:Boolean;
+    public function get modelGetFromAttic():Boolean { return _modelGetFromAttic; }
 
     static private var _s_defaultRole:Role = null;
     static public function get defaultRole() :Role {

@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.persistance 
 {
+import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.animation.AnimationSound;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.PlayerInfoCache;
@@ -50,7 +51,7 @@ public class PersistBigDB
 			return true;
 		else if ( Globals.BIGDB_TABLE_AMMO == $pe.table )	
 			return true;
-		else if ( Globals.BIGDB_TABLE_ANIMATIONS == $pe.table )	
+		else if ( AnimationCache.BIGDB_TABLE_ANIMATIONS == $pe.table )
 			return true;
 		else if ( Globals.BIGDB_TABLE_MODEL_INFO == $pe.table )	
 			return true;

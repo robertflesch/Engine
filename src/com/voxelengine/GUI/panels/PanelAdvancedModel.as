@@ -108,6 +108,7 @@ public class PanelAdvancedModel extends ExpandableBox
         if ( _mmd.owner == Network.userId  && _mmd.permissions.creator == Network.userId ) {
             new AssignModelAndChildrenToPublicOwnership( _mmd.guid, true );
         }
+        remove();
     }
 
     private function copyAndPutInStore( $me:MouseEvent ):void {

@@ -31,6 +31,9 @@ public class Network
     static private var _storeID:String = STORE;
     static public function get storeId():String { return _storeID; }
 
+    static private var _atticID:String = STORE;
+    static public function get atticID():String { return _atticID; }
+
 	// This was a test to see if I could make a client that didnt need user interaction.
 	// This will allow me to do things like post to Facebook things that users create.
 	static public function autoLogin( $startingRegionGuid:String ):void {
