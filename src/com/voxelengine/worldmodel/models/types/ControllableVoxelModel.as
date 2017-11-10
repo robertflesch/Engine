@@ -167,11 +167,6 @@ public class ControllableVoxelModel extends VoxelModel
 		ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 	}
 
-	override public function release():void
-	{
-		super.release();
-		
-	}
 	protected function collisionPointsAdd():void {
 		// TO DO Should define this in meta data??? RSF or using extents?
 		if ( 0 < _ct.hasPoints() )
@@ -195,8 +190,7 @@ public class ControllableVoxelModel extends VoxelModel
 	// Just here for the descendants to override
 	protected function onChildAdded( me:ModelEvent ):void { }
 	
-	protected function throttleEvent( event:ShipEvent ):void
-	{
+	protected function throttleEvent( event:ShipEvent ):void {
 		if ( event.instanceGuid != instanceInfo.instanceGuid )
 			return;
 			

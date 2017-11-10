@@ -76,6 +76,17 @@ public class ModelCache
 		return _instanceByGuid[$instanceGuid];
 	}
 
+    public function instanceOfModelWithInstanceGuid( $modelGuid:String, $instanceGuid:String ):VoxelModel {
+        var models:Vector.<VoxelModel> = instancesOfModelGet($modelGuid);
+        for each (var vm:VoxelModel in models) {
+            if ($instanceGuid == vm.instanceInfo.instanceGuid) {
+                return vm;
+                break;
+            }
+        }
+        return null;
+    }
+
 	public function instancesOfModelGet( $modelGuid:String ):Vector.<VoxelModel>
 	{ 
 		var results:Vector.<VoxelModel> = new Vector.<VoxelModel>();

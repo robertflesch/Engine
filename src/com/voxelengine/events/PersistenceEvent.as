@@ -25,6 +25,7 @@ public class PersistenceEvent extends Event
 	static public const LOAD_NOT_FOUND:String 	= "LOAD_NOT_FOUND";
 
 	static public const GENERATE_SUCCEED:String = "GENERATE_SUCCEED";
+    static public const CLONE_SUCCEED:String 	= "CLONE_SUCCEED";
 
 	static public const SAVE_REQUEST:String  	= "SAVE_REQUEST";
 	static public const CREATE_SUCCEED:String	= "CREATE_SUCCEED";

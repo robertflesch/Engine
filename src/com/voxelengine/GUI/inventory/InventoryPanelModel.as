@@ -291,6 +291,9 @@ public class InventoryPanelModel extends VVContainer
 			cb;
 		}
 		else if ( e.target.objectInfo is ObjectModel ) {
+            if ( PopupMetadataAndModelInfo.inExistance ) // They clicked on the edit button
+				return;
+
 			var om:ObjectModel = (e.target.objectInfo as ObjectModel);
 			
 			var ii:InstanceInfo = new InstanceInfo();
@@ -298,8 +301,7 @@ public class InventoryPanelModel extends VVContainer
 			ii.instanceGuid = Globals.getUID();
 			if ( WindowInventoryNew.parentModel ) {
                 ii.controllingModel = WindowInventoryNew.parentModel;
-                if (!PopupMetadataAndModelInfo.inExistance)
-                    new ModelMakerClone( WindowInventoryNew.parentModel, ii );
+                new ModelMakerClone( ii, om.vmm );
             }
 			else {
 				// Only do this for top level models.
@@ -321,8 +323,10 @@ public class InventoryPanelModel extends VVContainer
                 viewVector = viewVector.add( VoxelModel.controlledModel.instanceInfo.positionGet );
                 viewVector.setTo( viewVector.x - size/2, viewVector.y - size/2, viewVector.z - size/2);
                 ii.positionSet = viewVector;
-                if ( !PopupMetadataAndModelInfo.inExistance )
-                    new ModelMaker( ii );
+            	if ( om.vmm.permissions.blueprint )
+                	new ModelMakerClone( ii, om.vmm );
+				else
+					new ModelMaker( ii );
 			}
 
 		}
@@ -480,8 +484,10 @@ public class InventoryPanelModel extends VVContainer
             var role:Role = Player.player.role;
             if ( $mmd.modelMetadata.owner == Network.PUBLIC && role.modelPublicDelete )
                 new WindowModelDeleteChildrenQuery( droppedItem.modelGuid, removeModel );
+            else if ( $mmd.modelMetadata.owner == Network.userId && role.modelPrivateDelete )
+                new WindowModelDeleteChildrenQuery( droppedItem.modelGuid, removeModel );
 			else {
-				(new Alert( "You do not have permission to delete this").display());
+				(new Alert( "You (" + Network.userId + " as a " + role.name + " do not have required permissions to delete this object owned by " + $mmd.modelMetadata.owner ).display( 600 ));
 			}
 
         }

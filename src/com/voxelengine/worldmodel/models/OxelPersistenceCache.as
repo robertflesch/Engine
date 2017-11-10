@@ -43,6 +43,7 @@ public class OxelPersistenceCache
 
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistenceEvent.addListener( PersistenceEvent.GENERATE_SUCCEED,generateSucceed );
+        PersistenceEvent.addListener( PersistenceEvent.CLONE_SUCCEED,   cloneSucceed );
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed );
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, 	loadNotFound );
 	}
@@ -167,7 +168,22 @@ public class OxelPersistenceCache
 		}
 	}
 
-	// This is the same as load succeed.
+    // This is similar to load succeed.
+    static private function cloneSucceed( $pe:PersistenceEvent ):void {
+        if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
+            return;
+        //Log.out( "OxelDataCache.generateSucceed " + $pe.toString(), Log.INFO );
+        var op:OxelPersistence = new OxelPersistence( $pe.guid, null, $pe.data, true );
+        if ( $pe.other )
+            op.bound = parseInt($pe.other);
+        else {
+            Log.out( "OxelDataCache.cloneSucceed - BUT with unknown bound. Assigning bound of 0" + $pe.toString(), Log.WARN );
+            op.bound = 0;
+        }
+        add( $pe.series, op );
+    }
+
+	// This is similar to load succeed.
 	static private function generateSucceed( $pe:PersistenceEvent ):void {
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;

@@ -96,7 +96,7 @@ public class PopupMetadataAndModelInfo extends VVPopup
         if ( Globals.isDebug )
             addElement( new ComponentLabel( "Model GUID",  _mi.guid, WIDTH ) );
         var panel:Container = new Container(width, 30);
-        panel.addElement( new ComponentLabel( "Grain Size",  String(_mi.grainSize), (WIDTH/2-2) ) );
+        panel.addElement( new ComponentLabel( "Grain Size",  "Grain: " + String(_mi.grainSize) + " - " + Math.pow( 2, _mi.grainSize )/32 + " meters", (WIDTH/2-2) ) );
         panel.addElement( new ComponentLabel( "Model Class",  _mi.modelClass, (WIDTH/2-2) ) );
         addElement( panel );
         addAdvanced();

@@ -140,5 +140,7 @@ package com.voxelengine.worldmodel.crafting {
 		{
 			return _className;
 		}
+
+        public function get templateId():String { return _templateId; }
 	}
 }

@@ -48,7 +48,7 @@ import com.voxelengine.GUI.LanguageManager
 		}
 		
 		protected function clone():void {
-			new ModelMakerClone( _vm, _vm.instanceInfo );
+			new ModelMakerClone( _vm.instanceInfo, _vm.metadata, _vm.modelInfo );
 		}
 		
 	private function addButtonPanel():void {

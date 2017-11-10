@@ -22,6 +22,7 @@ import flash.utils.getTimer;
 	{
 		private   var	_count:Number					= -1;
 		private   var 	_stats:Array 					= new Array(256);				// INSTANCE NOT EXPORTED
+		public function get stats():Array 				{ return _stats; }
 		private   const GRAINS_PER_SQUARE_METER:int		= 16 * 16 * 16;
 		
 		private var _x_max:int = 0;

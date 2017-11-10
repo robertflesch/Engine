@@ -154,7 +154,7 @@ public class Player extends PersistenceObject
 
 
 	static public const DEFAULT_PLAYER:String = "DefaultPlayer";
-    static private const REFERENCE_AVATAR:String = "778D6895-A44D-D8C7-B003-870D4973AEB7";
+    static private const REFERENCE_AVATAR:String = "7FAECF4C-6139-BAB8-790C-635F5EF526F5";
     public function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
 		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 		dbo = $dbo;
@@ -173,8 +173,8 @@ public class Player extends PersistenceObject
 				dbo.description = "New Player Avatar";
 				dbo.modifiedDate = new Date().toUTCString();
 				dbo.createdDate = new Date().toUTCString();
-				dbo.role = Role.USER;
 Log.out( "onPlayerLoadedAction - HACK TO NOT SAVE NEW PLAYER DATA", Log.WARN );
+//				dbo.role = Role.USER;
 //				dbo.save();
 			}
 			// Don't modify the modelGuid, change it in the DB if needed

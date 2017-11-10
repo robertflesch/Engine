@@ -375,9 +375,10 @@ public class ModelInfo extends PersistenceObject
 			//Log.out( "VoxelModel.childrenLoad - calling load on ii: " + ii + "  childCount: " + _childCount );
             if ( $buildState == ModelMakerBase.IMPORTING )
                 new ModelMakerImport( ii, false );
-            if ( $buildState == ModelMakerBase.CLONING )
-                new ModelMakerClone( owner, ii, false );
-			else
+            if ( $buildState == ModelMakerBase.CLONING ) {
+                ii.controllingModel = owner;
+                new ModelMakerClone( ii );
+            } else
 				new ModelMaker( ii, true, false );
 		}
 		//Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );

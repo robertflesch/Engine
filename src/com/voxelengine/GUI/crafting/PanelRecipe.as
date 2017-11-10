@@ -7,8 +7,21 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.crafting 
 {
+import com.voxelengine.events.ModelLoadingEvent;
+import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.crafting.CraftingManager;
 import com.voxelengine.worldmodel.crafting.items.CraftedItem;
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.ModelStatisics;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.oxel.Oxel;
+
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
@@ -28,6 +41,7 @@ public class PanelRecipe extends PanelBase
 	private var _panelBonuses:PanelBonuses;
 	private var _panelPreview:PanelPreview;
 	private var _recipeDesc:Label;
+    private var _recipe:Label;
 	
 	private var _craftedItem:CraftedItem;
 	
@@ -92,10 +106,67 @@ public class PanelRecipe extends PanelBase
 		_panelButtons.remove();
 		
 	}
-	
-	private function craft( e:UIMouseEvent ):void
-	{
+
+    private var _instanceGuid:String;
+	private function craft( e:UIMouseEvent ):void {
+		// create model using templateID and replace the components with materials
+        if ( _craftedItem ) {
+            var craftItemII:InstanceInfo 	= new InstanceInfo();
+            craftItemII.modelGuid			= _craftedItem.templateId;
+//            craftItemII.positionSet 		= point;
+            _instanceGuid = craftItemII.instanceGuid		= Globals.getUID();
+            craftItemII.name				= _craftedItem.name;
+            OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, templateComplete );
+            ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
+            new ModelMaker( craftItemII, true , false );
+        }
 		
+	}
+
+    private function modelLoadComplete( $mle:ModelLoadingEvent ): void {
+        if ( $mle.data.modelGuid == _craftedItem.templateId ) {
+            OxelDataEvent.removeListener(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, templateComplete);
+            ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete);
+
+            var ms:ModelStatisics = $mle.vm.modelInfo.oxelPersistence.statistics;
+            var stats:Array = ms.stats;
+            for ( var key:* in stats ) {
+                if ( !isNaN( key ) ) {
+                    var ti:TypeInfo = TypeInfo.typeInfo[key];
+                    if ( ti )
+                        Log.out( "Contains " + stats[key]/(16*16*16) + " cubic meters of " + ti.name);
+                }
+            }
+        }
+	}
+
+
+	// its built and ready to have its materials replaced
+	private function templateComplete(  $ode:OxelDataEvent ): void {
+		if ( $ode.modelGuid == _craftedItem.templateId ){
+            OxelDataEvent.removeListener( OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, templateComplete );
+            ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
+
+            var oxel:Oxel = $ode.oxelPersistence.oxel;
+			// I have the ToType, where do I get the from type?
+			// could I use the oxel statistics?
+			// should be able to find category from there, and the id
+            var vm:VoxelModel =  Region.currentRegion.modelCache.instanceOfModelWithInstanceGuid( $ode.modelGuid, _instanceGuid );
+            var ms:ModelStatisics = vm.modelInfo.oxelPersistence.statistics;
+			var stats:Array = ms.stats;
+            for ( var key:* in stats ) {
+                if ( !isNaN( key ) ) {
+                    var ti:TypeInfo = TypeInfo.typeInfo[key]
+                    if ( ti )
+                        Log.out( "Contains " + stats[key]/16*16*16 + " cubic meters of " + ti.name);
+                }
+            }
+
+//            oxel.changeTypeFromTo( fromType, toType );
+//            _vm.modelInfo.oxelPersistence.changed = true;
+//            _vm.modelInfo.oxelPersistence.save()
+
+		}
 	}
 	
 	public function get craftedItem():CraftedItem 

@@ -15,26 +15,17 @@ public class Role  extends PersistenceObject {
     static public const USER:String = "User";
     static public const ADMIN:String = "Admin";
 
-    private var _modelPrivateDelete:Boolean;
-    public function get modelPrivateDelete():Boolean { return _modelPrivateDelete; }
-    private var _modelNominate:Boolean;
-    public function get modelNominate():Boolean { return _modelNominate; }
-    private var _modelApprove:Boolean;
-    public function get modelApprove():Boolean { return _modelApprove; }
-    private var _modelPublicEdit:Boolean;
-    public function get modelPublicEdit():Boolean { return _modelPublicEdit; }
-    private var _modelPublicDelete:Boolean;
-    public function get modelPublicDelete():Boolean { return _modelPublicDelete; }
-    private var _modelPutInStore:Boolean;
-    public function get modelPutInStore():Boolean { return _modelPutInStore; }
-    private var _modelStoreEdit:Boolean;
-    public function get modelStoreEdit():Boolean { return _modelStoreEdit; }
-    private var _modelStoreDelete:Boolean;
-    public function get modelStoreDelete():Boolean { return _modelStoreDelete; }
-    private var _modelPutInAttic:Boolean;
-    public function get modelPutInAttic():Boolean { return _modelPutInAttic; }
-    private var _modelGetFromAttic:Boolean;
-    public function get modelGetFromAttic():Boolean { return _modelGetFromAttic; }
+    public function get modelPrivateDelete():Boolean { return dbo.modelPrivateDelete ? dbo.modelPrivateDelete : false; }
+    public function get modelNominate():Boolean { return dbo.modelNominate ? dbo.modelNominate : false; }
+    public function get modelApprove():Boolean { return dbo.modelApprove ? dbo.modelApprove : false; }
+    public function get modelPublicEdit():Boolean { return dbo.modelPublicEdit ? dbo.modelPublicEdit : false; }
+    public function get modelPublicDelete():Boolean { return dbo.modelPublicDelete ? dbo.modelPublicDelete : false; }
+    public function get modelPutInStore():Boolean { return dbo.modelPutInStore ? dbo.modelPutInStore : false; }
+    public function get modelStoreEdit():Boolean { return dbo.modelStoreEdit ? dbo.modelStoreEdit : false; }
+    public function get modelStoreDelete():Boolean { return dbo.modelStoreDelete ? dbo.modelStoreDelete : false; }
+    public function get modelPutInAttic():Boolean { return dbo.modelPutInAttic ? dbo.modelPutInAttic : false; }
+    public function get modelGetFromAttic():Boolean { return dbo.modelGetFromAttic ? dbo.modelGetFromAttic : false; }
+    public function get name():String { return dbo.name ? dbo.name : "Unknown Role"; }
 
     static private var _s_defaultRole:Role = null;
     static public function get defaultRole() :Role {
@@ -45,17 +36,7 @@ public class Role  extends PersistenceObject {
 
     public function Role( $guid:String, $dbo:DatabaseObject = null ) {
         super( $guid, BIGDB_TABLE_ROLES );
-
-        if ( $dbo ) {
-            _modelNominate = $dbo.modelNominate;
-            _modelApprove = $dbo.modelApprove;
-
-            _modelPublicDelete = $dbo.modelPublicDelete;
-            _modelPrivateDelete = $dbo.modelPrivateDelete;
-
-            _modelPublicEdit = $dbo.modelPublicEdit;
-            _modelPutInStore = $dbo.modelPutInStore;
-        }
+        dbo = $dbo;
     }
 
     // This table is read only

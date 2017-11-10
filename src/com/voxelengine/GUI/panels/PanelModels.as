@@ -257,7 +257,7 @@ public class PanelModels extends PanelBase
 		_selectedText.x = 5;
         _selectedText.text = "-------";
 
-		var addButton:Button = new Button( LanguageManager.localizedStringGet( "Model_Add" )  );
+		var addButton:Button = new Button( LanguageManager.localizedStringGet( "InstanceAdd" )  );
 		//addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowModelList(); } );
 		addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, addModel );
 		
@@ -267,7 +267,7 @@ public class PanelModels extends PanelBase
 		container.addElement( addButton );
 		container.height += addButton.height + pbPadding;
 		
-		_deleteButton = new Button( LanguageManager.localizedStringGet( "Model_Delete" ) );
+		_deleteButton = new Button( LanguageManager.localizedStringGet( "InstanceDelete" ) );
 		_deleteButton.y = currentY = currentY + BUTTON_DISTANCE;
 		_deleteButton.x = 5;
 		_deleteButton.width = btnWidth;
@@ -277,7 +277,7 @@ public class PanelModels extends PanelBase
 		container.addElement( _deleteButton );
 		container.height += _deleteButton.height + pbPadding;
 		
-		_detailButton = new Button( LanguageManager.localizedStringGet( "instance_details" ) );
+		_detailButton = new Button( LanguageManager.localizedStringGet( "InstanceDetails" ) );
 		_detailButton.y = currentY = currentY + BUTTON_DISTANCE;
 		_detailButton.x = 5;
 		_detailButton.width = btnWidth;
@@ -286,7 +286,7 @@ public class PanelModels extends PanelBase
 		container.addElement( _detailButton );
 
 		if ( Globals.isDebug ) {
-			_dupButton = new Button( LanguageManager.localizedStringGet( "DUP" ) );
+			_dupButton = new Button( LanguageManager.localizedStringGet( "CloneModel" ) );
 			_dupButton.y = currentY = currentY + BUTTON_DISTANCE;
 			_dupButton.x = 5;
 			_dupButton.width = btnWidth;
@@ -301,7 +301,7 @@ public class PanelModels extends PanelBase
 		function dupModel(event:UIMouseEvent):void  {
 			if ( VoxelModel.selectedModel ) {
                 var vm:VoxelModel = VoxelModel.selectedModel;
-				new ModelMakerClone( vm, vm.instanceInfo, false );
+				new ModelMakerClone( vm.instanceInfo, vm.metadata, vm.modelInfo );
             }
 		}
 

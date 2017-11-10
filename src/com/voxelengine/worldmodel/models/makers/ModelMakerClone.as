@@ -36,40 +36,19 @@ public class ModelMakerClone extends ModelMakerBase {
     private var _newModelGuid:String;
     private var _oldModelInfo:ModelInfo;
     private var _oldModelMetadata:ModelMetadata;
-    private var _parentModel:VoxelModel;
 
-    public function ModelMakerClone( $parentModel:VoxelModel, $instanceInfo:InstanceInfo, $killOldModel:Boolean = true ) {
+    public function ModelMakerClone( $instanceInfo:InstanceInfo, $mmd:ModelMetadata = null, $mi:ModelInfo = null ) {
         super($instanceInfo.clone(), CLONING );
 
-        _parentModel = $parentModel;
-        _newModelGuid = Globals.getUID();
-        Log.out("ModelMakerClone - clone model with modelGuid: " + $instanceInfo.modelGuid + "  instanceGuid: " + $instanceInfo.instanceGuid + "  NEW modelGuid: " + _newModelGuid );
-        if ($killOldModel) {
-            var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet(ii.instanceGuid);
-            if (vm)
-                vm.dead = true;
-        } else {
-            // Only do this for top level models.
-            if (null == $instanceInfo.controllingModel) {
-                var size:int = GrainCursor.two_to_the_g($parentModel.modelInfo.oxelPersistence.oxel.gc.grain);
-                var v:Vector3D = ii.positionGet.clone();
-                ii.positionSetComp(v.x + size / 4, v.y + size / 4, v.z + size / 4);
-            }
-        }
+        Log.out("ModelMakerClone - clone model with modelGuid: " + $instanceInfo.modelGuid + "  instanceGuid: " + $instanceInfo.instanceGuid );
 
-        _oldModelInfo = $parentModel.modelInfo;
-        _oldModelMetadata = $parentModel.metadata;
+        _oldModelInfo = $mi;
+        _oldModelMetadata = $mmd;
 
-        if ($parentModel.modelInfo.oxelPersistence && ( 0 < $parentModel.modelInfo.oxelPersistence.oxelCount )) {
-            Log.out( "ModelMakerClone OXEL READY go with ii.modelGuid: " + ii.modelGuid + "  newModelGuid: " + _newModelGuid );
-            if (_oldModelInfo)
-                processModelInfo();
-            else
-                requestModelInfo();
-        } else {
-            // wait on oxel to finish!
-            Log.out( "ModelMakerCLone OXEL NOT READY wait for ii.modelGuid: " + ii.modelGuid + "  newModelGuid: " + _newModelGuid );
-            OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_COMPLETE, onOxelBuildComplete );
+        if ( _oldModelInfo )
+            processModelInfo();
+        else {
+            requestModelInfo();
         }
     }
 
@@ -82,24 +61,32 @@ public class ModelMakerClone extends ModelMakerBase {
     }
 
     private function processModelInfo():void {
-        _modelInfo = _oldModelInfo.clone( _newModelGuid );
-        if ( _oldModelMetadata ) {
-            processModelMetadata();
-        } else {
-            addMetadataListeners();
-            ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null );
+        // If the OLD modelInfo is completely build, move on to requesting the metadata, otherwise wait for it.
+        if ( _oldModelInfo.oxelPersistence && ( 0 < _oldModelInfo.oxelPersistence.oxelCount ) ) {
+            _newModelGuid = Globals.getUID();
+            _modelInfo = _oldModelInfo.clone(_newModelGuid);
+            Log.out( "ModelMakerClone.processModelInfo CLONED Model has a build Oxel _oldModelInfo.guid: " + _oldModelInfo.guid );
+            if (_oldModelMetadata) {
+                processModelMetadata();
+            } else {
+                addMetadataListeners();
+                ModelMetadataEvent.create(ModelBaseEvent.REQUEST, 0, ii.modelGuid, null);
+            }
+        } else {  // wait on OLD modelInfo's oxel to finish!
+            Log.out( "ModelMakerClone.processModelInfo CLONED Models OXEL NOT READY wait for _oldModelInfo.guid: " + _oldModelInfo.guid );
+            OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_COMPLETE, onOxelBuildComplete );
         }
     }
 
-    private function onOxelBuildComplete( $ode:OxelDataEvent ):void {
-        // oxel s loaded, we can go!
-        if ($ode.modelGuid == ii.modelGuid ) {
-            Log.out( "ModelMakerClone.onOxelBuildComplete ode.modelGuid: " + $ode.modelGuid + "  ii.modelGuid: " + ii.modelGuid + "  newModelGuid: " + _newModelGuid );
-            OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, onOxelBuildComplete );
-            processModelInfo();
-        }
-    }
-
+     private function onOxelBuildComplete( $ode:OxelDataEvent ):void {
+         // oxel s loaded, we can go!
+         if ( $ode.modelGuid == _oldModelInfo.guid ) {
+             Log.out("ModelMakerClone.onOxelBuildComplete OLD Models oxel is now ready ode.modelGuid: " + $ode.modelGuid + "  _oldModelInfo.guid: " + _oldModelInfo.guid );
+             OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, onOxelBuildComplete);
+             // go back and try again
+             processModelInfo();
+         }
+     }
 
     override protected function retrievedMetadata( $mme:ModelMetadataEvent):void {
         if ( ii.modelGuid == $mme.modelGuid ) {
@@ -113,12 +100,12 @@ public class ModelMakerClone extends ModelMakerBase {
         _modelMetadata = _oldModelMetadata.clone( _newModelGuid );
         // Now that all the information has been processed, we can assign the new model guid
         ii.modelGuid = _newModelGuid;
-		if ( !parentModelGuid ) {
+        if ( !parentModelGuid ) {
             var modelClass:String = _oldModelInfo.modelClass;
             _modelMetadata.animationClass = AnimationCache.requestAnimationClass(modelClass);
         }
-		completeMake();
-	}
+        completeMake();
+    }
 
     private function completeMake():void {
         //Log.out("ModelMakerClone.completeMake: " + ii.toString());
@@ -128,7 +115,7 @@ public class ModelMakerClone extends ModelMakerBase {
             if ( _vm ) {
                 _vm.stateLock( true, 10000 ); // Lock state so that it has time to load animations
                 addODEListeners();
-                PersistenceEvent.create( PersistenceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, modelInfo.guid, null, modelInfo.oxelPersistence.ba, null, String( _modelMetadata.bound  ) );
+                PersistenceEvent.create( PersistenceEvent.CLONE_SUCCEED, 0, Globals.IVM_EXT, modelInfo.guid, null, modelInfo.oxelPersistence.ba, null, String( _modelMetadata.bound  ) );
                 if ( false == modelInfo.childrenLoaded ) { // its true if they are loaded or the model has no children.
                     _waitForChildren = true;
                     ModelLoadingEvent.addListener(ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady);
@@ -226,7 +213,13 @@ public class ModelMakerClone extends ModelMakerBase {
             super.markComplete(true);
             ModelEvent.create( ModelEvent.CLONE_COMPLETE, modelInfo.guid, null, null, "", _vm );
 
-            _parentModel = null;
+            // Only do this for top level models.
+            if ( null == ii.controllingModel ) {
+                var size:int = GrainCursor.two_to_the_g( ii.controllingModel.modelInfo.oxelPersistence.oxel.gc.grain );
+                var v:Vector3D = ii.positionGet.clone();
+                ii.positionSetComp(v.x + size / 4, v.y + size / 4, v.z + size / 4);
+            }
+
             _oldModelInfo = null;
             _oldModelMetadata = null;
         }
