@@ -108,7 +108,7 @@ public class ModelDestroyer {
             if ( _modelGuid == $mie.modelGuid ) {
                 removeListeners();
                 Log.out( "ModelDestroyer.dataResultFailed - failed to receive modelInfo: " + _modelGuid + " but continuing", Log.WARN );
-                removeTheRest();
+                removeTheRest( null );
             }
         }
 
