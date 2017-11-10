@@ -8,6 +8,7 @@
 package com.voxelengine.GUI.inventory {
 
 import com.voxelengine.renderer.Renderer;
+import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 import org.flashapi.swing.*
@@ -77,6 +78,8 @@ import org.flashapi.swing.*
 
 		public function WindowInventoryNew( $startingTab:String, $label:String, $parentModel:VoxelModel )
 		{
+			if ( Globals.isDebug )
+					$label += " - " + Network.userId;
 			super( $label );
             _parentModel = $parentModel;
 			autoSize = true;

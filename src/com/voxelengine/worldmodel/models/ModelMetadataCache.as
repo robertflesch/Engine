@@ -239,9 +239,8 @@ public class ModelMetadataCache
 	}
 
     static private function saveEvent( $pe:ModelMetadataEvent ):void {
-        for each ( var vmm:ModelMetadata in _metadata ) {
-			vmm.save();
-		}
+		if ( $pe.modelMetadata )
+            $pe.modelMetadata.save();
 	}
 
 
@@ -266,7 +265,7 @@ public class ModelMetadataCache
         function getTrees():Vector.<ModelMetadata> {
             var vectorOfTreeModels:Vector.<ModelMetadata> = new Vector.<ModelMetadata>();
             for each( var mmd:ModelMetadata in _metadata ){
-                if ( 0 <= mmd.hashTags.indexOf("tree")) {
+                if ( mmd && (0 <= mmd.hashTags.indexOf("tree")) ) {
                     vectorOfTreeModels.push(mmd);
                 }
             }

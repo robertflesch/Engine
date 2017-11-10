@@ -25,7 +25,6 @@ import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.models.types.VoxelModel
 import com.voxelengine.worldmodel.oxel.GrainCursor;
-import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
@@ -74,15 +73,15 @@ public class ModelMakerClone extends ModelMakerBase {
             }
         } else {  // wait on OLD modelInfo's oxel to finish!
             Log.out( "ModelMakerClone.processModelInfo CLONED Models OXEL NOT READY wait for _oldModelInfo.guid: " + _oldModelInfo.guid );
-            OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_COMPLETE, onOxelBuildComplete );
+            OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_COMPLETE, onBaseModelOxelBuildComplete );
         }
     }
 
-     private function onOxelBuildComplete( $ode:OxelDataEvent ):void {
+     private function onBaseModelOxelBuildComplete( $ode:OxelDataEvent ):void {
          // oxel s loaded, we can go!
          if ( $ode.modelGuid == _oldModelInfo.guid ) {
              Log.out("ModelMakerClone.onOxelBuildComplete OLD Models oxel is now ready ode.modelGuid: " + $ode.modelGuid + "  _oldModelInfo.guid: " + _oldModelInfo.guid );
-             OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, onOxelBuildComplete);
+             OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, onBaseModelOxelBuildComplete);
              // go back and try again
              processModelInfo();
          }
@@ -162,8 +161,38 @@ public class ModelMakerClone extends ModelMakerBase {
     override protected function markComplete( $success:Boolean ):void {
         if ( true == $success ) {
             modelInfo.brandChildren();
-            OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE,  quadsComplete );
             Log.out("ModelMakerClone.completeMake - waiting on quad build: " + _modelMetadata.description );
+            ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
+            ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
+            _vm.complete = true;
+
+            modelInfo.changed = true;
+            modelInfo.oxelPersistence.changed = true;
+            _modelMetadata.changed = true;
+            _vm.save();
+
+            Log.out("ModelMakerClone.quadsComplete - needed info found: " + _modelMetadata.description );
+            ModelEvent.create( ModelEvent.CLONE_COMPLETE, modelInfo.guid, null, null, "", _vm );
+
+            // Only do this for top level models, need ControlledModel to get offset.
+            if ( null == ii.controllingModel && VoxelModel.controlledModel ) {
+                var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.grainSize), 16)/2;
+                // this gives me corner.
+                var msCamPos:Vector3D = VoxelModel.controlledModel.cameraContainer.current.position;
+                var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld(msCamPos);
+
+                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector(new Vector3D(-(radius + 8), adjCameraPos.y - radius, -radius * 3));
+                var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet();
+                diffPos = diffPos.add(lav);
+                _vm.instanceInfo.positionSet = diffPos;
+            }
+
+            var bmpd:BitmapData = Renderer.renderer.modelShot( _vm );
+            _vm.metadata.thumbnail = drawScaled(bmpd, 128, 128);
+
+            _oldModelInfo = null;
+            _oldModelMetadata = null;
+            super.markComplete(true);
         } else {
             if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" )
                 Log.out( "ModelMakerClone.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.ERROR );
@@ -176,52 +205,6 @@ public class ModelMakerClone extends ModelMakerBase {
             OxelDataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
             ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
             super.markComplete( $success );
-        }
-
-    }
-
-    private	function quadsComplete( $ode:OxelDataEvent ):void {
-        if ( _modelMetadata.guid == $ode.modelGuid ) {
-
-            if ( !ii.controllingModel && VoxelModel.controlledModel ) {
-                // Only do this for top level models.
-                var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 16)/2;
-                // this gives me corner.
-                var msCamPos:Vector3D = VoxelModel.controlledModel.cameraContainer.current.position;
-                var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld(msCamPos);
-
-                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector(new Vector3D(-(radius + 8), adjCameraPos.y - radius, -radius * 3));
-                var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet();
-                diffPos = diffPos.add(lav);
-                _vm.instanceInfo.positionSet = diffPos;
-            }
-
-            OxelDataEvent.removeListener(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, quadsComplete);
-            var bmpd:BitmapData = Renderer.renderer.modelShot( _vm );
-            _vm.metadata.thumbnail = drawScaled(bmpd, 128, 128);
-
-            ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
-            ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
-            _vm.complete = true;
-
-            modelInfo.changed = true;
-            modelInfo.oxelPersistence.changed = true;
-            _modelMetadata.changed = true;
-            _vm.save();
-
-            Log.out("ModelMakerClone.quadsComplete - needed info found: " + _modelMetadata.description );
-            super.markComplete(true);
-            ModelEvent.create( ModelEvent.CLONE_COMPLETE, modelInfo.guid, null, null, "", _vm );
-
-            // Only do this for top level models.
-            if ( null == ii.controllingModel ) {
-                var size:int = GrainCursor.two_to_the_g( ii.controllingModel.modelInfo.oxelPersistence.oxel.gc.grain );
-                var v:Vector3D = ii.positionGet.clone();
-                ii.positionSetComp(v.x + size / 4, v.y + size / 4, v.z + size / 4);
-            }
-
-            _oldModelInfo = null;
-            _oldModelMetadata = null;
         }
 
         function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {

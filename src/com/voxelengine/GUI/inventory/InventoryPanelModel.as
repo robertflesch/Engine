@@ -481,14 +481,17 @@ public class InventoryPanelModel extends VVContainer
 		}
 
         function checkModelMetadataPermissions( $mmd:ModelMetadataEvent ):void {
-            var role:Role = Player.player.role;
-            if ( $mmd.modelMetadata.owner == Network.PUBLIC && role.modelPublicDelete )
-                new WindowModelDeleteChildrenQuery( droppedItem.modelGuid, removeModel );
-            else if ( $mmd.modelMetadata.owner == Network.userId && role.modelPrivateDelete )
-                new WindowModelDeleteChildrenQuery( droppedItem.modelGuid, removeModel );
-			else {
-				(new Alert( "You (" + Network.userId + " as a " + role.name + " do not have required permissions to delete this object owned by " + $mmd.modelMetadata.owner ).display( 600 ));
-			}
+			if ( $mmd.modelGuid == droppedItem.modelGuid ) {
+                ModelMetadataEvent.removeListener(ModelBaseEvent.RESULT, checkModelMetadataPermissions);
+                var role:Role = Player.player.role;
+                if ($mmd.modelMetadata.owner == Network.PUBLIC && role.modelPublicDelete)
+                    new WindowModelDeleteChildrenQuery(droppedItem.modelGuid, removeModel);
+                else if ($mmd.modelMetadata.owner == Network.userId && role.modelPrivateDelete)
+                    new WindowModelDeleteChildrenQuery(droppedItem.modelGuid, removeModel);
+                else {
+                    (new Alert("You (" + Network.userId + " as a " + role.name + " do not have required permissions to delete this object owned by " + $mmd.modelMetadata.owner).display(600));
+                }
+            }
 
         }
 	}
