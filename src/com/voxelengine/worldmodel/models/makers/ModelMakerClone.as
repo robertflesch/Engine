@@ -7,6 +7,8 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
+import com.voxelengine.worldmodel.PermissionsModel;
+
 import flash.display.BitmapData;
 import flash.geom.Matrix;
 
@@ -41,6 +43,7 @@ public class ModelMakerClone extends ModelMakerBase {
 
         Log.out("ModelMakerClone - clone model with modelGuid: " + $instanceInfo.modelGuid + "  instanceGuid: " + $instanceInfo.instanceGuid );
 
+        _newModelGuid = Globals.getUID();
         _oldModelInfo = $mi;
         _oldModelMetadata = $mmd;
 
@@ -62,7 +65,6 @@ public class ModelMakerClone extends ModelMakerBase {
     private function processModelInfo():void {
         // If the OLD modelInfo is completely build, move on to requesting the metadata, otherwise wait for it.
         if ( _oldModelInfo.oxelPersistence && ( 0 < _oldModelInfo.oxelPersistence.oxelCount ) ) {
-            _newModelGuid = Globals.getUID();
             _modelInfo = _oldModelInfo.clone(_newModelGuid);
             Log.out( "ModelMakerClone.processModelInfo CLONED Model has a build Oxel _oldModelInfo.guid: " + _oldModelInfo.guid );
             if (_oldModelMetadata) {
@@ -162,8 +164,18 @@ public class ModelMakerClone extends ModelMakerBase {
         if ( true == $success ) {
             modelInfo.brandChildren();
             Log.out("ModelMakerClone.completeMake - waiting on quad build: " + _modelMetadata.description );
+
+            if ( _oldModelMetadata.permissions.blueprint ) {
+                _modelMetadata.permissions.blueprint = false;
+                _modelMetadata.permissions.blueprintGuid = _oldModelMetadata.guid;
+                _modelMetadata.permissions.binding = PermissionsModel.BIND_CREATE;
+            }
+
+
             ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
             ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
+
+
             _vm.complete = true;
 
             modelInfo.changed = true;

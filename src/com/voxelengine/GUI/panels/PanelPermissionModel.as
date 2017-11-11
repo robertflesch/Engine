@@ -103,11 +103,14 @@ public class PanelPermissionModel extends ExpandableBox
         // blueprintGuid
         _itemBox.addElement( new ComponentLabelSide( "Blue Print Guid", _permissions.blueprintGuid ? _permissions.blueprintGuid : "" , _itemBox.width ) );
 		// can the user modify this
-        var modifyCB:ComponentCheckBox = new ComponentCheckBox( "Modify", _permissions.modify, _itemBox.width, changeModify )
-        if ( Network.userId != _permissions.creator ) {
-			modifyCB.enabled = false;
-        }
-		_itemBox.addElement( modifyCB );
+        Log.out( "PanelPermissionModel.expand - NOT SHOWING MODIFY OPTIONS", Log.WARN);
+
+//        var modifyCB:ComponentCheckBox = new ComponentCheckBox( "Modify", _permissions.modify, _itemBox.width, changeModify )
+//        if ( Network.userId != _permissions.creator ) {
+//			modifyCB.enabled = false;
+//        }
+//		_itemBox.addElement( modifyCB );
+        _itemBox.addElement( new ComponentLabelSide( "Modify Types", PermissionsModel.getTextFromModificationCode(_permissions.modify), _itemBox.width ) );
 
         // creator
         _itemBox.addElement( new ComponentLabelSide( "Creator", _permissions.creator, _itemBox.width ) );
@@ -117,13 +120,13 @@ public class PanelPermissionModel extends ExpandableBox
         _itemBox.addElement( new ComponentLabelSide( "Modified Date", _permissions.modifiedDate, _itemBox.width ) );
 	}
 	
-	private function changeModify(event:UIMouseEvent):void {
-		if ( Network.userId == _permissions.creator ) {
-			_permissions.modify = (event.target as CheckBox).selected;
-		}
-		else
-			(new Alert("You do not have permission to change the 'modify' permission on this object")).display();		
-	}
+//	private function changeModify(event:UIMouseEvent):void {
+//		if ( Network.userId == _permissions.creator ) {
+//			_permissions.modify = (event.target as CheckBox).selected;
+//		}
+//		else
+//			(new Alert("You do not have permission to change the 'modify' permission on this object")).display();
+//	}
 			
 	private function changeBluePrint(event:UIMouseEvent):void {
 		if ( Network.userId == _permissions.creator ) {

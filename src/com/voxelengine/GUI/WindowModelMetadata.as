@@ -154,14 +154,15 @@ Log.out( "WindowModelMetadata - need drop down list of Bind types", Log.WARN );
 			
 			addElement( new HorizontalSeparator( width ) );		
 			
-			var rbModifyGroup:RadioButtonGroup = new RadioButtonGroup( this );
-			eventCollector.addEvent( rbModifyGroup, ButtonsGroupEvent.GROUP_CHANGED
-								   , function (event:ButtonsGroupEvent):void {  _vmm.permissions.modify = (0 == event.target.index ?  true :  false ) } );
-			var rbModifyDP:DataProvider = new DataProvider();
-			rbModifyDP.addAll( { label:"Allow this object to be modified" }
-							   , { label:"This objects shape is set" } );
-			rbModifyGroup.dataProvider = rbModifyDP;
-			rbModifyGroup.index = 0;
+Log.out( "WindowModelMetadata.dataReceived - NOT SHOWING MODIFY OPTIONS", Log.WARN);
+//			var rbModifyGroup:RadioButtonGroup = new RadioButtonGroup( this );
+//			eventCollector.addEvent( rbModifyGroup, ButtonsGroupEvent.GROUP_CHANGED
+//								   , function (event:ButtonsGroupEvent):void {  _vmm.permissions.modify = (0 == event.target.index ?  true :  false ) } );
+//			var rbModifyDP:DataProvider = new DataProvider();
+//			rbModifyDP.addAll( { label:"Allow this object to be modified" }
+//							   , { label:"This objects shape is set" } );
+//			rbModifyGroup.dataProvider = rbModifyDP;
+//			rbModifyGroup.index = 0;
 
 			addElement( new HorizontalSeparator( width ) );		
 			

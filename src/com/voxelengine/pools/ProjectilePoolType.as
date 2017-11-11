@@ -13,6 +13,7 @@ import com.voxelengine.Log
 import com.voxelengine.Globals
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.worldmodel.PermissionsModel;
 import com.voxelengine.worldmodel.models.*
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
@@ -58,7 +59,7 @@ public final class ProjectilePoolType
 		// This is a special case for _modelInfo, the _modelInfo its self is contained in the generate script
 
         _modelMetadata = new ModelMetadata( PROJECTILE + $type );
-        _modelMetadata.permissions.modify = false;
+        _modelMetadata.permissions.modify = PermissionsModel.MODIFY_NONE;
         _modelMetadata.doNotPersist = true;
         _modelMetadata.name = PROJECTILE  + $type;
         _modelMetadata.description = PROJECTILE + $type + " - GENERATED";

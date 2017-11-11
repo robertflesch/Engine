@@ -86,8 +86,10 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
             }
         }
 
-        var button:Button = new Button( "Delete", 100 );
+        padding = 5;
+        var button:Button = new Button( "Delete", width - 10, 50 );
         button.autoSize = false;
+        button.color = 0xFF0000;
         eventCollector.addEvent( button, UIMouseEvent.CLICK, deleteModelHandler );
         addElement( button );
 
