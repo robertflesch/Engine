@@ -93,12 +93,12 @@ public class ModelTransform
 	}
 	
 	static public function defaultObject():ModelTransform {
-		var obj:Object = { 	time : 1,
-							delta: { x:0, y:0, z:0 },
-							type: ModelTransform.ROTATION_REPEATING,
-							name: "Default" };
-
-		return new ModelTransform( obj.delta.x, obj.delta.y, obj.delta.z, obj.time, obj.type, obj.name );
+//		var obj:Object = { 	time : 1,
+//							delta: { x:0, y:0, z:0 },
+//							type: ModelTransform.ROTATION_REPEATING,
+//							name: "Default" };
+		//return new ModelTransform( obj.delta.x, obj.delta.y, obj.delta.z, obj.time, obj.type, obj.name );
+        return new ModelTransform( 0, 0, 0, 1, ModelTransform.ROTATION_REPEATING, "Default" );
 	}
 	
 	public function ModelTransform( $x:Number, $y:Number, $z:Number, $time:Number, $type:int, $name:String = "Default" ) {
