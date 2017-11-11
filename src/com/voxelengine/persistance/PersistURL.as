@@ -53,7 +53,7 @@ public class PersistURL
         else if ( CraftingManager.CRAFTING_EXT == $pe.table )
 			_filePath = Globals.appPath + "VoxelVerse/assets/crafting/" + $pe.guid + $pe.table;
         else if ( Globals.LANG_EXT == $pe.table )
-            _filePath = $pe.guid;
+            _filePath = Globals.appPath + "VoxelVerse" + $pe.guid;
 		else if ( Globals.APP_EXT == $pe.table )
 			_filePath = Globals.appPath + "VoxelVerse/" + $pe.guid + $pe.table;
 		else if ( Globals.ANI_EXT == $pe.table )
@@ -62,8 +62,6 @@ public class PersistURL
 			_filePath = Globals.modelPath + $pe.guid + $pe.table;
 		else if ( AnimationSound.SOUND_EXT == $pe.table )
 			_filePath = Globals.soundPath + $pe.guid + $pe.table;
-        else if ( Globals.APP_XML == $pe.table )
-            _filePath = "/assets/languages/lang_en/" + $pe.guid + $pe.table;
 
 		else
 			return false;
