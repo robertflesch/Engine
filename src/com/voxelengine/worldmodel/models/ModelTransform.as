@@ -277,7 +277,7 @@ public class ModelTransform
 				//Log.out( "ModelTransform.update - Velocity: " + _transformTarget );
 			}
 			else {
-				if ( ROTATION == type ) {
+				if ( ROTATION == type || ROTATION_REPEATING == type ) {
 					_transformTarget.x = (_transformTarget.x + channelRunTime * _delta.x )% 360;
 					_transformTarget.y = (_transformTarget.y + channelRunTime * _delta.y ) % 360;
 					_transformTarget.z = (_transformTarget.z + channelRunTime * _delta.z ) % 360;
