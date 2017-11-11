@@ -43,58 +43,8 @@ import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 
 public class Player extends PersistenceObject
 {
-	private var _nameArray:Array = [
-			"Ellyn",
-			"Vilma",
-			"Danyell",
-			"Celia",
-			"Shaunna",
-			"Tatyana",
-			"Verdie",
-			"Lucrecia",
-			"Genesis",
-			"Ivy",
-			"Madie",
-			"Edmund",
-			"Enoch",
-			"Elvia",
-			"Melania",
-			"Irwin",
-			"Huong",
-			"Trenton",
-			"Rosio",
-			"Johnna",
-			"Sudie",
-			"Gertude",
-			"Ryan",
-			"Tamika",
-			"Maxine",
-			"Adan",
-			"Xenia",
-			"Latashia",
-			"Anton",
-			"Maggie",
-			"Agnes",
-			"Nancy",
-			"Ingeborg",
-			"Emilie",
-			"Paris",
-			"Tawnya",
-			"Elda",
-			"Marquetta",
-			"Natosha",
-			"Joy",
-			"Kurt",
-			"Velva",
-			"Hector",
-			"Ciara",
-			"Reyna",
-			"Eustolia",
-			"Johnny",
-			"Shannon",
-			"Deetta",
-			"Vida",
-			"Lucky" ];
+    static public const DEFAULT_PLAYER:String = "DefaultPlayer";
+    static private const REFERENCE_AVATAR:String = "7FAECF4C-6139-BAB8-790C-635F5EF526F5";
 
     public function get role():Role { return RoleCache.roleGet( dbo ? dbo.role : null ) }
 
@@ -121,40 +71,6 @@ public class Player extends PersistenceObject
 		}
 	}
 
-	static private function onRegionLoad( $re:RegionEvent ):void {
-		if ( VoxelModel.controlledModel ) {
-			if ( null == Region.currentRegion.modelCache.instanceGet( VoxelModel.controlledModel.instanceInfo.instanceGuid ) )
-				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, VoxelModel.controlledModel );
-
-			var avatar:Avatar = VoxelModel.controlledModel as Avatar;
-			if ( null == avatar ) {
-				Log.out("Region.applyRegionInfoToPlayer - NO PLAYER DEFINED", Log.WARN);
-				return;
-			}
-
-			var region:Region = Region.currentRegion;
-			if ( region.playerPosition ) {
-				//Log.out( "Player.onLoadingPlayerComplete - setting position to  - x: "  + playerPosition.x + "   y: " + playerPosition.y + "   z: " + playerPosition.z );
-				avatar.instanceInfo.positionSetComp( region.playerPosition.x, region.playerPosition.y, region.playerPosition.z );
-			}
-			else
-				avatar.instanceInfo.positionSetComp( 0, 0, 0 );
-
-			if ( region.playerRotation ) {
-				//Log.out( "Player.onLoadingPlayerComplete - setting player rotation to  -  y: " + playerRotation );
-				avatar.instanceInfo.rotationSet = new Vector3D( 0, region.playerRotation.y, 0 );
-			}
-			else
-				avatar.instanceInfo.rotationSet = new Vector3D( 0, 0, 0 );
-
-			avatar.usesGravity = region.gravity;
-            WindowSplashEvent.create(WindowSplashEvent.ANNIHILATE);
-		}
-	}
-
-
-	static public const DEFAULT_PLAYER:String = "DefaultPlayer";
-    static private const REFERENCE_AVATAR:String = "7FAECF4C-6139-BAB8-790C-635F5EF526F5";
     public function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
 		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 		dbo = $dbo;
@@ -174,8 +90,8 @@ public class Player extends PersistenceObject
 				dbo.modifiedDate = new Date().toUTCString();
 				dbo.createdDate = new Date().toUTCString();
 Log.out( "onPlayerLoadedAction - HACK TO NOT SAVE NEW PLAYER DATA", Log.WARN );
-//				dbo.role = Role.USER;
-//				dbo.save();
+				dbo.role = Role.USER;
+				dbo.save();
 			}
 			// Don't modify the modelGuid, change it in the DB if needed
 			var pi:PlayerInfo = new PlayerInfo( instanceGuid, null );
@@ -184,7 +100,7 @@ Log.out( "onPlayerLoadedAction - HACK TO NOT SAVE NEW PLAYER DATA", Log.WARN );
 			createPlayer( dbo.modelGuid, instanceGuid );
 		}
 		else {
-			Log.out( "Avatar.onPlayerLoadedAction - ERROR, failed to create new record for new players?" );
+			Log.out( "Avatar.onPlayerLoadedAction - ERROR, failed to create new record for new players?", Log.ERROR );
 		}
 	}
 
@@ -294,22 +210,105 @@ Log.out( "onPlayerLoadedAction - HACK TO NOT SAVE NEW PLAYER DATA", Log.WARN );
 		VoxelModel.controlledModel.usesGravity = Region.currentRegion.gravity;
 	}
 
+    static private function onRegionLoad( $re:RegionEvent ):void {
+        if ( VoxelModel.controlledModel ) {
+            if ( null == Region.currentRegion.modelCache.instanceGet( VoxelModel.controlledModel.instanceInfo.instanceGuid ) )
+                RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, VoxelModel.controlledModel );
 
-	/*
-	 override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-	 Log.out( "Player.init instanceGuid: " + instanceInfo.instanceGuid + "  --------------------------------------------------------------------------------------------------------------------" );
-	 super.init( $mi, $vmm );
+            var avatar:Avatar = VoxelModel.controlledModel as Avatar;
+            if ( null == avatar ) {
+                Log.out("Region.applyRegionInfoToPlayer - NO PLAYER DEFINED", Log.WARN);
+                return;
+            }
 
-	 hasInventory = true;
-	 instanceInfo.usesCollision = true;
-	 clipVelocityFactor = AVATAR_CLIP_FACTOR;
-	 addEventHandlers();
-	 takeControl( null );
-	 torchToggle();
-	 if ( _displayCollisionMarkers )
-	 _ct.markersAdd();
-	 }
-	 */
+            var region:Region = Region.currentRegion;
+            if ( region.playerPosition ) {
+                //Log.out( "Player.onLoadingPlayerComplete - setting position to  - x: "  + playerPosition.x + "   y: " + playerPosition.y + "   z: " + playerPosition.z );
+                avatar.instanceInfo.positionSetComp( region.playerPosition.x, region.playerPosition.y, region.playerPosition.z );
+            }
+            else
+                avatar.instanceInfo.positionSetComp( 0, 0, 0 );
+
+            if ( region.playerRotation ) {
+                //Log.out( "Player.onLoadingPlayerComplete - setting player rotation to  -  y: " + playerRotation );
+                avatar.instanceInfo.rotationSet = new Vector3D( 0, region.playerRotation.y, 0 );
+            }
+            else
+                avatar.instanceInfo.rotationSet = new Vector3D( 0, 0, 0 );
+
+            avatar.usesGravity = region.gravity;
+            WindowSplashEvent.create(WindowSplashEvent.ANNIHILATE);
+        }
+    }
+
+    private var _nameArray:Array = [
+        "Ellyn",
+        "Vilma",
+        "Danyell",
+        "Celia",
+        "Shaunna",
+        "Tatyana",
+        "Verdie",
+        "Lucrecia",
+        "Genesis",
+        "Ivy",
+        "Madie",
+        "Edmund",
+        "Enoch",
+        "Elvia",
+        "Melania",
+        "Irwin",
+        "Huong",
+        "Trenton",
+        "Rosio",
+        "Johnna",
+        "Sudie",
+        "Gertude",
+        "Ryan",
+        "Tamika",
+        "Maxine",
+        "Adan",
+        "Xenia",
+        "Latashia",
+        "Anton",
+        "Maggie",
+        "Agnes",
+        "Nancy",
+        "Ingeborg",
+        "Emilie",
+        "Paris",
+        "Tawnya",
+        "Elda",
+        "Marquetta",
+        "Natosha",
+        "Joy",
+        "Kurt",
+        "Velva",
+        "Hector",
+        "Ciara",
+        "Reyna",
+        "Eustolia",
+        "Johnny",
+        "Shannon",
+        "Deetta",
+        "Vida",
+        "Lucky" ];
+
+    /*
+     override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
+     Log.out( "Player.init instanceGuid: " + instanceInfo.instanceGuid + "  --------------------------------------------------------------------------------------------------------------------" );
+     super.init( $mi, $vmm );
+
+     hasInventory = true;
+     instanceInfo.usesCollision = true;
+     clipVelocityFactor = AVATAR_CLIP_FACTOR;
+     addEventHandlers();
+     takeControl( null );
+     torchToggle();
+     if ( _displayCollisionMarkers )
+     _ct.markersAdd();
+     }
+     */
 	/*
 	 // When the player stops editing, set movement speed to 1
 	 private function changeCursorOperationEvent( e:CursorOperationEvent ):void	{
