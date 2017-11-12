@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel
 {
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.worldmodel.models.PersistenceObject;
 
 import playerio.DatabaseObject;
 import com.voxelengine.server.Network;
@@ -27,23 +28,27 @@ import com.voxelengine.server.Network;
  * Move - if you are owner, you can change.
  */
 public class PermissionsBase {
-	protected var _dboReference:DatabaseObject;
-    protected function get dboReference():DatabaseObject { return _dboReference; }
+    protected var _owner:PersistenceObject;
+    protected function get owner():PersistenceObject 				{ return _owner; }
+    protected function set owner($val:PersistenceObject):void  	{ _owner = $val; }
 
-	public function get modifiedDate():String 				{ return _dboReference.permissions.modifiedDate; }
-	public function get creator():String 					{ return _dboReference.permissions.creator; }
-	public function get createdDate():String 				{ return _dboReference.permissions.createdDate; }
+    protected function get dbo():DatabaseObject 				{ return _owner.dbo; }
+
+
+	public function get modifiedDate():String 				{ return dbo.permissions.modifiedDate; }
+	public function get creator():String 					{ return dbo.permissions.creator; }
+	public function get createdDate():String 				{ return dbo.permissions.createdDate; }
 
     private var _guid:String;
 
-	public function PermissionsBase( $dboReference:DatabaseObject, $guid:String ) {
+	public function PermissionsBase( $owner:PersistenceObject, $guid:String ) {
         _guid = $guid;
-		_dboReference = $dboReference;
-		if ( !_dboReference.permissions ) {
-            _dboReference.permissions = {};
-            _dboReference.permissions.creator = Network.userId;
-            _dboReference.permissions.createdDate = new Date().toUTCString();
-            _dboReference.permissions.modifiedDate = new Date().toUTCString();
+		owner = $owner;
+		if ( !dbo.permissions ) {
+            dbo.permissions = {};
+            dbo.permissions.creator = Network.userId;
+            dbo.permissions.createdDate = new Date().toUTCString();
+            dbo.permissions.modifiedDate = new Date().toUTCString();
             changed = true;
         }
 	}
@@ -58,8 +63,8 @@ public class PermissionsBase {
     }
 
 	protected function set changed( $val:Boolean ):void {
-        _dboReference.permissions.modifiedDate = new Date().toUTCString();
-		ModelMetadataEvent.create( ModelBaseEvent.CHANGED, 0, _guid );
+        dbo.permissions.modifiedDate = new Date().toUTCString();
+		owner.changed = true;
 	}
 }
 }

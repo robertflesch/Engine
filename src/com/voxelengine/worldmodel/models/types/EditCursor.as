@@ -676,11 +676,6 @@ public class EditCursor extends VoxelModel
 			foundModel = VoxelModel.selectedModel;
 			if ( CursorShapeEvent.SQUARE == cursorShape )
 			{
-				if ( foundModel.metadata.permissions.blueprint ) {
-					if ( !WindowBluePrintCopy.exists() )
-						new WindowBluePrintCopy( this)
-				}
-
 				var gcDelete:GrainCursor = GrainCursorPool.poolGet(foundModel.modelInfo.oxelPersistence.bound);
 				// This is where it intersects with a grain 0
 				gcDelete.grainX = int( EditCursor.currentInstance.instanceInfo.positionGet.x + 0.05 );

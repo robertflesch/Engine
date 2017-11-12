@@ -121,7 +121,7 @@ public class ModelMetadata extends PersistenceObject
 				mergeOverwrite( $newData );
 
 			// the permission object is just an encapsulation of the permissions section of the object
-			_permissions = new PermissionsModel( dbo, guid );
+			_permissions = new PermissionsModel( this, guid );
 
 
 			if ( dbo.thumbnail ) {

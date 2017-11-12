@@ -120,16 +120,7 @@ public class WindowModelMetadata extends VVPopup
 
 			addElement( new HorizontalSeparator( width ) );
 			
-			var rbGroup:RadioButtonGroup = new RadioButtonGroup( this );
-			var radioButtons:DataProvider = new DataProvider();
-			radioButtons.addAll( { label:"Template for other models" }
-							   , { label:"Unique Instance" } );
-			eventCollector.addEvent( rbGroup, ButtonsGroupEvent.GROUP_CHANGED
-								   , function (event:ButtonsGroupEvent):void {  _vmm.permissions.blueprint = (0 == event.target.index ?  true : false) } );
-			rbGroup.dataProvider = radioButtons;
-			rbGroup.index = 1;
-
-			addElement( new HorizontalSeparator( width ) );		
+			addElement( new HorizontalSeparator( width ) );
 			
 			var rbOwnerGroup:RadioButtonGroup = new RadioButtonGroup( this );
 			eventCollector.addEvent( rbOwnerGroup, ButtonsGroupEvent.GROUP_CHANGED

@@ -323,10 +323,7 @@ public class InventoryPanelModel extends VVContainer
                 viewVector = viewVector.add( VoxelModel.controlledModel.instanceInfo.positionGet );
                 viewVector.setTo( viewVector.x - size/2, viewVector.y - size/2, viewVector.z - size/2);
                 ii.positionSet = viewVector;
-            	if ( om.vmm.permissions.blueprint )
-                	new ModelMakerClone( ii, om.vmm );
-				else
-					new ModelMaker( ii );
+				new ModelMaker( ii );
 			}
 
 		}

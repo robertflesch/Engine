@@ -165,13 +165,6 @@ public class ModelMakerClone extends ModelMakerBase {
             modelInfo.brandChildren();
             Log.out("ModelMakerClone.completeMake - waiting on quad build: " + _modelMetadata.description );
 
-            if ( _oldModelMetadata.permissions.blueprint ) {
-                _modelMetadata.permissions.blueprint = false;
-                _modelMetadata.permissions.blueprintGuid = _oldModelMetadata.guid;
-                _modelMetadata.permissions.binding = PermissionsModel.BIND_CREATE;
-            }
-
-
             ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
             ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
 

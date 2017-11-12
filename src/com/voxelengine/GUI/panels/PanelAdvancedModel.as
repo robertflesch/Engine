@@ -42,10 +42,6 @@ public class PanelAdvancedModel extends ExpandableBox
         var outString:String = "";
 
         outString += "owner: " + _mmd.owner + "   ";
-        if ( _mmd.permissions.blueprint )
-            outString += "blue print: " + (_mmd.permissions.blueprint?"Yes ":"No ");
-        else
-            outString += "blue print: No ";
         return outString
     }
 

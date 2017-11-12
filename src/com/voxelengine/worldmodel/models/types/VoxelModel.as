@@ -46,6 +46,8 @@ import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.worldmodel.scripts.Script;
 
+import org.flashapi.swing.Alert;
+
 /**
  * ...
  * @author Robert Flesch - RSF
@@ -469,9 +471,8 @@ public class VoxelModel {
 	// This function writes to the root oxel, and lets the root find the correct target
 	// it also add flow and lighting
 	public function write( $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
-		if ( _metadata.permissions.blueprint ) {
-			if ( !WindowBluePrintCopy.exists() )
-				new WindowBluePrintCopy( this)
+		if ( _metadata.permissions.modify & PermissionsModel.MODIFY_VOXEL ) {
+			(new Alert( "You do not have permission to modify that model").display());
 		}
 		else {
 			//Log.out( "VoxelModel.write - going to changeOxel");

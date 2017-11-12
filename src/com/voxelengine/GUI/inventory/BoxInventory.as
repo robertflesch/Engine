@@ -119,37 +119,15 @@ public class BoxInventory extends VVBox
 
 				setHelp( "guid: " + om.vmm.guid );
 
-				if ( $displayAddons ) {
-					if ( permissions.blueprint ) {
-						_bpValue = new Image( "blueprint.png");
-						if (128 == width)
-							_bpValue.x = _bpValue.y = 64;
-						addElement(_bpValue)
-					}
-					else if (_bpValue) {
-						removeElement(_bpValue);
-						_bpValue = null
-					}
-
-					if ( permissions.creator == Network.userId || role.modelPublicEdit ) {
-						_editData = new Image( "editModelData.png", 40, 40, true);
-						$evtColl.addEvent(_editData, UIMouseEvent.CLICK, editModelData);
-						if (128 == width)
-							_editData.x = _editData.y = 0;
-						addElement(_editData)
-					} else if (_editData) {
-						removeElement(_editData);
-						_editData = null;
-					}
-				} else {
-					if ( _bpValue ) {
-						removeElement(_bpValue);
-						_bpValue = null;
-					}
-					if ( _editData ) {
-						removeElement(_editData);
-						_editData = null;
-					}
+				if ( $displayAddons&& permissions.creator == Network.userId || role.modelPublicEdit ) {
+					_editData = new Image( "editModelData.png", 40, 40, true);
+					$evtColl.addEvent(_editData, UIMouseEvent.CLICK, editModelData);
+					if (128 == width)
+						_editData.x = _editData.y = 0;
+					addElement(_editData)
+				} else if (_editData) {
+					removeElement(_editData);
+					_editData = null;
 				}
 			}
 			break;

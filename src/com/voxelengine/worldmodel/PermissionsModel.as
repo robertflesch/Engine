@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel {
 
 import com.voxelengine.Log;
+import com.voxelengine.worldmodel.models.PersistenceObject;
 
 import playerio.DatabaseObject;
 
@@ -31,7 +32,6 @@ public class PermissionsModel extends PermissionsBase
 
     // All the binds need to be tested
     static public const BIND_NONE:String 		= "BIND_NONE";
-    static public const BIND_CREATE:String 		= "BIND_CREATE";
     static public const BIND_PICKUP:String 		= "BIND_PICKUP";
     static public const BIND_USE:String 		= "BIND_USE";
     static public const BIND_MODIFY:String 		= "BIND_MODIFY";
@@ -74,33 +74,26 @@ public class PermissionsModel extends PermissionsBase
     }
 
 
-    public function get blueprintGuid():String  			{ return _dboReference.permissions.blueprintGuid; }
-    public function set blueprintGuid(value:String):void 	{ _dboReference.permissions.blueprintGuid = value; changed = true; }
+    public function get modify():int 					{ return dbo.permissions.modify; }
+    public function set modify(value:int):void 			{ dbo.permissions.modify = value; changed = true; }
 
-    public function get modify():int 					{ return _dboReference.permissions.modify; }
-    public function set modify(value:int):void 			{ _dboReference.permissions.modify = value; changed = true; }
+    public function get copyCount():int  				{ return dbo.permissions.copyCount; }
+    public function set copyCount(value:int):void  		{ dbo.permissions.copyCount = value; changed = true; }
 
-    public function get copyCount():int  					{ return _dboReference.permissions.copyCount; }
-    public function set copyCount(value:int):void  			{ _dboReference.permissions.copyCount = value; changed = true; }
+    public function get binding():String 				{ return dbo.permissions.binding; }
+    public function set binding(value:String):void  	{ dbo.permissions.binding = value; changed = true; }
 
-    public function get binding():String 					{ return _dboReference.permissions.binding; }
-    public function set binding(value:String):void  		{ _dboReference.permissions.binding = value; changed = true; }
-
-    public function get blueprint():Boolean 				{ return _dboReference.permissions.blueprint; }
-    public function set blueprint(value:Boolean):void		{ _dboReference.permissions.blueprint = value; changed = true; }
-
-    public function PermissionsModel( $dboReference:DatabaseObject, $guid:String ) {
+    public function PermissionsModel( $owner:PersistenceObject, $guid:String ) {
+        owner = $owner;
         var newPermissions:Boolean = false;
-        if ( !$dboReference.permissions )
+        if ( !owner.dbo.permissions )
             newPermissions = true;
-        super( $dboReference, $guid );
+        super( $owner, $guid );
 
-        var p:Object = $dboReference.permissions;
+        var p:Object = dbo.permissions;
         if ( newPermissions ) {
             copyCount 							= COPY_COUNT;
             modify								= 1;
-            blueprint							= false;
-            blueprintGuid						= null;
             binding								= BIND_NONE;
         }
         else {
@@ -110,8 +103,6 @@ public class PermissionsModel extends PermissionsBase
             else
                 modify							    = p.modify;
 
-            blueprint							= p.blueprint;
-            blueprintGuid						= p.blueprintGuid;
             binding							    = p.binding;
         }
 
@@ -121,8 +112,6 @@ public class PermissionsModel extends PermissionsBase
         var o:Object = super.toObject();
         o.copyCount 						= copyCount;
         o.modify							= modify;
-        o.blueprint							= blueprint;
-        o.blueprintGuid						= blueprintGuid;
         o.binding							= binding;
 
         return o;

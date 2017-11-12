@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+import com.voxelengine.worldmodel.models.PersistenceObject;
+
 import playerio.DatabaseObject;
 
 /**
@@ -29,14 +31,14 @@ public class PermissionsRegion extends PermissionsBase
 	//public function get editors():Vector.<String> { return _editors; }
 	//public function set editors(value:Vector.<String>):void  { _editors = value; }
 	
-	public function get guest():Boolean  { return dboReference.permissions.guest; }
-	public function set guest(value:Boolean):void  { dboReference.permissions.guest = value; }
+	public function get guest():Boolean  { return dbo.permissions.guest; }
+	public function set guest(value:Boolean):void  { dbo.permissions.guest = value; }
 
-	public function PermissionsRegion( $dboReference:DatabaseObject, $guid:String ) {
-		super( $dboReference, $guid );
+	public function PermissionsRegion( $owner:PersistenceObject, $guid:String ) {
+		super( $owner, $guid );
 
-		if ( !dboReference.permissions.guests )
-			dboReference.permissions.guests = false;
+		if ( !dbo.permissions.guests )
+			dbo.permissions.guests = false;
 		//$info.permissions.editors = [];
 		//$info.permissions.admins = [];
 	}

@@ -144,7 +144,7 @@ public class Animation extends PersistenceObject
 		}
 
 		// the permission object is just an encapsulation of the permissions section of the object
-		_permissions = new PermissionsBase( dbo, guid );
+		_permissions = new PermissionsBase( this, guid );
 	}
 
     private function soundAdded( $se:SoundEvent ):void {
