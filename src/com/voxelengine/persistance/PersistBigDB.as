@@ -7,13 +7,11 @@
 ==============================================================================*/
 package com.voxelengine.persistance 
 {
+import com.voxelengine.worldmodel.RegionManager;
 import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.animation.AnimationSound;
-import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.PlayerInfoCache;
 import com.voxelengine.worldmodel.models.Role;
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
 import playerio.PlayerIOError;
 import playerio.DatabaseObject;
@@ -39,13 +37,11 @@ public class PersistBigDB
 		if ( false == Globals.online )
 			return false;
 			
-		if ( ModelMetadata.BIGDB_TABLE_MODEL_METADATA == $pe.table )
-			return true;
-        else if ( PlayerInfoCache.BIGDB_TABLE_PLAYEROBJECTS == $pe.table )
+        if ( PlayerInfoCache.BIGDB_TABLE_PLAYEROBJECTS == $pe.table )
             return true;
 		else if ( Globals.BIGDB_TABLE_OXEL_DATA == $pe.table )
 			return true;
-		else if ( Globals.BIGDB_TABLE_REGIONS == $pe.table )	
+		else if ( RegionManager.BIGDB_TABLE_REGIONS == $pe.table )
 			return true;
 		else if ( Globals.BIGDB_TABLE_INVENTORY == $pe.table )	
 			return true;

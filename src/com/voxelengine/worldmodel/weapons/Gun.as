@@ -54,8 +54,8 @@ public class Gun extends ControllableVoxelModel
 		// give the gun a unique series
 	}
 	
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
-		super.init( $mi, $vmm, $buildState );
+	override public function init( $mi:ModelInfo, $buildState:String = ModelMakerBase.MAKING ):void {
+		super.init( $mi, $buildState );
 		if ( $mi.oxelPersistence && $mi.oxelPersistence.bound ) {
 			var centerLoc:int = 2 << ( $mi.oxelPersistence.bound - 2);
 			calculateCenter( centerLoc );

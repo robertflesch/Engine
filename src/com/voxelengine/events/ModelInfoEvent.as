@@ -15,27 +15,31 @@ import com.voxelengine.worldmodel.models.ModelInfo;
 public class ModelInfoEvent extends ModelBaseEvent
 {
 	static public const DELETE_RECURSIVE:String					= "DELETE_RECURSIVE";
-    static public const PERMISSION_FAIL:String					= "PERMISSION_FAIL";
+    static public const BITMAP_LOADED:String					= "BITMAP_LOADED";
+    static public const DATA_COLLECTED:String					= "DATA_COLLECTED";
+    static public const REASSIGN_STORE:String					= "REASSIGN_STORE";
+    static public const REASSIGN_PUBLIC:String					= "REASSIGN_PUBLIC";
+    static public const REASSIGN_FAILED:String					= "REASSIGN_FAILED";
+    static public const REASSIGN_SUCCEED:String					= "REASSIGN_SUCCEED";
 
-	
-	private var _vmi:ModelInfo;
+    private var _mi:ModelInfo;
 	private var _modelGuid:String;
 	private var _fromTables:Boolean;
 
-	public function get vmi():ModelInfo { return _vmi; }
+	public function get modelInfo():ModelInfo { return _mi; }
 	public function get modelGuid():String { return _modelGuid; }
 	public function get fromTables():Boolean  { return _fromTables; }
 	
-	public function ModelInfoEvent( $type:String, $series:int, $guid:String, $vmi:ModelInfo, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function ModelInfoEvent( $type:String, $series:int, $guid:String, $mi:ModelInfo, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $series, $bubbles, $cancellable );
-		_vmi = $vmi;
+		_mi = $mi;
 		_modelGuid = $guid;
 		_fromTables = $fromTable;
 	}
 	
 	public override function toString():String { return formatToString("ModelInfoEvent", "series", "modelGuid", "vmi", "fromTables" ); }
-	public override function clone():Event { return new ModelInfoEvent(type, series, _modelGuid, _vmi, _fromTables, bubbles, cancelable); }
+	public override function clone():Event { return new ModelInfoEvent(type, series, _modelGuid, _mi, _fromTables, bubbles, cancelable); }
 	
 	///////////////// Event handler interface /////////////////////////////
 

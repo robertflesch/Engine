@@ -10,11 +10,9 @@ package com.voxelengine.worldmodel.models.makers {
 import com.voxelengine.Log;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
@@ -27,106 +25,61 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 	 */
 public class ModelDestroyer {
 	
-	private var _modelGuid:String;
-	private var _recursive:Boolean;
-	
 	public function ModelDestroyer( $modelGuid:String, $recursive:Boolean ) {
-        _modelGuid = $modelGuid;
-        _recursive = $recursive;
-
         // The Region could also listen for model delete
         // this removes the on screen instances
-        var modelOnScreen:Vector.<VoxelModel> = Region.currentRegion.modelCache.instancesOfModelGet(_modelGuid);
+        var modelOnScreen:Vector.<VoxelModel> = Region.currentRegion.modelCache.instancesOfModelGet($modelGuid);
         // only instances have inventory, not models
         for each (var vm:VoxelModel in modelOnScreen)
             vm.dead = true;
 
-        Log.out("ModelDestroyer - removing modelGuid: " + _modelGuid + ( _recursive ? " and children from" : " from" ) + " persistance");
+        Log.out("ModelDestroyer - attempting to remove modelGuid: " + $modelGuid + ( $recursive ? " and children from" : " from" ) + " persistence");
 
-        // We need to do metadata first so that we can check permissions
-		addModelMetadataListeners();
-        ModelMetadataEvent.create(ModelBaseEvent.REQUEST, 0, _modelGuid, null);
+        addListeners();
+        ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, $modelGuid, null );
 
-        function metaDataResultFailed($mmd:ModelMetadataEvent):void {
-            if (_modelGuid == $mmd.modelGuid) {
-                removeModelMetadataListeners();
-                Log.out("ModelDestroyer.metaDataResultFailed - failed to find modelMetadata guid: " + _modelGuid, Log.WARN);
-            }
-        }
-
-        function metaDataResult( $mmd:ModelMetadataEvent ):void {
-            if (_modelGuid == $mmd.modelGuid ) {
-                removeModelMetadataListeners();
-                if ( $mmd.modelMetadata.owner == Network.PUBLIC && Player.player.role.modelPublicDelete )
-                    permissionsVerified();
-                else if ( $mmd.modelMetadata.owner == Network.userId )
-                    permissionsVerified();
-                else
-                    Log.out("ModelDestroyer.metaDataResult - permission failure for modelMetadata guid: " + _modelGuid + " aborting -- owner: " + $mmd.modelMetadata.owner + " deleting users role: " + Player.player.role.name, Log.WARN);
-            }
-        }
-
-        function removeModelMetadataListeners():void {
-            ModelMetadataEvent.removeListener(ModelBaseEvent.RESULT, metaDataResult);
-            ModelMetadataEvent.removeListener(ModelBaseEvent.ADDED, metaDataResult);
-            ModelMetadataEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, metaDataResultFailed);
-        }
-
-        function addModelMetadataListeners():void {
-            ModelMetadataEvent.addListener(ModelBaseEvent.RESULT, metaDataResult);
-            ModelMetadataEvent.addListener(ModelBaseEvent.ADDED, metaDataResult);
-            ModelMetadataEvent.addListener(ModelBaseEvent.REQUEST_FAILED, metaDataResultFailed);
-        }
-    }
-
-    private function permissionsVerified():void {
-        // request the modelInfo so that we can get the children from it.
-        ModelInfoEvent.addListener( ModelBaseEvent.RESULT, dataResult );
-        ModelInfoEvent.addListener( ModelBaseEvent.ADDED, dataResult );
-        ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, dataResultFailed );
-        ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, _modelGuid, null );
-
-        function dataResult( $mie:ModelInfoEvent):void	{
-            if ( _modelGuid == $mie.modelGuid ) {
-                //Log.out( "ModelDestroyer.dataResult - received modelInfo: " + $mie, Log.WARN );
-                // Now that we have the modelData, we can extract the modelInfo
+        function dataResult( $mie:ModelInfoEvent):void {
+            if ( $modelGuid == $mie.modelGuid ) {
                 removeListeners();
+                if (  ( $mie.modelInfo.owner == Network.PUBLIC && Player.player.role.modelPublicDelete )
+                   || ( $mie.modelInfo.owner == Network.userId ) ) {
 
-                // now have the modelData to remove all of the guids associated with this model.
-                removeTheRest( $mie.vmi );
+                    if ($mie.modelInfo)
+                        $mie.modelInfo.animationsDelete();
 
-                // Let MetadataCache handle the recursive delete
-                if ( _recursive )
-                    ModelInfoEvent.create( ModelInfoEvent.DELETE_RECURSIVE, 0, _modelGuid, null, _recursive );
-                else
-                    ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, _modelGuid, null );
+                    // This has to be last since it destroys the modelInfo
+                    if ($recursive)
+                        ModelInfoEvent.create(ModelInfoEvent.DELETE_RECURSIVE, 0, $modelGuid, null, $recursive);
+                    else
+                        ModelInfoEvent.create(ModelBaseEvent.DELETE, 0, $modelGuid, null);
 
+                    OxelDataEvent.create(ModelBaseEvent.DELETE, 0, $modelGuid, null);
+                    // TODO Remove sounds! RSF
+                    // TODO Inventory is by instance... but this is removing the model template.
+                    // InventoryModelEvent.dispatch( new InventoryModelEvent( ModelBaseEvent.DELETE, "", vm.instanceInfo.instanceGuid, null ) )
+                }
+                Log.out("ModelDestroyer - SUCCESSFULLY removed modelGuid: " + $modelGuid + ( $recursive ? " and children from" : " from" ) + " persistence");
             }
         }
 
         function dataResultFailed( $mie:ModelInfoEvent):void {
-            if ( _modelGuid == $mie.modelGuid ) {
+            if ( $modelGuid == $mie.modelGuid ) {
                 removeListeners();
-                Log.out( "ModelDestroyer.dataResultFailed - failed to receive modelInfo: " + _modelGuid + " but continuing", Log.WARN );
-                removeTheRest( null );
+                Log.out( "ModelDestroyer.dataResultFailed - failed to receive modelInfo: " + $modelGuid + " but continuing", Log.WARN );
             }
+        }
+
+        function addListeners():void {
+            ModelInfoEvent.addListener( ModelBaseEvent.RESULT, dataResult );
+            ModelInfoEvent.addListener( ModelBaseEvent.ADDED, dataResult );
+            ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, dataResultFailed );
         }
 
         function removeListeners():void {
             ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, dataResult);
             ModelInfoEvent.removeListener(ModelBaseEvent.ADDED, dataResult);
+            ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, dataResultFailed );
         }
-	}
-
-    private function removeTheRest( $mi:ModelInfo ):void {
-        if ( $mi ) {
-            $mi.animationsDelete();
-        }
-		ModelMetadataEvent.create(ModelBaseEvent.DELETE, 0, _modelGuid, null);
-		OxelDataEvent.create(ModelBaseEvent.DELETE, 0, _modelGuid, null);
-        // TODO Remove sounds! RSF
-		// TODO Inventory is by instance... but this is removing the model template.
-		// InventoryModelEvent.dispatch( new InventoryModelEvent( ModelBaseEvent.DELETE, "", vm.instanceInfo.instanceGuid, null ) )
-	}
+    }
 }
 }

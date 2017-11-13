@@ -39,8 +39,8 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 			super( instanceInfo );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
-			super.init( $mi, $vmm, $buildState );
+		override public function init( $mi:ModelInfo, $buildState:String = ModelMakerBase.MAKING ):void {
+			super.init( $mi, $buildState );
 			
 			_bombHolder = _instanceInfo.controllingModel;
 			//SoundCache.getSound( _soundFile ); // Preload the animationSound file

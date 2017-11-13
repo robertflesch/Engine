@@ -5,10 +5,7 @@ package com.voxelengine.worldmodel.models {
 import com.voxelengine.Log;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.scripts.BobbleScript;
 
 import org.flashapi.swing.Alert;
 
@@ -20,7 +17,6 @@ public class AssignModelAndChildrenToPublicOwnership {
     private static const RESULT_SUCCESS:String = "RESULT_SUCCESS";
     private var _guid:String;
     private var _taskResult:String = RESULT_UNDETERMINED;
-    private var _mmd:ModelMetadata;
     private var _mi:ModelInfo;
     // This hold a list of guids and the result for that guid
     private var _resultObject:Object = {};
@@ -31,41 +27,7 @@ public class AssignModelAndChildrenToPublicOwnership {
         _guid = $guid;
         _topLevel = $topLevel;
         _s_resultAllObjects[_guid] = RESULT_UNDETERMINED;
-        requestModelMetadata();
         requestModelInfo();
-    }
-
-    private function requestModelMetadata():void {
-        addMMDEListeners();
-        ModelMetadataEvent.create(ModelBaseEvent.REQUEST, 0, _guid, null);
-
-        function retrievedModelMetadata(e:ModelMetadataEvent):void {
-            if (_guid == e.modelGuid) {
-                _mmd = e.modelMetadata;
-                removeMMDEListeners();
-                attemptReassignment();
-            }
-        }
-
-        function failedModelMetadata(e:ModelMetadataEvent):void {
-            if (_guid == e.modelGuid) {
-                removeMMDEListeners();
-                Log.out("AssignModelAndChildrenToPublicOwnership.failedModelMetadata - guid: " + _guid + " didn't find metadata when trying to assign to public", Log.ERROR);
-                taskStatus( RESULT_FAILURE );
-            }
-        }
-
-        function addMMDEListeners():void {
-            ModelMetadataEvent.addListener(ModelBaseEvent.ADDED, retrievedModelMetadata);
-            ModelMetadataEvent.addListener(ModelBaseEvent.RESULT, retrievedModelMetadata);
-            ModelMetadataEvent.addListener(ModelBaseEvent.REQUEST_FAILED, failedModelMetadata);
-        }
-
-        function removeMMDEListeners():void {
-            ModelMetadataEvent.removeListener(ModelBaseEvent.ADDED, retrievedModelMetadata);
-            ModelMetadataEvent.removeListener(ModelBaseEvent.RESULT, retrievedModelMetadata);
-            ModelMetadataEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, failedModelMetadata);
-        }
     }
 
     private function requestModelInfo():void {
@@ -76,7 +38,7 @@ public class AssignModelAndChildrenToPublicOwnership {
         function retrievedModelInfo($mie:ModelInfoEvent):void  {
             if (_guid == $mie.modelGuid ) {
                 removeMIEListeners();
-                _mi = $mie.vmi;
+                _mi = $mie.modelInfo;
                 attemptReassignment();
             }
         }
@@ -104,10 +66,10 @@ public class AssignModelAndChildrenToPublicOwnership {
 
     public function attemptReassignment():void {
         // If we have the data, check ownership
-        if ( _mi && _mmd ) {
-            if (  _mmd.owner == Network.userId || _mmd.owner == Network.PUBLIC ) {
-                ModelMetadataEvent.addListener(ModelMetadataEvent.REASSIGN_FAILED, modelReassignmentResult);
-                ModelMetadataEvent.addListener(ModelMetadataEvent.REASSIGN_SUCCEED, modelReassignmentResult);
+        if ( _mi ) {
+            if (  _mi.owner == Network.userId || _mi.owner == Network.PUBLIC ) {
+                ModelInfoEvent.addListener(ModelInfoEvent.REASSIGN_FAILED, modelReassignmentResult);
+                ModelInfoEvent.addListener(ModelInfoEvent.REASSIGN_SUCCEED, modelReassignmentResult);
                 var children:Object = _mi.childrenGet();
                 if (children) {
                     var ol:int = objectLength( children );
@@ -144,19 +106,19 @@ public class AssignModelAndChildrenToPublicOwnership {
                     _taskResult = RESULT_FAILURE;
                     return;
                 } else {
-                    _s_resultAllObjects[_guid] = ModelMetadataEvent.REASSIGN_SUCCEED;
+                    _s_resultAllObjects[_guid] = ModelInfoEvent.REASSIGN_SUCCEED;
                     // it worked, send result and null members
                 }
                 break;
             case RESULT_FAILURE:
-                _s_resultAllObjects[_guid] = ModelMetadataEvent.REASSIGN_FAILED;
+                _s_resultAllObjects[_guid] = ModelInfoEvent.REASSIGN_FAILED;
                 // both failed, sent result
                 break;
         }
         finalCheck();
     }
 
-    private function modelReassignmentResult( $mmd:ModelMetadataEvent ):void {
+    private function modelReassignmentResult( $mmd:ModelInfoEvent ):void {
         // this might be our guid, or childs guid, or some other branches child guid
         var guid:String = $mmd.modelGuid;
 
@@ -186,31 +148,31 @@ public class AssignModelAndChildrenToPublicOwnership {
             // if there are results yet to be determined, hold off until all have completed
             if ( result == RESULT_UNDETERMINED ){
                 return;
-            } else if ( result == ModelMetadataEvent.REASSIGN_FAILED ) {
+            } else if ( result == ModelInfoEvent.REASSIGN_FAILED ) {
                 finalResult = false;
             }
         }
 
         // all child models have been resolved
-        ModelMetadataEvent.removeListener(ModelMetadataEvent.REASSIGN_SUCCEED, modelReassignmentResult);
-        ModelMetadataEvent.removeListener(ModelMetadataEvent.REASSIGN_FAILED, modelReassignmentResult);
+        ModelInfoEvent.removeListener(ModelInfoEvent.REASSIGN_SUCCEED, modelReassignmentResult);
+        ModelInfoEvent.removeListener(ModelInfoEvent.REASSIGN_FAILED, modelReassignmentResult);
 
         // if we get here, then all children have been reassigned
         if ( finalResult ) {
-            ModelMetadataEvent.create( ModelMetadataEvent.REASSIGN_SUCCEED, 0, _guid );
+            ModelInfoEvent.create( ModelInfoEvent.REASSIGN_SUCCEED, 0, _guid );
         } else {
-            ModelMetadataEvent.create( ModelMetadataEvent.REASSIGN_FAILED, 0, _guid );
+            ModelInfoEvent.create( ModelInfoEvent.REASSIGN_FAILED, 0, _guid );
         }
 
 
         // if this is the top of the hierarchy
-        // and everything succeeded or failed, if success we can change owner to public
+        // and everything succeeded or failed, if success we can change owningModel to public
         if ( _topLevel ) {
             if ( finalResult ){
                 // This reassigns all object in hierarchy and saves them
                 for ( var i:String in _s_resultAllObjects ){
                     // Do I need to be able to specify PUBLIC OR STORE HERE?
-                    ModelMetadataEvent.create( ModelMetadataEvent.REASSIGN_PUBLIC, 0, i );
+                    ModelInfoEvent.create( ModelInfoEvent.REASSIGN_PUBLIC, 0, i );
                 }
             } else {
                 // nothings been changed at this point, so if anything fails we are ok

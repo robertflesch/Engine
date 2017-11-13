@@ -119,8 +119,8 @@ public class Animation extends PersistenceObject
 			dbo.owner = Network.PUBLIC;
 
 		// These don't appear to DO anything... they gather data that is not used
-		//Region.currentRegion.modelCache.requestModelInfoByModelGuid( owner );
-		//Region.currentRegion.modelCache.instancesOfModelGet( owner );
+		//Region.currentRegion.modelCache.requestModelInfoByModelGuid( owningModel );
+		//Region.currentRegion.modelCache.instancesOfModelGet( owningModel );
 
 		if ( dbo.sound ) {
             _animationSound = null;
@@ -144,7 +144,8 @@ public class Animation extends PersistenceObject
 		}
 
 		// the permission object is just an encapsulation of the permissions section of the object
-		_permissions = new PermissionsBase( this, guid );
+		_permissions = new PermissionsBase();
+		_permissions.fromObject( this );
 	}
 
     private function soundAdded( $se:SoundEvent ):void {
@@ -317,7 +318,7 @@ public class Animation extends PersistenceObject
 
 //		if ( _attachments && 0 < _attachments.length ) {
 //			for each ( var aa:AnimationAttachment in _attachments ) {
-//				var cm:VoxelModel = $owner.childFindByName( aa.attachsTo );
+//				var cm:VoxelModel = $owningModel.childFindByName( aa.attachsTo );
 //				if ( cm )
 //					aa.create( cm );
 //			}
@@ -330,7 +331,7 @@ public class Animation extends PersistenceObject
 			
 //		if ( _attachments && 0 < _attachments.length ) {
 //			for each ( var aa:AnimationAttachment in _attachments ) {
-//				var cm:VoxelModel = $owner.childFindByName( aa.attachsTo );
+//				var cm:VoxelModel = $owningModel.childFindByName( aa.attachsTo );
 //				if ( cm )
 //					aa.detach();
 //			}

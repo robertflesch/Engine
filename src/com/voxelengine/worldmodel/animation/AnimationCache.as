@@ -35,7 +35,7 @@ public class AnimationCache
 	static public const MODEL_QUADRUPED:String =  "MODEL_QUADRUPED";
 
     static public const BIGDB_TABLE_ANIMATIONS:String = "animations";
-    static public const BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER:String = "owner";
+    static public const BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER:String = "owningModel";
 
 
     static public const MODEL_UNKNOWN:String =  "MODEL_UNKNOWN";
@@ -70,7 +70,7 @@ public class AnimationCache
     // TODO - NEED TO ADD HANDLER WHEN MORE THAN 100 ARE NEEDED - RSF 9.14.2017
     static private function requestType( $mme:AnimationEvent ):void {
 
-        //Log.out( "ModelMetadataCache.requestType  owner: " + $mme.modelGuid, Log.WARN );
+        //Log.out( "ModelMetadataCache.requestType  owningModel: " + $mme.modelGuid, Log.WARN );
         // For each one loaded this will send out a new ModelMetadataEvent( ModelBaseEvent.ADDED, $vmm.guid, $vmm ) event
         if ( false == _initializedPublic && $mme.modelGuid == Network.PUBLIC ) {
             PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, BIGDB_TABLE_ANIMATIONS, Network.PUBLIC, null, BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );

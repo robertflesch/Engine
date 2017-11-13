@@ -11,21 +11,14 @@ import com.voxelengine.Log
 import com.voxelengine.Globals
 import com.voxelengine.events.ModelBaseEvent
 import com.voxelengine.events.ModelInfoEvent
-import com.voxelengine.events.LoadingEvent
 import com.voxelengine.events.LoadingImageEvent
 import com.voxelengine.events.ModelLoadingEvent
-import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.ObjectHierarchyData;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.*
-import com.voxelengine.worldmodel.models.types.Avatar;
 import com.voxelengine.worldmodel.models.types.VoxelModel
-
-import flash.geom.Vector3D;
-
-import org.flashapi.swing.Alert;
 
 /**
 	 * ...
@@ -48,8 +41,7 @@ public class ModelMakerBase {
     static private var _makerCount:int;
 
     protected 		var _buildState:String = MAKING;
-	protected   	var _modelMetadata:ModelMetadata;
-	
+
 	protected 	       var _modelInfo:ModelInfo;
 	protected function get modelInfo():ModelInfo { return _modelInfo }
 	
@@ -108,7 +100,7 @@ public class ModelMakerBase {
 		if (_ii.modelGuid == $mie.modelGuid ) {
 			//Log.out( "ModelMakerBase.retrievedModelInfo - ii: " + _ii.toString(), Log.DEBUG )
 			removeMIEListeners();
-			_modelInfo = $mie.vmi;
+			_modelInfo = $mie.modelInfo;
 			attemptMake();
 		}
 	}
@@ -139,37 +131,6 @@ public class ModelMakerBase {
 
 	// ModelInfo
 	/////////////////////////////////////////////////////////////
-	// ModelMetadata
-
-	protected function retrievedMetadata( $mme:ModelMetadataEvent):void {
-		if ( ii.modelGuid == $mme.modelGuid ) {
-			removeMetadataListeners();
-			_modelMetadata = $mme.modelMetadata;
-			//Log.out( "ModelMakerBase.retrievedMetadata - metadata: " + _modelMetadata.toString() )
-			attemptMake();
-		}
-	}
-
-	protected function failedMetadata( $mme:ModelMetadataEvent):void {
-		if ( ii.modelGuid == $mme.modelGuid ) {
-			removeMetadataListeners();
-			markComplete(false);
-		}
-	}
-
-	protected function addMetadataListeners():void {
-		ModelMetadataEvent.addListener(ModelBaseEvent.ADDED, retrievedMetadata);
-		ModelMetadataEvent.addListener(ModelBaseEvent.RESULT, retrievedMetadata);
-		ModelMetadataEvent.addListener(ModelBaseEvent.REQUEST_FAILED, failedMetadata);
-	}
-
-	protected function removeMetadataListeners():void {
-		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retrievedMetadata );
-		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retrievedMetadata );
-		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata )
-	}
-	// ModelMetadata
-	/////////////////////////////////////////////////////////////
 
 	// check to make sure all of info required is here
 	protected function attemptMake():void { throw new Error( "ModelMakerBase.attemptMake is an abstract method" ) }
@@ -184,7 +145,7 @@ public class ModelMakerBase {
 			Log.out( "ModelMakerBase.make - Model failed in creation - modelAsset: " + modelAsset + "  modelClass: " + modelClass, Log.ERROR );
 			return null
 		}
-		vm.init( _modelInfo, _modelMetadata, _buildState );
+		vm.init( _modelInfo, _buildState );
 		return vm;
 
 	}
@@ -221,7 +182,7 @@ public class ModelMakerBase {
 				modelInfo.oxelPersistence.baseLightLevel( ii.baseLightLevel, false );
 			// This puts the object into the model cache which will then add the rendering tasks needed.
 			_vm.calculateCenter();
-			_vm.metadata.bound = $ode.oxelPersistence.bound;
+			_vm.modelInfo.bound = $ode.oxelPersistence.bound;
 			_vm.complete = true;
 			if ( _vm && addToRegionWhenComplete )
 				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vm );
@@ -265,7 +226,6 @@ public class ModelMakerBase {
 			ModelLoadingEvent.create( ModelLoadingEvent.MODEL_LOAD_FAILURE, ohd );
 		}
 
-		_modelMetadata = null;
 		_modelInfo = null;
 		_ii = null;
 		_vm = null;

@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.inventory
 {
 import com.voxelengine.worldmodel.models.ModelGuid;
+import com.voxelengine.worldmodel.models.ModelInfo;
 
 import flash.events.TimerEvent
 import flash.utils.Timer
@@ -15,10 +16,9 @@ import flash.utils.Timer
 import com.voxelengine.Log
 import com.voxelengine.events.InventorySlotEvent
 import com.voxelengine.events.ModelBaseEvent
-import com.voxelengine.events.ModelMetadataEvent
+import com.voxelengine.events.ModelInfoEvent
 import com.voxelengine.GUI.inventory.BoxInventory
 import com.voxelengine.server.Network
-import com.voxelengine.worldmodel.models.ModelMetadata
 
 public class ObjectModel extends ObjectInfo
 {
@@ -27,10 +27,10 @@ public class ObjectModel extends ObjectInfo
 	public function get modelGuid():String 						{ return _modelGuid.val; }
 	public function set modelGuid(value:String):void 			{ _modelGuid.valSet = value; }
 
-	protected var _vmm:ModelMetadata;
-	public function get vmm():ModelMetadata 					{ return _vmm }
-	public function set vmm(value:ModelMetadata):void 			{ _vmm = value }
-	
+	protected var _mi:ModelInfo;
+	public function get modelInfo():ModelInfo 					{ return _mi }
+	public function set modelInfo(value:ModelInfo):void 		{ _mi = value }
+
 	public function ObjectModel( $owner:BoxInventory, $guid:String ):void {
 		super( $owner, ObjectInfo.OBJECTINFO_MODEL, "Left click to place model" );
 		modelGuid = $guid;
@@ -54,36 +54,37 @@ public class ObjectModel extends ObjectInfo
 		_objectType = values[0];
 		modelGuid = values[1];
 		_displayAddons = false;
-		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, metadataAdded );
-		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, metadataAdded );
-		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
-		ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, modelGuid, null );
+		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, modelInfoAdded );
+		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, modelInfoAdded );
+		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, modelInfoFailed );
+		ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, modelGuid, null );
 		return this
 	}
 	
-	private function metadataFailed(e:ModelMetadataEvent):void 
+	private function modelInfoFailed(e:ModelInfoEvent):void
 	{
 		if ( modelGuid == e.modelGuid ) {
-			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, metadataAdded );
-			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
+			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, modelInfoAdded );
+            ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoAdded );
+			ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, modelInfoFailed );
 			//_owner remove me!
 			reset();
 			if ( box )
 				box.reset();
-			Log.out( "ObjectModel.metadataFailed - guid: " + e.modelGuid, Log.WARN );
+			Log.out( "ObjectModel.modelInfoFailed - guid: " + e.modelGuid, Log.WARN );
 			InventorySlotEvent.create( InventorySlotEvent.CHANGE, Network.userId, Network.userId, _slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY, ObjectInfo.DEFAULT_OBJECT_NAME ) );
 		}
 	}
 	
-	private function metadataAdded(e:ModelMetadataEvent):void 
+	private function modelInfoAdded(e:ModelInfoEvent):void
 	{
 		if ( modelGuid == e.modelGuid ) {
-			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, metadataAdded );
-			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, metadataAdded );
-			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
-			_vmm = e.modelMetadata;
-			_name = _vmm.name;
-			// a delay is needed since the metadata loads the thumbnail on a seperate thread.
+			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, modelInfoAdded );
+			ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoAdded );
+			ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, modelInfoFailed );
+            _mi = e.modelInfo;
+			_name = _mi.name;
+			// a delay is needed since the modelInfo loads the thumbnail on a separate thread.
 			delayedUpdate()
 		}
 	}
@@ -105,7 +106,7 @@ public class ObjectModel extends ObjectInfo
 		super.reset();
 		_modelGuid.release();
 		_modelGuid = null;
-		_vmm = null;
+		_mi = null;
 	}
 }
 }

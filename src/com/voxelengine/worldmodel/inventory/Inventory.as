@@ -58,7 +58,7 @@ public class Inventory {
 	}
 
 	public function unload():void {
-		//Log.out( "Inventory.unload - owner: " + guid, Log.WARN );
+		//Log.out( "Inventory.unload - owningModel: " + guid, Log.WARN );
 		_slots.unload();
 		_voxels.unload();
 		_characterSlots.unload();

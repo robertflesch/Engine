@@ -56,7 +56,7 @@ public class ProjectileEvent extends Event
 		//pe.position = position.clone();
 		//pe.ammo = _ammo.clone();
 		//pe.direction = direction.clone();
-		//pe.owner = owner;
+		//pe.owningModel = owningModel;
 		return pe;
 	}
    

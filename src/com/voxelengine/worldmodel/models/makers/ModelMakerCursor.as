@@ -11,7 +11,6 @@ import com.voxelengine.Log;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 
 	/**
@@ -23,10 +22,9 @@ import com.voxelengine.worldmodel.models.types.EditCursor;
 	 */
 public class ModelMakerCursor extends ModelMakerBase {
 	
-	public function ModelMakerCursor( $ii:InstanceInfo, $vmm:ModelMetadata ) {
+	public function ModelMakerCursor( $ii:InstanceInfo ) {
 		Log.out( "ModelMakerCursor.constructor ii: " + $ii.toString(), Log.DEBUG );
 		super( $ii );
-		_modelMetadata = $vmm;
 		addToRegionWhenComplete = false;
 		makerCountIncrement();
 		requestModelInfo();

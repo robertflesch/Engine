@@ -37,7 +37,7 @@ package com.voxelengine.worldmodel.scripts
 				if ( Player.player ) {
 					var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( instanceGuid );
 					vm.takeControl( VoxelModel.controlledModel );
-					Log.out( "AutoControlObjectScript.AutoControlObjectScript player controlling this object: " + vm.metadata.name );
+					Log.out( "AutoControlObjectScript.AutoControlObjectScript player controlling this object: " + vm.modelInfo.name );
 				}
 				else {
 					OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, onOxelBuildComplete );

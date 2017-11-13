@@ -101,7 +101,7 @@ public class OxelPersistenceCache
 
 	static private function request( $ode:OxelDataEvent ):void {   
 		if ( null == $ode.modelGuid ) {
-			Log.out( "OxelDataCache.modelDataRequest guid rquested is NULL: ", Log.WARN );
+			Log.out( "OxelDataCache.modelDataRequest guid requested is NULL: ", Log.WARN );
 			return;
 		}
 		

@@ -8,14 +8,12 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 
-import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.models.makers.ModelMaker;
-import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
-import com.voxelengine.worldmodel.models.types.Player;
-import com.voxelengine.worldmodel.oxel.OxelBad;
+import flash.display.Bitmap;
+
+import flash.display.BitmapData;
 
 import flash.display3D.Context3D;
+import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
 
@@ -30,46 +28,107 @@ import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.RegionEvent;
+import com.voxelengine.events.TextureLoadingEvent;
+import com.voxelengine.events.ObjectHierarchyData;
+import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.animation.Animation;
 import com.voxelengine.worldmodel.biomes.Biomes;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
-import com.voxelengine.events.ObjectHierarchyData;
 import com.voxelengine.worldmodel.models.types.Avatar;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.PermissionsModel;
+import com.voxelengine.worldmodel.TextureBank;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
+import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
+import com.voxelengine.worldmodel.oxel.OxelBad;
 
 public class ModelInfo extends PersistenceObject
 {
-	public function get animationInfo():Object						{ return dbo.animations; }
-	
-	// This stores the instantiated objects
-	private var 		_animations:Vector.<Animation> 				= new Vector.<Animation>();	// Animations that this model has
-	public function get animations():Vector.<Animation> 			{ return _animations; }
-	
+    static public const BIGDB_TABLE_MODEL_INFO_INDEX_OWNER:String = "owner";
+    static public const BIGDB_TABLE_MODEL_INFO_INDEX_CREATOR:String = "creator";
+	private const DEFAULT_BOUND:int                       = 10;
+
+    public function get name():String  						{ return dbo.name; }
+    public function set name($val:String):void  			{ dbo.name = $val; changed = true; }
+
+    public function get description():String  				{ return dbo.description; }
+    public function set description($val:String):void  		{ dbo.description = $val; changed = true; }
+
+    public function get animationClass():String 			{ return dbo.animationClass; }
+    public function set animationClass($val:String):void  	{ dbo.animationClass = $val; changed = true; }
+
+    public function get childOf():String 					{ return dbo.childOf; }
+    public function set childOf($val:String):void  			{ dbo.childOf = $val; changed = true; }
+
+    public function modelScalingVec3D():Vector3D 			{ return new Vector3D( dbo.modelScaling.x, dbo.modelScaling.y, dbo.modelScaling.z ); }
+    public function modelScalingInfo():Object 				{ return dbo.modelScaling }
+    public function get modelScaling():Object 				{ return dbo.modelScaling; }
+    public function set modelScaling($val:Object):void  	{ dbo.modelScaling = $val; changed = true; }
+
+    public function modelPositionVec3D():Vector3D 			{ return new Vector3D( dbo.modelPosition.x, dbo.modelPosition.y, dbo.modelPosition.z ); }
+    public function modelPositionInfo():Object 			{ return dbo.modelPosition }
+    public function get modelPosition():Object 				{ return dbo.modelPosition; }
+    public function set modelPosition($val:Object):void  	{ dbo.modelPosition = $val; changed = true; }
+
+    public function get version():int 						{ return dbo.version; }
+    public function set version( $val:int ):void			{ dbo.version = $val; }
+
+    public function get bound():int 						{ return dbo.bound; }
+    public function set bound( $val:int ):void				{
+        if ( dbo.bound != $val ) {
+            //changed = true;
+            dbo.bound = $val;
+        } }
+
+    public function get hashTags():String 					{ return dbo.hashTags; }
+    public function set hashTags($val:String):void			{ dbo.hashTags = $val; changed = true }
+
+    public function get scripts():Array 					{ return dbo.scripts; }
+    public function get modelClass():String					{ return dbo.modelClass; }
+    public function get childOfGuid():String				{ return dbo.childOfGuid; }
+    public function set childOfGuid( $val:String ):void		{ dbo.childOfGuid = $val; changed = true; }
+//	public function set modelClass(val:String):void 		{ dbo.modelClass = val;  changed = true; }
+    public function set modelClass(val:String):void 		{
+        if ( val == null )
+            throw new Error( "ModelInfo.modelClass CAN NOT BE NULL");
+        dbo.modelClass = val;
+        changed = true;
+    }
+
+    public function get owner():String  					{ return dbo.owner; }
+    public function set owner($val:String):void  			{ dbo.owner = $val; changed = true; }
+
+    public function get animationInfo():Object				{ return dbo.animations; }
+    // This stores the instantiated objects
+    private var 		_animations:Vector.<Animation> 		= new Vector.<Animation>();	// Animations that this model has
+    public function get animations():Vector.<Animation> 	{ return _animations; }
+
+    private var _permissions:PermissionsModel;
+    public function get permissions():PermissionsModel 		{ return _permissions; }
+    public function set permissions( $val:PermissionsModel):void	{ _permissions = $val; changed = true; }
+
+    private var _thumbnail:BitmapData;
+    public function get thumbnail():BitmapData 				{ return _thumbnail; }
+    public function set thumbnail($val:BitmapData):void 	{ _thumbnail = $val; changed = true; }
+
+    private var _thumbnailLoaded:Boolean;
+    public function get thumbnailLoaded():Boolean 			{ return _thumbnailLoaded; }
+    public function set thumbnailLoaded($val:Boolean):void  { _thumbnailLoaded = $val; }
+
 	private var 		_oxelPersistence:OxelPersistence;
-	public function get oxelPersistence():OxelPersistence  			{ return _oxelPersistence; }
+	public function get oxelPersistence():OxelPersistence  	{ return _oxelPersistence; }
 	public function set oxelPersistence($oxel:OxelPersistence ):void { _oxelPersistence = $oxel; }
 
-	public function get scripts():Array 							{ return dbo.scripts; }
-	public function get modelClass():String							{ return dbo.modelClass; }
-	public function get childOfGuid():String						{ return dbo.childOfGuid; }
-	public function set childOfGuid( $val:String ):void				{ dbo.childOfGuid = $val; changed = true; }
-//	public function set modelClass(val:String):void 				{ dbo.modelClass = val;  changed = true; }
-	public function set modelClass(val:String):void 				{
-		if ( val == null )
-				throw new Error( "ModelInfo.modelClass CAN NOT BE NULL");
-		dbo.modelClass = val;
-		changed = true;
-	}
 
-	private var			_owner:VoxelModel;
-	public function get owner():VoxelModel 							{ return _owner; }
-	public function set owner(value:VoxelModel):void 				{ _owner = value; }
+    private var			_owningModel:VoxelModel;
+	public function get owningModel():VoxelModel 			{ return _owningModel; }
+	public function set owningModel(value:VoxelModel):void 	{ _owningModel = value; }
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// overrideable in instanceInfo
@@ -93,36 +152,85 @@ public class ModelInfo extends PersistenceObject
 			dbo = $dbo;
 		}
 
-		init( $newData );
+        if ( $newData )
+            mergeOverwrite( $newData );
 	}
 
-	override protected function assignNewDatabaseObject():void {
+    public function init():void {
+
+        if ( dbo.biomes )
+            biomesFromObject( dbo.biomes );
+
+        if ( dbo.thumbnail ) {
+            try {
+                var bmd:BitmapData = new BitmapData(128,128,false);
+                bmd.setPixels(new Rectangle(0, 0, 128, 128), dbo.thumbnail);
+                _thumbnail = bmd;
+                thumbnailLoaded = true;
+                ModelInfoEvent.create( ModelInfoEvent.BITMAP_LOADED, 0, guid, this );
+            }
+            catch (e:Error) {
+                loadNoImage();
+            }
+        }
+        else {
+            loadNoImage();
+        }
+
+        // the permission object is just an encapsulation of the permissions section of the object
+        _permissions = new PermissionsModel();
+        _permissions.fromObject( this as PersistenceObject );
+
+        function biomesFromObject( $biomes:Object ):void {
+            // TODO this should only be true for new terrain models.
+            const createHeightMap:Boolean = true;
+            _biomes = new Biomes( createHeightMap  );
+            if ( !$biomes.layers )
+                throw new Error( "ModelInfo.biomesFromObject - WARNING - unable to find layerInfo: " + guid );
+            _biomes.layersLoad( $biomes.layers );
+            // now remove the biome oxelPersistence from the object so it is not saved to persistance
+            delete dbo.biomes;
+        }
+
+        function loadNoImage():void {
+            TextureLoadingEvent.addListener( TextureLoadingEvent.LOAD_SUCCEED, noImageLoaded );
+            TextureLoadingEvent.create( TextureLoadingEvent.REQUEST, TextureBank.NO_IMAGE_128 );
+        }
+    }
+
+    private function noImageLoaded( $tle:TextureLoadingEvent ):void {
+        if ( TextureBank.NO_IMAGE_128 == $tle.name ) {
+            TextureLoadingEvent.removeListener( TextureLoadingEvent.LOAD_SUCCEED, noImageLoaded );
+            //Log.out("ModelMetadata.init.noImageLoaded: " + TextureBank.NO_IMAGE_128 + "  for guid: " + guid, Log.WARN);
+            _thumbnail = ($tle.data as Bitmap).bitmapData;
+            thumbnailLoaded = true;
+            ModelInfoEvent.create( ModelInfoEvent.BITMAP_LOADED, 0, guid, this );
+            //      Log.out( "ModelMetadata.init.imageLoaded complete isDebug: " + Globals.isDebug + " + Capabilities.isDebugger: " + Capabilities.isDebugger, Log.WARN );
+        }
+    }
+
+
+    public function setGeneratedData( $name:String, $owner:String ): void {
+        dbo.name = $name;
+        dbo.description = $name + " - GENERATED";
+        dbo.owner = $owner;
+    }
+
+    override protected function assignNewDatabaseObject():void {
 		super.assignNewDatabaseObject();
 		dbo.modelClass = DEFAULT_CLASS;
-	}
+        setToDefault();
 
-
-	private function init( $newData:Object = null ):void {
-
-		if ( $newData )
-			mergeOverwrite( $newData );
-
-		if ( dbo.biomes )
-			biomesFromObject( dbo.biomes );
-
-		function biomesFromObject( $biomes:Object ):void {
-			// TODO this should only be true for new terrain models.
-			const createHeightMap:Boolean = true;
-			_biomes = new Biomes( createHeightMap  );
-			if ( !$biomes.layers )
-				throw new Error( "ModelInfo.biomesFromObject - WARNING - unable to find layerInfo: " + guid );
-			_biomes.layersLoad( $biomes.layers );
-			// now remove the biome oxelPersistence from the object so it is not saved to persistance
-			delete dbo.biomes;
-		}
-
-		//OxelDataEvent.addListener( OxelDataEvent.OXEL_FBA_COMPLETE, assignOxelData );
-
+        function setToDefault():void {
+            dbo.hashTags 		= "#new";
+            _thumbnail 			= null;
+            dbo.animationClass 	= "";
+            dbo.description 	= "Default";
+            dbo.name 			= "Default";
+            dbo.owner 			= "";
+            dbo.version 		= Globals.VERSION;
+            dbo.bound 			= DEFAULT_BOUND;
+        }
 	}
 
 	// Only used when importing object from disk
@@ -143,8 +251,8 @@ public class ModelInfo extends PersistenceObject
 			OxelDataEvent.create( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null );
 		}
         changed = true;
-		if ( null != _owner.instanceInfo.controllingModel )
-            _owner.instanceInfo.controllingModel.modelInfo.changed = true;
+		if ( null != _owningModel.instanceInfo.controllingModel )
+            _owningModel.instanceInfo.controllingModel.modelInfo.changed = true;
 	}
 
 	public function update( $context:Context3D, $elapsedTimeMS:int ):void {
@@ -376,7 +484,7 @@ public class ModelInfo extends PersistenceObject
             if ( $buildState == ModelMakerBase.IMPORTING )
                 new ModelMakerImport( ii, false );
             if ( $buildState == ModelMakerBase.CLONING ) {
-                ii.controllingModel = owner;
+                ii.controllingModel = owningModel;
                 new ModelMakerClone( ii );
             } else
 				new ModelMaker( ii, true, false );
@@ -409,7 +517,7 @@ public class ModelInfo extends PersistenceObject
             var ohd:ObjectHierarchyData = new ObjectHierarchyData();
 			// If the child load failed
             if ( null == $vm )
-                ohd.fromNullChildModel( _owner, $childModelGuid );
+                ohd.fromNullChildModel( _owningModel, $childModelGuid );
 			else
                 ohd.fromModel( $vm );
 
@@ -540,7 +648,7 @@ public class ModelInfo extends PersistenceObject
 
 	public function childModelFindByName( $name:String, $recursive:Boolean = true ):VoxelModel	{
 		for each (var child:VoxelModel in childVoxelModels) {
-			if (child.metadata.name ==  $name )
+			if (child.modelInfo.name ==  $name )
 				return child;
 		}
 		// didn't find it at first level, lets look recursively
@@ -630,7 +738,7 @@ public class ModelInfo extends PersistenceObject
 	}
 
 	override protected function toObject():void {
-		owner.buildExportObject();
+		owningModel.buildExportObject();
 
 		// this updates the original positions, to the current positions...
 		// how do I get original location and position, on animated objects?
@@ -640,8 +748,14 @@ public class ModelInfo extends PersistenceObject
 			Log.out( "ModelInfo.toObject - creating object with children still loading.", Log.WARN);
 
 		animationsGetSummary();
-		
 
+        if ( thumbnail )
+        //dbo.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() );
+            dbo.thumbnail 		= thumbnail.getPixels(new Rectangle(0, 0, 128, 128));
+        else
+            dbo.thumbnail = null;
+
+        dbo.permissions = _permissions.toObject();
 	}
 
 	public function childrenGet():Object {
@@ -702,6 +816,7 @@ public class ModelInfo extends PersistenceObject
 	
 	override public function clone( $guid:String ):* {
 		var newModelInfo:ModelInfo = new ModelInfo( $guid, null, dbo );
+        newModelInfo.init();
 		for each ( var ani:Animation in _animations ) {
 			var newAni:Animation = ani.clone( guid );
 			newModelInfo._animations.push(newAni);
@@ -710,9 +825,25 @@ public class ModelInfo extends PersistenceObject
 		delete newModelInfo.dbo.animations;
 		newModelInfo.animationsLoaded = true;
 		newModelInfo.oxelPersistence = oxelPersistence.cloneNew( $guid );
+
+
+/////////////////////////
+//        var oldObj:String = JSON.stringify( dbo );
+//        var newData:Object = JSON.parse( oldObj );
+//
+//        newData.owner = Network.userId;
+//        newData.hashTags = this.hashTags + "#cloned";
+//        newData.name = this.name;
+//        //newData.createdDate = new Date().toUTCString();
+//        var newModelMetadata:ModelMetadata = new ModelMetadata( $guid, null, newData );
+
+////////////////////////
 		return newModelInfo;
 	}
 
-	public function toString():String {  return "ModelInfo - guid: " + guid; }
+    public function toString():String {
+        return "name: " + name + "  description: " + description + "  guid: " + guid;
+    }
+
 }
 }

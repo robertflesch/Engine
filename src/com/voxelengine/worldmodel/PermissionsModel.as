@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel {
 
 import com.voxelengine.Log;
+import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.PersistenceObject;
 
 import playerio.DatabaseObject;
@@ -23,12 +24,12 @@ import playerio.DatabaseObject;
  * Modify - modify
  * Copy - copy count
  * Transfer - Bind
- * Move - if you are owner, you can change.
+ * Move - if you are owningModel, you can change.
  */
 
 public class PermissionsModel extends PermissionsBase
 {
-    static public const COPY_COUNT:int			= 1;
+    static public const COPY_COUNT:int			= -1;
 
     // All the binds need to be tested
     static public const BIND_NONE:String 		= "BIND_NONE";
@@ -37,7 +38,6 @@ public class PermissionsModel extends PermissionsBase
     static public const BIND_MODIFY:String 		= "BIND_MODIFY";
     static public const BIND_CURSE:String 		= "BIND_CURSE";
 
-    static public const MODIFY_ANY:int 		        = 1;
     static public const MODIFY_VOXEL:int            = 2;
     static public const MODIFY_CHILD_REMOVE:int     = 4;
     static public const MODIFY_CHILD_ADD:int 	    = 8;
@@ -47,6 +47,7 @@ public class PermissionsModel extends PermissionsBase
     static public const MODIFY_ANI_REMOVE:int       = 128;
     static public const MODIFY_ANI_MODIFY:int 	    = 256;
     static public const MODIFY_ANI_ADD:int 	        = 512;
+    static public const MODIFY_ANY:int 		        = 1 + 2 + 4 + 8 + 16 + 32 + 64 + 128 + 256 + 512;
     static public const MODIFY_NONE:int 		    = 8192;
 
     static private var _s_lookup:Array              = [];
@@ -83,29 +84,23 @@ public class PermissionsModel extends PermissionsBase
     public function get binding():String 				{ return dbo.permissions.binding; }
     public function set binding(value:String):void  	{ dbo.permissions.binding = value; changed = true; }
 
-    public function PermissionsModel( $owner:PersistenceObject, $guid:String ) {
-        owner = $owner;
-        var newPermissions:Boolean = false;
-        if ( !owner.dbo.permissions )
-            newPermissions = true;
-        super( $owner, $guid );
+    public function PermissionsModel() {
+        super();
+    }
 
-        var p:Object = dbo.permissions;
+    override public function fromObject( $owner:PersistenceObject ):void {
+        var newPermissions:Boolean = true;
+        if ( null == $owner )
+            Log.out( "PermissionModel NULL OWNER", Log.WARN );
+        if ( $owner && $owner.dbo && $owner.dbo.permissions && $owner.dbo.permissions.creator != "" )
+            newPermissions = false;
+        super.fromObject( $owner as PersistenceObject );
+
         if ( newPermissions ) {
-            copyCount 							= COPY_COUNT;
-            modify								= 1;
-            binding								= BIND_NONE;
+            dbo.permissions.copyCount 			= COPY_COUNT;
+            dbo.permissions.modify				= MODIFY_ANY;
+            dbo.permissions.binding				= BIND_NONE;
         }
-        else {
-            copyCount 						    = p.copyCount;
-            if ( p.modify is String )
-                modify							    = 1;
-            else
-                modify							    = p.modify;
-
-            binding							    = p.binding;
-        }
-
     }
 
     override public function toObject():Object {

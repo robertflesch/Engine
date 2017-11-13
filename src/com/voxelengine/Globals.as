@@ -24,14 +24,11 @@ public class Globals  {
 	static public const BIGDB_TABLE_TREE_INFO:String = "treeInfo";
 	static public const BIGDB_TABLE_OXEL_DATA:String = "oxelData";
 	static public const BIGDB_TABLE_AMMO:String = "ammo";
-	static public const BIGDB_TABLE_REGIONS:String = "regions";
 
 	// Yahoo Game Networks Big DB table indexs
 	static public const BIGDB_TABLE_AMMO_INDEX_WEAPON_TYPE:String = "weaponType";
-	static public const BIGDB_TABLE_REGIONS_INDEX_OWNER:String = "owner";
 
 	// Local file names for import
-	static public const REGION_EXT:String = ".rjson";
     static public const LANG_EXT:String = ".xml";
 	static public const APP_EXT:String = ".json";
 	static public const IVM_EXT:String = ".ivm";

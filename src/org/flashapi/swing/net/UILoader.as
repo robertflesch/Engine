@@ -198,7 +198,7 @@ use namespace spas_internal;
 		 * 						additional parameters for loading the external asset.
 		 */
 		public function load(url:String, parameters:LoaderParameters = null):void {
-            Log.out( "UILoader.loadAndAddChild - loading: " + url );
+            //Log.out( "UILoader.loadAndAddChild - loading: " + url );
 
             var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
             var resolvedFilePath:String = fs.getUrl( "/VoxelVerse" + Globals.texturePath + url );

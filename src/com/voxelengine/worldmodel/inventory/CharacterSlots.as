@@ -10,15 +10,6 @@ import com.voxelengine.Log;
 import com.voxelengine.events.CharacterSlotEvent;
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.ModelLoadingEvent;
-import com.voxelengine.worldmodel.inventory.Inventory;
-import com.voxelengine.worldmodel.inventory.ObjectAction;
-import com.voxelengine.worldmodel.inventory.ObjectGrain;
-import com.voxelengine.worldmodel.inventory.ObjectInfo;
-import com.voxelengine.worldmodel.inventory.ObjectModel;
-import com.voxelengine.worldmodel.inventory.ObjectTool;
-import com.voxelengine.worldmodel.inventory.ObjectVoxel;
-import com.voxelengine.worldmodel.models.types.Player;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 public class CharacterSlots {
 
@@ -100,7 +91,7 @@ public class CharacterSlots {
 
     private function modelLoadComplete($mle:ModelLoadingEvent):void {
         if ( $mle.vm ) {
-            if ( loadAttachmentForThisModelName( $mle.vm.metadata.name ) )
+            if ( loadAttachmentForThisModelName( $mle.vm.modelInfo.name ) )
                 if ( 0 == _itemCount ){
                     ModelLoadingEvent.removeListener(ModelLoadingEvent.CHILD_LOADING_COMPLETE, modelChildLoadComplete);
                     ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete);
@@ -110,7 +101,7 @@ public class CharacterSlots {
 
     private function modelChildLoadComplete($mle:ModelLoadingEvent):void {
         if ( $mle.vm ) {
-            if ( loadAttachmentForThisModelName( $mle.vm.metadata.name ) ) {
+            if ( loadAttachmentForThisModelName( $mle.vm.modelInfo.name ) ) {
                 if ( 0 == _itemCount ){
                     ModelLoadingEvent.removeListener(ModelLoadingEvent.CHILD_LOADING_COMPLETE, modelChildLoadComplete);
                     ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete);

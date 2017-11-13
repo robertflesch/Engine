@@ -33,8 +33,7 @@ import flash.geom.Vector3D;
 	 * @author Bob
 	 */
 	public class Region extends PersistenceObject {
-		
-		
+
 		static public var _s_currentRegion:Region;
 		static public function get currentRegion():Region { return _s_currentRegion; }
 
@@ -89,7 +88,7 @@ import flash.geom.Vector3D;
 		}
 
 		public function Region( $guid:String, $dbo:DatabaseObject, $importedData:Object ):void {
-			super( $guid, Globals.BIGDB_TABLE_REGIONS );
+			super( $guid, RegionManager.BIGDB_TABLE_REGIONS );
 			if( $dbo ) {
                 dbo = $dbo;
             } else {
@@ -103,13 +102,15 @@ import flash.geom.Vector3D;
 			// unless they are loaded
 			RegionEvent.addListener( RegionEvent.LOAD, 		load );
 
-			function init():void {
-				// This creates and parses the permissions
-				_permissions = new PermissionsRegion( this, guid );
-			}
 		}
 
-		override protected function assignNewDatabaseObject():void {
+        private function init():void {
+            // This creates and parses the permissions
+            _permissions = new PermissionsRegion();
+            _permissions.fromObject( this );
+        }
+
+        override protected function assignNewDatabaseObject():void {
 			super.assignNewDatabaseObject();
 			dbo.models = [];
 			dbo.skyColor = {"x": 92, "y": 172, "z": 238};
@@ -223,7 +224,7 @@ import flash.geom.Vector3D;
 		private function incrementObjectCount():void { _objectCount++;  }
 		private function decrementObjectCount():void { if ( _objectCount > 0 ) _objectCount--;  }
 		private function parentModelAdded( $me:ModelEvent ):void  {
-			if ( 0 == getObjectCount() )
+			if ( 0 == getObjectCount() && _loaded )
 				changed = true;
 			decrementObjectCount();
 		}
@@ -265,7 +266,7 @@ import flash.geom.Vector3D;
 			// This does not generate valid JSON
 			var outString:String = "  name:" + name;
 			outString += "  desc:" + desc;
-			outString += "  owner:" + owner;
+			outString += "  owningModel:" + owner;
 			outString += "  gravity:" +  gravity;
 			return outString;
 		}
@@ -283,7 +284,7 @@ import flash.geom.Vector3D;
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		override public function save( $validateGuid:Boolean = true ):Boolean {
-			// The null owner check makes it to we dont save local loaded regions to persistence
+			// The null owningModel check makes it to we dont save local loaded regions to persistence
 			if ( null != owner && Globals.isGuid( guid ) ) {
 				if (changed) {
 					Log.out( "RegionManager.save saving region name: " + name, Log.WARN );

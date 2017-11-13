@@ -37,7 +37,7 @@ public class FireProjectileScript extends Script
 	public function onFire( $event:WeaponEvent ):void
 	{
 		// This gun listens for a WeaponEvent.FIRE, that means that a weapon has been fired
-		// make sure its the owner of this weapon that fired it. so that correct position info, etc can be determined
+		// make sure its the owningModel of this weapon that fired it. so that correct position info, etc can be determined
 		if ( instanceGuid != $event.gun.instanceInfo.instanceGuid )
 			return Log.out( "FireProjectileScript.onFire - ignoring event for someone else" + $event + " instanceGuid: " + instanceGuid );
 
@@ -85,7 +85,7 @@ public class FireProjectileScript extends Script
 		Log.out( "FireProjectileScript.createProjectile - ProjectileEvent: " + pe );
 		SoundCache.playSound( pe.ammo.launchSound );
 		/*
-		var ownerGuid:String = pe.owner;
+		var ownerGuid:String = pe.owningModel;
 		var gunModel:VoxelModel = Region.currentRegion.modelCache.instanceGet( ownerGuid );
 		var chain:Vector.<VoxelModel> = new Vector.<VoxelModel>()
 		gunModel.getModelChain( chain )

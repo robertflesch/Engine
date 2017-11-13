@@ -8,19 +8,15 @@
 package com.voxelengine.GUI.crafting {
 
 import com.voxelengine.GUI.VVBox;
-import com.voxelengine.Globals;
 import com.voxelengine.events.CharacterSlotEvent;
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.inventory.InventoryManager;
 
 import org.flashapi.swing.Image;
 import org.flashapi.swing.constants.BorderStyle;
-import org.flashapi.swing.constants.LayoutOrientation;
 
 import com.voxelengine.GUI.VVPopup;
-import com.voxelengine.GUI.panels.PanelBase;
 import com.voxelengine.renderer.Renderer;
 
 import org.flashapi.swing.layout.AbsoluteLayout;
@@ -79,14 +75,14 @@ public class WindowCharacter extends VVPopup {
         function lhSlotResult( $cse:CharacterSlotEvent ):void {
             CharacterSlotEvent.removeListener(CharacterSlotEvent.RESULT, lhSlotResult );
             if ( $cse.guid ) {
-                ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, lhSlotResultMetadata );
-                ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, $cse.guid, null );
+                ModelInfoEvent.addListener( ModelBaseEvent.RESULT, lhSlotResultMetadata );
+                ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, $cse.guid, null );
             }
 
-            function lhSlotResultMetadata( $mde:ModelMetadataEvent ):void {
-                ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, lhSlotResultMetadata );
-                if ( $mde.modelMetadata ) {
-                    lh.backgroundTexture = VVBox.drawScaled( $mde.modelMetadata.thumbnail, BOX_SIZE, BOX_SIZE );
+            function lhSlotResultMetadata( $mde:ModelInfoEvent ):void {
+                ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, lhSlotResultMetadata );
+                if ( $mde.modelInfo ) {
+                    lh.backgroundTexture = VVBox.drawScaled( $mde.modelInfo.thumbnail, BOX_SIZE, BOX_SIZE );
                 }
             }
         }
@@ -94,14 +90,14 @@ public class WindowCharacter extends VVPopup {
         function rhSlotResult( $cse:CharacterSlotEvent ):void {
             CharacterSlotEvent.removeListener(CharacterSlotEvent.RESULT, lhSlotResult );
             if ( $cse.guid ) {
-                ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, lhSlotResultMetadata );
-                ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, $cse.guid, null );
+                ModelInfoEvent.addListener( ModelBaseEvent.RESULT, lhSlotResultMetadata );
+                ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, $cse.guid, null );
             }
 
-            function lhSlotResultMetadata( $mde:ModelMetadataEvent ):void {
-                ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, lhSlotResultMetadata );
-                if ( $mde.modelMetadata ) {
-                    rh.backgroundTexture = VVBox.drawScaled( $mde.modelMetadata.thumbnail, BOX_SIZE, BOX_SIZE );
+            function lhSlotResultMetadata( $mde:ModelInfoEvent ):void {
+                ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, lhSlotResultMetadata );
+                if ( $mde.modelInfo ) {
+                    rh.backgroundTexture = VVBox.drawScaled( $mde.modelInfo.thumbnail, BOX_SIZE, BOX_SIZE );
                 }
             }
         }

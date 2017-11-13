@@ -13,6 +13,7 @@ import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.RegionManager;
+import com.voxelengine.worldmodel.models.Role;
 import com.voxelengine.worldmodel.models.types.Player;
 
 import flash.geom.Vector3D;
@@ -79,9 +80,9 @@ public class WindowRegionDetail extends VVPopup
 			_region.owner = Network.PUBLIC;
 			_region.name = Network.userId + "-" + int( Math.random() * 1000 );
 			_region.desc = "Please enter region description here";
-			markDirty();
+            _region.changed = true;
 
-			collectRegionInfo( new RegionEvent( ModelBaseEvent.ADDED, 0, _region.guid, _region ) );
+            collectRegionInfo( new RegionEvent( ModelBaseEvent.ADDED, 0, _region.guid, _region ) );
 		}
 		
 	}
@@ -105,12 +106,14 @@ public class WindowRegionDetail extends VVPopup
 		addElement( new Spacer( WIDTH, 10 ) );
 		addElement( new ComponentTextInput( "Name", changeNameHandler, _region.name, WIDTH ) );
 		addElement( new ComponentTextArea( "Desc", changeDescHandler, _region.desc ? _region.desc : "No Description", WIDTH ) );
-		
 
-		if ( Player.player.role.modelPublicEdit ) {
+
+        var player:Player = Player.player;
+		var role:Role = player.role;
+        if ( role.modelPublicEdit ) {
             var ownerArray:Array = [{label: Globals.MODE_PUBLIC}, {label: Globals.MODE_PRIVATE}, {label: Network.storeId}];
-			var ownerButIndex:int;
-			if ( Network.PUBLIC == _region.owner )
+            var ownerButIndex:int;
+            if ( Network.PUBLIC == _region.owner )
                 ownerButIndex = 0;
             else if ( Network.PRIVATE == _region.owner )
                 ownerButIndex = 1;
@@ -119,6 +122,9 @@ public class WindowRegionDetail extends VVPopup
 
             addElement(new ComponentRadioButtonGroup("Owner", ownerArray, ownerChange, ownerButIndex, WIDTH));
         }
+		else
+			_region.owner = Network.userId;
+
 		var gravArray:Array = [ { label:"Use Gravity" }, { label:"NO Gravity. " } ];
 		addElement( new ComponentRadioButtonGroup( "Gravity", gravArray, gravChange,  _region.gravity ? 0 : 1, WIDTH ) );
 		
@@ -176,14 +182,11 @@ public class WindowRegionDetail extends VVPopup
 		if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival--;
 		else 											ival++;
 		$e.target.data.text = ival.toString();
-		markDirty();
+        setChanged();
 		return ival;
 	}
 	
-	private function markDirty():void {
-		_region.changed = true;
-	}
-	
+
 	private function save( e:UIMouseEvent ):void {
 		
 		if ( _create ) {
@@ -193,7 +196,7 @@ public class WindowRegionDetail extends VVPopup
 			// remove the event listeners on this temporary object
 //			_region.release();
 			//
-			var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true );
+			var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, RegionManager.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true );
 			RegionManager.instance.add( pe, _region );
 			// This tell the region manager to add it to the region list
 			//PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true ) );
@@ -220,26 +223,9 @@ public class WindowRegionDetail extends VVPopup
 		remove();
 	}
 	
-	private function gravChange(event:ButtonsGroupEvent):void {  
-		_region.gravity = (0 == event.target.index ?  true : false );
-		markDirty();
-	} 
-	
-	private function ownerChange(event:ButtonsGroupEvent):void {  
-		_region.owner = (0 == event.target.index ?  Network.PUBLIC : Network.userId );
-		markDirty();
-	} 
-	
-	private function changeNameHandler(event:TextEvent):void
-	{
-		_region.name = event.target.text;
-		markDirty();
-	}
-	
-	private function changeDescHandler(event:TextEvent):void
-	{
-		_region.desc = event.target.text;
-		markDirty();
-	}
+	private function gravChange(event:ButtonsGroupEvent):void { _region.gravity = (0 == event.target.index ?  true : false ); setChanged(); }
+	private function ownerChange(event:ButtonsGroupEvent):void { _region.owner = (0 == event.target.index ?  Network.PUBLIC : Network.userId ); setChanged(); }
+	private function changeNameHandler(event:TextEvent):void { _region.name = event.target.text; setChanged(); }
+	private function changeDescHandler(event:TextEvent):void { _region.desc = event.target.text; setChanged(); }
 }
 }

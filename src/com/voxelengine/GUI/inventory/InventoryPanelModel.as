@@ -7,14 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
 
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.worldmodel.models.ModelCacheUtils;
-import com.voxelengine.worldmodel.models.Role;
-import com.voxelengine.worldmodel.models.makers.ModelMaker;
-import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
-import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
-import com.voxelengine.worldmodel.models.types.Player;
+
+import com.voxelengine.events.ModelInfoEvent;
 
 import flash.display.DisplayObject;
 import flash.events.Event;
@@ -39,7 +33,7 @@ import com.voxelengine.GUI.LanguageManager;
 import com.voxelengine.GUI.VVBox;
 import com.voxelengine.GUI.actionBars.QuickInventory;
 import com.voxelengine.GUI.crafting.BoxCharacterSlot;
-import com.voxelengine.GUI.voxelModels.PopupMetadataAndModelInfo;
+import com.voxelengine.GUI.voxelModels.PopupModelInfo;
 import com.voxelengine.GUI.WindowModelDeleteChildrenQuery;
 import com.voxelengine.GUI.WindowPictureImport;
 
@@ -47,8 +41,12 @@ import com.voxelengine.events.CharacterSlotEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.ModelMetadataEvent;
-
+import com.voxelengine.worldmodel.models.ModelCacheUtils;
+import com.voxelengine.worldmodel.models.Role;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
+import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
+import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
+import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.InstanceInfo;
@@ -80,9 +78,9 @@ public class InventoryPanelModel extends VVContainer
 	// http://www.flashapi.org/spas-doc/org/flashapi/swing/ScrollPane.html
 	private var _itemContainer:ScrollPane;
 	private var _currentRow:Container;
-	private var _seriesModelMetadataEvent:int;
     private var _source:String;
 	private var _category:String = MODEL_CAT_ALL;
+    private var _seriesModelMetadataEvent:int;
 
 	public function InventoryPanelModel( $parent:VVContainer, $source:String ) {
 		super( $parent );
@@ -92,12 +90,14 @@ public class InventoryPanelModel extends VVContainer
 		FunctionRegistry.functionAdd( createNewObjectIPM, "createNewObjectIPM" );
 		FunctionRegistry.functionAdd( importObjectIPM, "importObjectIPM" );
 		FunctionRegistry.functionAdd( importObjectStainedGlass, "importObjectStainedGlass" );
-		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, addModelMetadataEvent );
-		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, addModelMetadataEvent );
-		ModelMetadataEvent.addListener( ModelBaseEvent.DELETE, removeModelMetadataEvent );
-        ModelMetadataEvent.addListener( ModelMetadataEvent.REASSIGN_PUBLIC, reassignPublicModelMetadataEvent );
+
+		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, addModelInfoEvent );
+        ModelInfoEvent.addListener( ModelBaseEvent.RESULT_RANGE, resultRangeModelInfoEvent );
+//        ModelInfoEvent.addListener( ModelBaseEvent.UPDATE, updateModel );
+        ModelInfoEvent.addListener( ModelBaseEvent.DELETE, removeModelInfoEvent );
+        ModelInfoEvent.addListener( ModelInfoEvent.REASSIGN_PUBLIC, reassignPublicModelInfoEvent );
 		// This was causing model to be added twice when importing.
-		//ModelMetadataEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, addModelMetadataEvent );
+		//ModelInfoEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, addModelInfoEvent );
 
 		upperTabsAdd();
 		addItemContainer();
@@ -193,13 +193,13 @@ public class InventoryPanelModel extends VVContainer
 			addTools();
 		}
 
-		_seriesModelMetadataEvent = ModelBaseEvent.seriesCounter;
+        _seriesModelMetadataEvent = ModelBaseEvent.seriesCounter;
 		if ( _source == WindowInventoryNew.INVENTORY_PUBLIC )
-            ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.PUBLIC, null );
+            ModelInfoEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.PUBLIC, null );
 		else if ( _source == WindowInventoryNew.INVENTORY_OWNED )
-			ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId, null );
+			ModelInfoEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.userId, null );
 		else
-            ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.storeId, null );
+            ModelInfoEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.storeId, null );
 	}
 
     // TODO I see problem here when language is different then what is in TypeInfo RSF - 11.16.14
@@ -211,34 +211,48 @@ public class InventoryPanelModel extends VVContainer
         displaySelectedSource();
     }
 
-    private function reassignPublicModelMetadataEvent($mme:ModelMetadataEvent):void {
+    private function reassignPublicModelInfoEvent($mie:ModelInfoEvent):void {
 		// For this to happen I have to be on the backpack page!
         if ( _source == WindowInventoryNew.INVENTORY_OWNED )
-        	removeModel( $mme.modelGuid );
+        	removeModel( $mie.modelGuid );
     }
 
-    private function removeModelMetadataEvent($mme:ModelMetadataEvent):void {
-		removeModel( $mme.modelGuid );
+    private function removeModelInfoEvent( $mie:ModelInfoEvent ):void {
+		removeModel( $mie.modelGuid );
 	}
 
-	private function addModelMetadataEvent($mme:ModelMetadataEvent):void {
+    private function resultRangeModelInfoEvent( $mie:ModelInfoEvent ):void {
+		if ( $mie.series == _seriesModelMetadataEvent )
+        	addModel( $mie );
+		else
+        Log.out( "IPM.resultRangeModelInfoEvent $mie.series: (" + $mie.series + ") != _seriesModelMetadataEvent (" + _seriesModelMetadataEvent + ")" );
+    }
+
+	private function addModelInfoEvent( $mie:ModelInfoEvent ):void {
 		// I only want the results from the series I asked for, or from models being added outside a series, like a generated or new model
-        //Log.out( "IPM.addModelMetadataEvent series: " + $mme.series +  "  guid: " + $mme.modelGuid );
-		if ( _seriesModelMetadataEvent == $mme.series || 0 == $mme.series ) {
-			if ( "Player" == $mme.modelGuid)
-					return;
-			var om:ObjectModel = new ObjectModel(null, $mme.modelGuid);
-			om.vmm = $mme.modelMetadata;
-			var cat:String = _category.toLowerCase();
-			//Log.out( "IPM.addModelMetadataEvent cat: " + cat + "  hasTags: " + $mme.modelMetadata.hashTags + "  found? " + $mme.modelMetadata.hashTags.indexOf(cat));
-			if ( "all" == cat )
-				addModel(om);
-			else if ( 0 <= $mme.modelMetadata.hashTags.indexOf(cat))
-				addModel(om);
-		}
+        //Log.out( "IPM.addModelInfoEvent series: " + $mme.series +  "  guid: " + $mme.modelGuid );
+		addModel( $mie );
 	}
-	
-	private function addModel( $oi:ObjectInfo, allowDrag:Boolean = true ):BoxInventory {
+    private function addModel( $mie:ModelInfoEvent ):void {
+        var om:ObjectModel = new ObjectModel(null, $mie.modelGuid);
+        om.modelInfo = $mie.modelInfo;
+        var cat:String = _category.toLowerCase();
+        //Log.out( "IPM.addModelInfoEvent cat: " + cat + "  hasTags: " + $mme.modelMetadata.hashTags + "  found? " + $mme.modelMetadata.hashTags.indexOf(cat));
+        if ( "all" == cat )
+            qualifyAndPlaceModel(om);
+        else if ( 0 <= $mie.modelInfo.hashTags.indexOf(cat))
+            qualifyAndPlaceModel(om);
+    }
+
+//    private function updateModel( $mie:ModelInfoEvent ):void {
+//     //   ModelBaseEvent.UPDATE
+//        var box:BoxInventory = findFirstEmpty();
+//        if ( box ) {
+//            box.updateObjectInfo($oi);
+//        }
+//    }
+
+	private function qualifyAndPlaceModel( $oi:ObjectInfo, allowDrag:Boolean = true ):BoxInventory {
 		//// Add the filled bar to the container and create a new container
 		if ( ObjectInfo.OBJECTINFO_MODEL == $oi.objectType ) {
 			var om:ObjectModel = $oi as ObjectModel;
@@ -246,20 +260,20 @@ public class InventoryPanelModel extends VVContainer
 			//if ( !WindowInventoryNew._s_hackShowChildren )
 			if ( WindowInventoryNew.parentModel ) {
 				var bound:int = WindowInventoryNew.parentModel.modelInfo.oxelPersistence.bound;
-				if ( null != om.vmm.childOf && "" != om.vmm.childOf ) {
-					if ( WindowInventoryNew.parentModel.metadata.name != om.vmm.childOf ) {
-						Log.out( "InventoryPanelModel.addModel - child model of wrong parent: " + om.vmm.name, Log.INFO );
+				if ( null != om.modelInfo.childOf && "" != om.modelInfo.childOf ) {
+					if ( WindowInventoryNew.parentModel.modelInfo.name != om.modelInfo.childOf ) {
+						Log.out( "InventoryPanelModel.qualifyAndPlaceModel - child model of wrong parent: " + om.modelInfo.name, Log.INFO );
 						return null;
 					}
 				} else {
-					if ( om.vmm.bound >= bound ) {
-						Log.out("InventoryPanelModel.addModel - NOT child model of: " + om.vmm.name + " AND is larger", Log.WARN);
+					if ( om.modelInfo.bound >= bound ) {
+						Log.out("InventoryPanelModel.qualifyAndPlaceModel - NOT child model of: " + om.modelInfo.name + " AND is larger", Log.WARN);
 						return null;
 					}
 				}
 			} else {
-				if ( null != om.vmm.childOf && "" != om.vmm.childOf ) {
-					//Log.out( "InventoryPanelModel.addModel - NOT adding child model of: " + om.vmm.name, Log.INFO );
+				if ( null != om.modelInfo.childOf && "" != om.modelInfo.childOf ) {
+					//Log.out( "InventoryPanelModel.qualifyAndPlaceModel - NOT adding child model of: " + om.vmm.name, Log.INFO );
 					return null;
 				}
 			}
@@ -271,18 +285,17 @@ public class InventoryPanelModel extends VVContainer
 			if ( allowDrag )
 				eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
 			if ( WindowInventoryNew._s_hackSupportClick	)
-				eventCollector.addEvent( box, UIMouseEvent.CLICK, addModelTo );
+				eventCollector.addEvent( box, UIMouseEvent.CLICK, instantiateModel );
 
 			return box;
 		}
-		Log.out( "InventoryPanelModel.addModel - Failed to addModel: " + $oi, Log.ERROR );
+		Log.out( "InventoryPanelModel.qualifyAndPlaceModel - Failed to qualifyAndPlaceModel: " + $oi, Log.ERROR );
 		return null
 	}
 
     static private var _cameraMatrix:Matrix3D = new Matrix3D();
-    static private var _viewVectors:Vector.<Vector3D> = new Vector.<Vector3D>(6);
 
-	static private function addModelTo( e:UIMouseEvent ):void {
+	static private function instantiateModel( e:UIMouseEvent ):void {
 		if ( e.target.objectInfo is ObjectAction ) {
 			var oa:ObjectAction = e.target.objectInfo as ObjectAction;
 			var cb:Function = oa.callBack;
@@ -291,7 +304,7 @@ public class InventoryPanelModel extends VVContainer
 			cb;
 		}
 		else if ( e.target.objectInfo is ObjectModel ) {
-            if ( PopupMetadataAndModelInfo.inExistance ) // They clicked on the edit button
+            if ( PopupModelInfo.inExistance ) // They clicked on the edit button
 				return;
 
 			var om:ObjectModel = (e.target.objectInfo as ObjectModel);
@@ -301,11 +314,11 @@ public class InventoryPanelModel extends VVContainer
 			ii.instanceGuid = Globals.getUID();
 			if ( WindowInventoryNew.parentModel ) {
                 ii.controllingModel = WindowInventoryNew.parentModel;
-                new ModelMakerClone( ii, om.vmm );
+                new ModelMakerClone( ii, om.modelInfo );
             }
 			else {
 				// Only do this for top level models.
-				var size:int = Math.max( GrainCursor.get_the_g0_edge_for_grain(om.vmm.bound), 32 );
+				var size:int = Math.max( GrainCursor.get_the_g0_edge_for_grain(om.modelInfo.bound), 32 );
 				// this give me edge,  really want center.
                 var cmRotation:Vector3D;
 				////////////////////////
@@ -358,17 +371,40 @@ public class InventoryPanelModel extends VVContainer
 		addEmptyRow( countMax );
 		return findFirstEmpty();
 	}
-	
-	private function addTools():void {
+
+    private function findBoxWithModelGuid( $guid:String ):BoxInventory {
+
+        var rows:int = _itemContainer.numElements;
+        var countMax:int = MODEL_CONTAINER_WIDTH / MODEL_IMAGE_WIDTH;
+        var row:Container;
+		for ( var i:int; i < rows; i++ ){
+             row = _itemContainer[i];
+            for ( var i:int=0; i < countMax; i++ ) {
+                var bie:* = row.getElementAt( i );
+                var bi:* = bie.getElement();
+                var box:BoxInventory = bi as BoxInventory;
+                if ( box.objectInfo && ObjectInfo.OBJECTINFO_MODEL == box.objectInfo.objectType ){
+                    var om:ObjectModel = box.objectInfo as ObjectModel;
+                    if ( om.modelInfo ) {
+						if ( om.modelInfo.guid == $guid )
+								return box;
+                    }
+            	}
+			}
+		}
+		return null;
+    }
+
+    private function addTools():void {
 		var box:BoxInventory = null;
-		box = addModel( new ObjectAction( box, "createNewObjectIPM", "NewModel128.png", "Click to create new model" ), false );
+		box = qualifyAndPlaceModel( new ObjectAction( box, "createNewObjectIPM", "NewModel128.png", "Click to create new model" ), false );
 		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		
-		box = addModel( new ObjectAction( box, "importObjectStainedGlass", "importPicture128.png", "Click to import picture" ), false );
+		box = qualifyAndPlaceModel( new ObjectAction( box, "importObjectStainedGlass", "importPicture128.png", "Click to import picture" ), false );
 		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 
 		if ( Globals.isDebug ) {
-			box = addModel( new ObjectAction( box, "importObjectIPM", "import128.png", "Click to import local model" ), false );
+			box = qualifyAndPlaceModel( new ObjectAction( box, "importObjectIPM", "import128.png", "Click to import local model" ), false );
 			eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		}
 	}
@@ -449,15 +485,15 @@ public class InventoryPanelModel extends VVContainer
 			if ( e.dropTarget is BoxTrashCan ) {
 				//var btc:BoxTrashCan = e.dropTarget as BoxTrashCan;
 				var droppedItem:ObjectModel = e.dragOperation.initiator.data;
-                ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, checkModelMetadataPermissions );
-                ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, droppedItem.modelGuid );
+                ModelInfoEvent.addListener( ModelBaseEvent.RESULT, checkModelInfoPermissions );
+                ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, droppedItem.modelGuid );
 			}
 
 			if ( e.dropTarget is BoxCharacterSlot ) {
 				var bcs:BoxCharacterSlot = e.dropTarget as BoxCharacterSlot;
 				var om:ObjectModel = e.dragOperation.initiator.data;
-				if ( om.vmm && om.vmm.thumbnailLoaded && om.vmm.thumbnail)
-					bcs.backgroundTexture = VVBox.drawScaled(om.vmm.thumbnail, bcs.width, bcs.height);
+				if ( om.modelInfo && om.modelInfo.thumbnailLoaded && om.modelInfo.thumbnail)
+					bcs.backgroundTexture = VVBox.drawScaled(om.modelInfo.thumbnail, bcs.width, bcs.height);
 
 				CharacterSlotEvent.create( CharacterSlotEvent.CHANGE, Network.userId, bcs.data, om.modelGuid );
 				Log.out( "InventoryPanelModel.dropMaterial - slot: " + bcs.data + "  guid: " + om.modelGuid, Log.WARN );
@@ -477,16 +513,16 @@ public class InventoryPanelModel extends VVContainer
 			}
 		}
 
-        function checkModelMetadataPermissions( $mmd:ModelMetadataEvent ):void {
-			if ( $mmd.modelGuid == droppedItem.modelGuid ) {
-                ModelMetadataEvent.removeListener(ModelBaseEvent.RESULT, checkModelMetadataPermissions);
+        function checkModelInfoPermissions( $mi:ModelInfoEvent ):void {
+			if ( $mi.modelGuid == droppedItem.modelGuid ) {
+                ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, checkModelInfoPermissions);
                 var role:Role = Player.player.role;
-                if ($mmd.modelMetadata.owner == Network.PUBLIC && role.modelPublicDelete)
+                if ($mi.modelInfo.owner == Network.PUBLIC && role.modelPublicDelete)
                     new WindowModelDeleteChildrenQuery(droppedItem.modelGuid, removeModel);
-                else if ($mmd.modelMetadata.owner == Network.userId && role.modelPrivateDelete)
+                else if ($mi.modelInfo.owner == Network.userId && role.modelPrivateDelete)
                     new WindowModelDeleteChildrenQuery(droppedItem.modelGuid, removeModel);
                 else {
-                    (new Alert("You (" + Network.userId + " as a " + role.name + " do not have required permissions to delete this object owned by " + $mmd.modelMetadata.owner).display(600));
+                    (new Alert("You (" + Network.userId + " as a " + role.name + " do not have required permissions to delete this object owned by " + $mi.modelInfo.owner).display(600));
                 }
             }
 
@@ -506,10 +542,10 @@ public class InventoryPanelModel extends VVContainer
 	}			
 	
 	override protected function onRemoved( event:UIOEvent ):void {
-		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, addModelMetadataEvent );
-		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, addModelMetadataEvent );
-		ModelMetadataEvent.removeListener( ModelBaseEvent.DELETE, removeModelMetadataEvent );
-		//ModelMetadataEvent.removeListener( ModelBaseEvent.IMPORT_COMPLETE, addModelMetadataEvent );
+		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, addModelInfoEvent );
+		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, addModelInfoEvent );
+		ModelInfoEvent.removeListener( ModelBaseEvent.DELETE, removeModelInfoEvent );
+		//ModelInfoEvent.removeListener( ModelBaseEvent.IMPORT_COMPLETE, addModelInfoEvent );
 	}
 }
 }

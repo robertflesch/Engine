@@ -100,8 +100,8 @@ public class ControllableVoxelModel extends VoxelModel
 		super( ii );
 	}
 	
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
-		super.init( $mi, $vmm, $buildState );
+	override public function init( $mi:ModelInfo, $buildState:String = ModelMakerBase.MAKING ):void {
+		super.init( $mi, $buildState );
 		Globals.g_app.addEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent, false, 0, true );
 		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 		CursorSizeEvent.addListener( CursorSizeEvent.SET, adjustSpeedMultiplier );

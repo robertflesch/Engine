@@ -31,6 +31,7 @@ public class ModelBaseEvent extends Event
 	//// tells us the manager has add this from persistance
 	static public const ADDED:String						= "ADDED";
 	static public const RESULT:String						= "RESULT";
+    static public const RESULT_RANGE:String					= "RESULT_RANGE";
 	static public const REQUEST_FAILED:String				= "REQUEST_FAILED";
 	static public const IMPORT_COMPLETE:String				= "IMPORT_COMPLETE";
 	static public const CLONE:String						= "CLONE";

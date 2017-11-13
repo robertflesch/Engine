@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.persistance 
 {
+import com.voxelengine.worldmodel.RegionManager;
 import com.voxelengine.worldmodel.animation.AnimationSound;
 import com.voxelengine.worldmodel.crafting.CraftingManager;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
@@ -44,7 +45,7 @@ public class PersistURL
 
 	static private function isSupportedTable( $pe:PersistenceEvent ):Boolean {
 
-		if ( Globals.REGION_EXT == $pe.table )
+		if ( RegionManager.REGION_EXT == $pe.table )
 			_filePath = Globals.regionPath + $pe.guid + $pe.table;
 		else if ( Globals.IVM_EXT == $pe.table )
 			_filePath = Globals.modelPath + $pe.guid + $pe.table;

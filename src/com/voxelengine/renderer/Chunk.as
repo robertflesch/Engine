@@ -379,7 +379,7 @@ public class Chunk {
 		if ( $ode.modelGuid == _guid ) {
 			quadTasksDec();
 			if (0 == quadTasks) {
-				Log.out("Chunk.quadsBuildTaskComplete - ALL TASKS COMPLETE - guid: " + _guid, Log.WARN);
+				//Log.out("Chunk.quadsBuildTaskComplete - ALL TASKS COMPLETE - guid: " + _guid, Log.WARN);
 				OxelDataEvent.removeListener(OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildTaskComplete);
 				OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, _op);
 				OxelDataEvent.create(OxelDataEvent.OXEL_BUILD_COMPLETE, 0, _guid, _op);

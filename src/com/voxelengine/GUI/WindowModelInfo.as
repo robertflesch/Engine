@@ -8,6 +8,7 @@
 
 package com.voxelengine.GUI 
 {
+
 import org.flashapi.swing.Button;
 import org.flashapi.swing.HorizontalSeparator;
 import org.flashapi.swing.constants.LayoutOrientation;
@@ -17,105 +18,83 @@ import org.flashapi.swing.databinding.DataProvider;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.GUI.components.VVLabelInput;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.PermissionsModel;
 import com.voxelengine.worldmodel.animation.AnimationCache;
-import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.ModelInfo;
 
 import org.flashapi.swing.event.ButtonsGroupEvent;
 import org.flashapi.swing.event.UIMouseEvent;
 
-public class WindowModelMetadata extends VVPopup
+public class WindowModelInfo extends VVPopup
 {
 	private var _name:VVLabelInput;
 	private var _desc:VVLabelInput;
 	private var _hashTags:VVLabelInput;
 
 	private var _copies:VVLabelInput;
-	private var _vmm:ModelMetadata;
+	private var _mi:ModelInfo;
 	private var _type:int;
 	
 	public static const TYPE_IMPORT:int = 0;
 	public static const TYPE_EDIT:int = 1;
 	
-	public function WindowModelMetadata( $ii:InstanceInfo, windowType:int )
+	public function WindowModelInfo($ii:InstanceInfo, $mi:ModelInfo, windowType:int )
 	{
+		// This one will require some farther thought
 		_type = windowType;
-		super("Model Metadata Detail");
+		super("Model Detail");
+		_mi = $mi;
 		autoSize = true;
 		layout.orientation = LayoutOrientation.VERTICAL;
-		
-		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, dataReceived );
-		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, dataReceived );
-		
+
 		// Only prompt for imports of parent models
 		if ( TYPE_IMPORT == windowType ) {
-			//_vmm = new ModelMetadata( $ii.modelGuid );
-			_vmm = new ModelMetadata( $ii.modelGuid );
-			_vmm.name = $ii.modelGuid;
-			_vmm.description = $ii.modelGuid + "-IMPORTED";
-			_vmm.owner = Network.userId;
-			// fake an event to populate the window
-			dataReceived( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, Globals.getUID(), _vmm ) );
-			
-			if ( $ii.controllingModel ) {
-				ModelInfoEvent.addListener( ModelBaseEvent.RESULT, modelInfoResult );
-				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, $ii.controllingModel.modelInfo.guid, null ) );
-			}
+			_mi.description = $ii.modelGuid + "-IMPORTED";
+			_mi.owner = Network.userId;
+
+//			if ( $ii.controllingModel ) {
+//				ModelInfoEvent.addListener( ModelBaseEvent.RESULT, modelInfoResult );
+//				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, $ii.controllingModel.modelInfo.guid, null ) );
+//			}
 		}
-		else {
-			ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, $ii.modelGuid, null );
-		}
-	}
-	
-	private function modelInfoResult(e:ModelInfoEvent):void {
-		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoResult );
-		var modelClass:String = e.vmi.modelClass;
-		_vmm.animationClass = AnimationCache.requestAnimationClass( modelClass );
-	}
-	
-	private function dataReceived( $mme:ModelMetadataEvent ):void {
-		
-		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, dataReceived );
-		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, dataReceived );
-		
-		_vmm = $mme.modelMetadata;
-		
+		if ( _mi.modelClass )
+        	_mi.animationClass = AnimationCache.requestAnimationClass( _mi.modelClass );
+
 		if ( TYPE_IMPORT == _type ) {
-			var creatorI:VVLabelInput = new VVLabelInput( "Creator: ", _vmm.permissions.creator );
+			var creatorI:VVLabelInput = new VVLabelInput( "Creator: ", _mi.permissions.creator );
 			creatorI.editable = false;
 			creatorI.selectable = false;
 			creatorI.enabled = false;
 			addElement( creatorI );
 			
-			_name = new VVLabelInput( "Name: ", _vmm.name );
+			_name = new VVLabelInput( "Name: ", _mi.name );
 			addElement( _name );
 
-			_desc = new VVLabelInput( "Description: ", _vmm.description );
+			_desc = new VVLabelInput( "Description: ", _mi.description );
 			addElement( _desc );
 
 			_hashTags = new VVLabelInput( "HashTags: ", "#imported" );
 			addElement( _hashTags );
 
 		} else {
-			var creator:VVLabelInput = new VVLabelInput( "Creator: ", _vmm.permissions.creator );
+			var creator:VVLabelInput = new VVLabelInput( "Creator: ", _mi.permissions.creator );
 			creator.editable = false;
 			creator.selectable = false;
 			creator.enabled = false;
 			addElement( creator );
 			
-			_name = new VVLabelInput( "Name: ", _vmm.name );
+			_name = new VVLabelInput( "Name: ", _mi.name );
 			addElement( _name );
 
-			_desc = new VVLabelInput( "Description: ", _vmm.description );
+			_desc = new VVLabelInput( "Description: ", _mi.description );
 			addElement( _desc );
 
-			_hashTags = new VVLabelInput( "HashTags: ", _vmm.hashTags );
+			_hashTags = new VVLabelInput( "HashTags: ", _mi.hashTags );
 			addElement( _hashTags );
 
 			addElement( new HorizontalSeparator( width ) );
@@ -124,7 +103,7 @@ public class WindowModelMetadata extends VVPopup
 			
 			var rbOwnerGroup:RadioButtonGroup = new RadioButtonGroup( this );
 			eventCollector.addEvent( rbOwnerGroup, ButtonsGroupEvent.GROUP_CHANGED
-								   , function (event:ButtonsGroupEvent):void {  _vmm.owner = (0 == event.target.index ?  Network.userId :  Network.PUBLIC ) } );
+								   , function (event:ButtonsGroupEvent):void {  _mi.owner = (0 == event.target.index ?  Network.userId :  Network.PUBLIC ) } );
 			var radioButtonsOwner:DataProvider = new DataProvider();
 			radioButtonsOwner.addAll( { label:"Owned by " + Network.userId }
 									, { label:"Public Object" } );
@@ -133,10 +112,10 @@ public class WindowModelMetadata extends VVPopup
 			
 			addElement( new HorizontalSeparator( width ) );		
 			
-Log.out( "WindowModelMetadata - need drop down list of Bind types", Log.WARN );			
+Log.out( "WindowModelInfo - need drop down list of Bind types", Log.WARN );			
 			var rbTransferGroup:RadioButtonGroup = new RadioButtonGroup( this );
 			eventCollector.addEvent( rbTransferGroup, ButtonsGroupEvent.GROUP_CHANGED
-								   , function (event:ButtonsGroupEvent):void {  _vmm.permissions.binding = (0 == event.target.index ?  PermissionsModel.BIND_MODIFY :  PermissionsModel.BIND_NONE ) } );
+								   , function (event:ButtonsGroupEvent):void {  _mi.permissions.binding = (0 == event.target.index ?  PermissionsModel.BIND_MODIFY :  PermissionsModel.BIND_NONE ) } );
 			var rbTransferDP:DataProvider = new DataProvider();
 			rbTransferDP.addAll( { label:"Allow this object to be transferred" }
 							   , { label:"Bind this object to user" } );
@@ -145,10 +124,10 @@ Log.out( "WindowModelMetadata - need drop down list of Bind types", Log.WARN );
 			
 			addElement( new HorizontalSeparator( width ) );		
 			
-Log.out( "WindowModelMetadata.dataReceived - NOT SHOWING MODIFY OPTIONS", Log.WARN);
+Log.out( "WindowModelInfo.dataReceived - NOT SHOWING MODIFY OPTIONS", Log.WARN);
 //			var rbModifyGroup:RadioButtonGroup = new RadioButtonGroup( this );
 //			eventCollector.addEvent( rbModifyGroup, ButtonsGroupEvent.GROUP_CHANGED
-//								   , function (event:ButtonsGroupEvent):void {  _vmm.permissions.modify = (0 == event.target.index ?  true :  false ) } );
+//								   , function (event:ButtonsGroupEvent):void {  _mi.permissions.modify = (0 == event.target.index ?  true :  false ) } );
 //			var rbModifyDP:DataProvider = new DataProvider();
 //			rbModifyDP.addAll( { label:"Allow this object to be modified" }
 //							   , { label:"This objects shape is set" } );
@@ -159,7 +138,7 @@ Log.out( "WindowModelMetadata.dataReceived - NOT SHOWING MODIFY OPTIONS", Log.WA
 			
 			var rbCopyGroup:RadioButtonGroup = new RadioButtonGroup( this );
 			eventCollector.addEvent( rbCopyGroup, ButtonsGroupEvent.GROUP_CHANGED
-								   , function (event:ButtonsGroupEvent):void {  _vmm.permissions.copyCount = (0 == event.target.index ?  -1 :  1 ) } );
+								   , function (event:ButtonsGroupEvent):void {  _mi.permissions.copyCount = (0 == event.target.index ?  -1 :  1 ) } );
 			var rbCopyDP:DataProvider = new DataProvider();
 			rbCopyDP.addAll( { label:"Allow this object to be copied freely" }
 						   , { label:"Allow how many copies - below (1) min" } );
@@ -189,13 +168,14 @@ Log.out( "WindowModelMetadata.dataReceived - NOT SHOWING MODIFY OPTIONS", Log.WA
 	}
 	
 	private function save( e:UIMouseEvent ):void { 
-		_vmm.name = _name.label;
-		_vmm.description = _desc.label;
+		_mi.name 		= _name.label;
+		_mi.description = _desc.label;
+        _mi.hashTags 	= _hashTags.label;
 		if ( _type == TYPE_EDIT ) {
 			// this field only exists when I am editting
-			_vmm.permissions.copyCount = parseInt( _copies.label, 10 );
+			_mi.permissions.copyCount = parseInt( _copies.label, 10 );
 		} else { // TYPE_IMPORT so new data
-			ModelMetadataEvent.create( ModelMetadataEvent.DATA_COLLECTED, 0, _vmm.guid, _vmm );
+            ModelInfoEvent.create( ModelInfoEvent.DATA_COLLECTED, 0, _mi.guid, _mi );
 		}
 		remove();
 	}

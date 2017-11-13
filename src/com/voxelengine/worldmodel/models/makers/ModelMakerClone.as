@@ -7,7 +7,6 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
-import com.voxelengine.worldmodel.PermissionsModel;
 
 import flash.display.BitmapData;
 import flash.geom.Matrix;
@@ -21,7 +20,6 @@ import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.PersistenceEvent;
-import com.voxelengine.events.ModelMetadataEvent
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.animation.AnimationCache;
@@ -29,23 +27,20 @@ import com.voxelengine.worldmodel.models.types.VoxelModel
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelInfo;
-import com.voxelengine.worldmodel.models.ModelMetadata;
 
 public class ModelMakerClone extends ModelMakerBase {
 
     private var _waitForChildren:Boolean;
     private var _newModelGuid:String;
     private var _oldModelInfo:ModelInfo;
-    private var _oldModelMetadata:ModelMetadata;
 
-    public function ModelMakerClone( $instanceInfo:InstanceInfo, $mmd:ModelMetadata = null, $mi:ModelInfo = null ) {
+    public function ModelMakerClone( $instanceInfo:InstanceInfo, $mi:ModelInfo = null ) {
         super($instanceInfo.clone(), CLONING );
 
         Log.out("ModelMakerClone - clone model with modelGuid: " + $instanceInfo.modelGuid + "  instanceGuid: " + $instanceInfo.instanceGuid );
 
         _newModelGuid = Globals.getUID();
         _oldModelInfo = $mi;
-        _oldModelMetadata = $mmd;
 
         if ( _oldModelInfo )
             processModelInfo();
@@ -57,7 +52,7 @@ public class ModelMakerClone extends ModelMakerBase {
     override protected function retrievedModelInfo($mie:ModelInfoEvent):void  {
         if ( ii.modelGuid == $mie.modelGuid ) {
             removeMIEListeners();
-            _oldModelInfo = $mie.vmi;
+            _oldModelInfo = $mie.modelInfo;
             processModelInfo();
         }
     }
@@ -67,12 +62,11 @@ public class ModelMakerClone extends ModelMakerBase {
         if ( _oldModelInfo.oxelPersistence && ( 0 < _oldModelInfo.oxelPersistence.oxelCount ) ) {
             _modelInfo = _oldModelInfo.clone(_newModelGuid);
             Log.out( "ModelMakerClone.processModelInfo CLONED Model has a build Oxel _oldModelInfo.guid: " + _oldModelInfo.guid );
-            if (_oldModelMetadata) {
-                processModelMetadata();
-            } else {
-                addMetadataListeners();
-                ModelMetadataEvent.create(ModelBaseEvent.REQUEST, 0, ii.modelGuid, null);
+            if ( !parentModelGuid ) {
+                var modelClass:String = _oldModelInfo.modelClass;
+                modelInfo.animationClass = AnimationCache.requestAnimationClass(modelClass);
             }
+            completeMake();
         } else {  // wait on OLD modelInfo's oxel to finish!
             Log.out( "ModelMakerClone.processModelInfo CLONED Models OXEL NOT READY wait for _oldModelInfo.guid: " + _oldModelInfo.guid );
             OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_COMPLETE, onBaseModelOxelBuildComplete );
@@ -89,34 +83,16 @@ public class ModelMakerClone extends ModelMakerBase {
          }
      }
 
-    override protected function retrievedMetadata( $mme:ModelMetadataEvent):void {
-        if ( ii.modelGuid == $mme.modelGuid ) {
-            removeMetadataListeners();
-            _oldModelMetadata = $mme.modelMetadata;
-            processModelMetadata()
-        }
-    }
-
-    private function processModelMetadata():void {
-        _modelMetadata = _oldModelMetadata.clone( _newModelGuid );
-        // Now that all the information has been processed, we can assign the new model guid
-        ii.modelGuid = _newModelGuid;
-        if ( !parentModelGuid ) {
-            var modelClass:String = _oldModelInfo.modelClass;
-            _modelMetadata.animationClass = AnimationCache.requestAnimationClass(modelClass);
-        }
-        completeMake();
-    }
 
     private function completeMake():void {
         //Log.out("ModelMakerClone.completeMake: " + ii.toString());
-        if ( null != modelInfo && null != _modelMetadata ) {
+        if ( null != modelInfo ) {
 
             _vm = make();
             if ( _vm ) {
                 _vm.stateLock( true, 10000 ); // Lock state so that it has time to load animations
                 addODEListeners();
-                PersistenceEvent.create( PersistenceEvent.CLONE_SUCCEED, 0, Globals.IVM_EXT, modelInfo.guid, null, modelInfo.oxelPersistence.ba, null, String( _modelMetadata.bound  ) );
+                PersistenceEvent.create( PersistenceEvent.CLONE_SUCCEED, 0, Globals.IVM_EXT, modelInfo.guid, null, modelInfo.oxelPersistence.ba, null, String( modelInfo.bound  ) );
                 if ( false == modelInfo.childrenLoaded ) { // its true if they are loaded or the model has no children.
                     _waitForChildren = true;
                     ModelLoadingEvent.addListener(ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady);
@@ -126,11 +102,11 @@ public class ModelMakerClone extends ModelMakerBase {
             }
         }
         else
-            Log.out( "ModelMakerClone.completeMake - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
+            Log.out( "ModelMakerClone.completeMake - modelInfo: " + modelInfo, Log.WARN );
 
         function childrenAllReady( $ode:ModelLoadingEvent):void {
             if ( modelInfo.guid == $ode.data.modelGuid  ) {
-                Log.out( "ModelMakerClone.allChildrenReady - modelMetadata.description: " + _modelMetadata.description, Log.WARN );
+                Log.out( "ModelMakerClone.allChildrenReady - modelMetadata.description: " + modelInfo.description, Log.WARN );
                 ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
                 markComplete( true );
             }
@@ -163,9 +139,8 @@ public class ModelMakerClone extends ModelMakerBase {
     override protected function markComplete( $success:Boolean ):void {
         if ( true == $success ) {
             modelInfo.brandChildren();
-            Log.out("ModelMakerClone.completeMake - waiting on quad build: " + _modelMetadata.description );
+            Log.out("ModelMakerClone.completeMake - waiting on quad build: " + modelInfo.description );
 
-            ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
             ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
 
 
@@ -173,10 +148,9 @@ public class ModelMakerClone extends ModelMakerBase {
 
             modelInfo.changed = true;
             modelInfo.oxelPersistence.changed = true;
-            _modelMetadata.changed = true;
             _vm.save();
 
-            Log.out("ModelMakerClone.quadsComplete - needed info found: " + _modelMetadata.description );
+            Log.out("ModelMakerClone.quadsComplete - needed info found: " + modelInfo.description );
             ModelEvent.create( ModelEvent.CLONE_COMPLETE, modelInfo.guid, null, null, "", _vm );
 
             // Only do this for top level models, need ControlledModel to get offset.
@@ -193,10 +167,9 @@ public class ModelMakerClone extends ModelMakerBase {
             }
 
             var bmpd:BitmapData = Renderer.renderer.modelShot( _vm );
-            _vm.metadata.thumbnail = drawScaled(bmpd, 128, 128);
+            _vm.modelInfo.thumbnail = drawScaled(bmpd, 128, 128);
 
             _oldModelInfo = null;
-            _oldModelMetadata = null;
             super.markComplete(true);
         } else {
             if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" )
@@ -208,7 +181,6 @@ public class ModelMakerClone extends ModelMakerBase {
 
             ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
             OxelDataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
-            ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
             super.markComplete( $success );
         }
 

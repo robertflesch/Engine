@@ -14,7 +14,6 @@ import com.voxelengine.worldmodel.models.InstanceInfo
 import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
-import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
 import com.voxelengine.worldmodel.TypeInfo;
 
 public class Axes extends VoxelModel
@@ -80,23 +79,25 @@ public class Axes extends VoxelModel
 	
 	static public function show():void {
 		if ( _model ) {
-			var bound:int = VoxelModel.selectedModel.metadata.bound;
+			var bound:int = VoxelModel.selectedModel.modelInfo.bound;
 			var size:int = Math.max( bound - 3, 1 );
 			var newScaleVal:uint = GrainCursor.two_to_the_g(bound)/size;
 			//trace( " Axes.show size: " + size + "  newScaleVal: " + newScaleVal );
 			_model.instanceInfo.setScaleInfo( { x: size, y : size, z: size } );
 
 			var vmx:VoxelModel = _model.childFindModelGuid(AXES_MODEL_GUID_X);
-			vmx.instanceInfo.setScaleInfo( { x: newScaleVal, y : 1, z: 1 } );
+			if ( vmx ) {
+                vmx.instanceInfo.setScaleInfo({x: newScaleVal, y: 1, z: 1});
 
-			var vmy:VoxelModel = _model.childFindModelGuid(AXES_MODEL_GUID_Y);
-			vmy.instanceInfo.setScaleInfo( { x: 1, y : newScaleVal, z: 1 } );
+                var vmy:VoxelModel = _model.childFindModelGuid(AXES_MODEL_GUID_Y);
+                vmy.instanceInfo.setScaleInfo({x: 1, y: newScaleVal, z: 1});
 
-			var vmz:VoxelModel = _model.childFindModelGuid(AXES_MODEL_GUID_Z);
-			vmz.instanceInfo.setScaleInfo( { x: 1, y : 1, z: newScaleVal } );
+                var vmz:VoxelModel = _model.childFindModelGuid(AXES_MODEL_GUID_Z);
+                vmz.instanceInfo.setScaleInfo({x: 1, y: 1, z: newScaleVal});
 
-			_model.instanceInfo.visible = true;
-			VoxelModel.selectedModel.modelInfo.childAdd( _model );
+                _model.instanceInfo.visible = true;
+                VoxelModel.selectedModel.modelInfo.childAdd(_model);
+            }
 		}
 	}
 }

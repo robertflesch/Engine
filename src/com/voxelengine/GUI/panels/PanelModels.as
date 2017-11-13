@@ -9,10 +9,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.GUI.panels
 {
 
-import com.voxelengine.GUI.panels.ContainerModelDetails;
-import com.voxelengine.GUI.panels.ContainerModelDetails;
-import com.voxelengine.GUI.panels.ContainerModelDetails;
-import com.voxelengine.GUI.panels.ContainerModelDetails;
 import com.voxelengine.events.InstanceInfoEvent;
 import com.voxelengine.worldmodel.models.types.Avatar;
 
@@ -28,7 +24,6 @@ import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.UIRegionModelEvent;
 import com.voxelengine.GUI.*;
 import com.voxelengine.GUI.inventory.WindowInventoryNew;
@@ -37,8 +32,6 @@ import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
-
-import org.flashapi.swing.text.UITextField;
 
 // all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
 public class PanelModels extends PanelBase
@@ -82,7 +75,7 @@ public class PanelModels extends PanelBase
 
 		//ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
 		ModelInfoEvent.addListener( ModelBaseEvent.DELETE, modelDeletedGlobally );
-        ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
+        ModelInfoEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
         InstanceInfoEvent.addListener( ModelBaseEvent.CHANGED, instanceInfoChanged );
 
 		// ALL DRAG AND DROP methods, which are not working
@@ -98,7 +91,7 @@ public class PanelModels extends PanelBase
 		//_listModels.eventCollector.addEvent( _listModels, ListEvent.DATA_PROVIDER_CHANGED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - DATA_PROVIDER_CHANGED $le: " + $le ) } )		
 	}
 
-    private function metadataChanged( $mme:ModelMetadataEvent ):void {
+    private function metadataChanged( $mme:ModelInfoEvent ):void {
         for ( var i:int = 0; i < _listModels.length; i++ ) {
             var li:ListItem = _listModels.getItemAt( i );
             var item:Object = li.data; // This is an object with instanceGuid and modelGuid
@@ -149,7 +142,7 @@ public class PanelModels extends PanelBase
 		//ModelMetadataEvent.removeListener( ModelBaseEvent.IMPORT_COMPLETE, metadataImported );
 
         ModelInfoEvent.removeListener( ModelBaseEvent.DELETE, modelDeletedGlobally );
-        ModelMetadataEvent.removeListener( ModelBaseEvent.CHANGED, metadataChanged );
+        ModelInfoEvent.removeListener( ModelBaseEvent.CHANGED, metadataChanged );
         InstanceInfoEvent.removeListener( ModelBaseEvent.CHANGED, instanceInfoChanged );
         ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, childModelAdded );
         ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED, parentModelAdded );
@@ -213,8 +206,8 @@ public class PanelModels extends PanelBase
         var itemName:String = "";
         if ( $vm.instanceInfo.name )
             itemName = $vm.instanceInfo.name;
-        else if ( $vm.metadata.name )
-            itemName = $vm.metadata.name;
+        else if ( $vm.modelInfo.name )
+            itemName = $vm.modelInfo.name;
         else
             itemName = $vm.modelInfo.guid;
 
@@ -277,7 +270,7 @@ public class PanelModels extends PanelBase
 		container.addElement( _deleteButton );
 		container.height += _deleteButton.height + pbPadding;
 		
-		_detailButton = new Button( LanguageManager.localizedStringGet( "InstanceDetails" ) );
+		_detailButton = new Button( LanguageManager.localizedStringGet( "instanceDetails" ) );
 		_detailButton.y = currentY = currentY + BUTTON_DISTANCE;
 		_detailButton.x = 5;
 		_detailButton.width = btnWidth;
@@ -286,7 +279,7 @@ public class PanelModels extends PanelBase
 		container.addElement( _detailButton );
 
 		if ( Globals.isDebug ) {
-			_dupButton = new Button( LanguageManager.localizedStringGet( "CloneModel" ) );
+			_dupButton = new Button( LanguageManager.localizedStringGet( "instanceClone" ) );
 			_dupButton.y = currentY = currentY + BUTTON_DISTANCE;
 			_dupButton.x = 5;
 			_dupButton.width = btnWidth;
@@ -301,7 +294,7 @@ public class PanelModels extends PanelBase
 		function dupModel(event:UIMouseEvent):void  {
 			if ( VoxelModel.selectedModel ) {
                 var vm:VoxelModel = VoxelModel.selectedModel;
-				new ModelMakerClone( vm.instanceInfo, vm.metadata, vm.modelInfo );
+				new ModelMakerClone( vm.instanceInfo, vm.modelInfo );
             }
 		}
 
@@ -312,7 +305,7 @@ public class PanelModels extends PanelBase
 				noModelSelected();
 			
 			function deleteModelCheck():void {
-				var alert:Alert = new Alert( "Do you really want to delete the model '" + VoxelModel.selectedModel.metadata.name + "'?", 400 );
+				var alert:Alert = new Alert( "Do you really want to delete the model '" + VoxelModel.selectedModel.modelInfo.name + "'?", 400 );
 				alert.setLabels( "Yes", "No" );
 				alert.alertMode = AlertMode.CHOICE;
 				$evtColl.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
@@ -351,7 +344,7 @@ public class PanelModels extends PanelBase
 			var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );
 			var title:String = "All items";
             if ( myParent.selectedModel )
-                title = "Showing possible children of " + myParent.selectedModel.metadata.name;
+                title = "Showing possible children of " + myParent.selectedModel.modelInfo.name;
 			WindowInventoryNew.toggle( startingTab, title, myParent.selectedModel );
 		}
 	}

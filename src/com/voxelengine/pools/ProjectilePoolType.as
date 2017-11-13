@@ -28,8 +28,7 @@ public final class ProjectilePoolType
 	private var _counter:uint;
 	private var _pool:Vector.<Projectile>;
 	private var _modelInfo:ModelInfo;
-	private var _modelMetadata:ModelMetadata;
-	
+
 	public function remaining():uint { return _counter }
 	public function total():uint { return _pool.length }
 	public function totalUsed():uint { return _pool ? _pool.length - _counter : _growthValue }
@@ -58,18 +57,16 @@ public final class ProjectilePoolType
 		//throw new Error( "Need to refactor this, I broke it when I added the island generation" );
 		// This is a special case for _modelInfo, the _modelInfo its self is contained in the generate script
 
-        _modelMetadata = new ModelMetadata( PROJECTILE + $type );
-        _modelMetadata.permissions.modify = PermissionsModel.MODIFY_NONE;
-        _modelMetadata.doNotPersist = true;
-        _modelMetadata.name = PROJECTILE  + $type;
-        _modelMetadata.description = PROJECTILE + $type + " - GENERATED";
-        _modelMetadata.owner = "";
-
         //creationInfo.name = "EDIT_CURSOR";
         //_modelInfo = new ModelInfo( _projectileGuid, null, GenerateOxel.cubeScript( 2, TypeInfo.BLUE ) );
         //_modelInfo = new ModelInfo( PROJECTILE, null, creationInfo );
         _modelInfo = new ModelInfo( PROJECTILE + $type, null, {} );
+		_modelInfo.init()
         _modelInfo.doNotPersist = true;
+        _modelInfo.permissions.modify = PermissionsModel.MODIFY_NONE;
+        _modelInfo.name = PROJECTILE  + $type;
+        _modelInfo.description = PROJECTILE + $type + " - GENERATED";
+        _modelInfo.owner = "";
 
 		var creationInfo:Object = GenerateCube.script( 4, TypeInfo.BLUE );
 		creationInfo.modelClass = "PROJECTILE";
@@ -94,7 +91,7 @@ public final class ProjectilePoolType
 			Log.out( "Projectile.newModel - failed to create Projectile", Log.ERROR );
 			return null
 		}
-		vm.init( _modelInfo, _modelMetadata );
+		vm.init( _modelInfo );
 		return vm
 	}
 

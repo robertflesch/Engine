@@ -7,9 +7,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 
 package com.voxelengine.GUI.voxelModels {
-import com.voxelengine.events.InstanceInfoEvent;
-import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ModelMetadataEvent;
 
 import flash.display.Bitmap;
 import flash.display.BitmapData;
@@ -23,6 +20,8 @@ import org.flashapi.swing.constants.*;
 import com.voxelengine.Globals;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.InstanceInfoEvent;
+import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.GUI.*;
 import com.voxelengine.GUI.components.*;
 import com.voxelengine.worldmodel.Region;
@@ -63,8 +62,8 @@ public class WindowModelDetail extends VVPopup {
 										  , function ($e:TextEvent):void { ii.name = $e.target.text; setChanged(); }
 										  , ii.name ? ii.name : "Unnamed Instance"
 										  , WIDTH ) );
-		addElement( new ComponentLabel( "Model Name ",  _vm.metadata.name ? _vm.metadata.name : "Unnamed Model", WIDTH ) );
-		addElement( new ComponentLabel( "Description",  _vm.metadata.description ? _vm.metadata.description : "No Description", WIDTH ) );
+		addElement( new ComponentLabel( "Model Name ",  _vm.modelInfo.name ? _vm.modelInfo.name : "Unnamed Model", WIDTH ) );
+		addElement( new ComponentLabel( "Description",  _vm.modelInfo.description ? _vm.modelInfo.description : "No Description", WIDTH ) );
 
 		_photoContainer.layout.orientation = LayoutOrientation.VERTICAL;
 		_photoContainer.layout.horizontalAlignment = HorizontalAlignment.CENTER;
@@ -140,8 +139,8 @@ public class WindowModelDetail extends VVPopup {
 	private function addPhoto():void {
 		_photoContainer.removeElements();
 		var bmd:BitmapData = null;
-		if ( _vm.metadata.thumbnail )
-			bmd = drawScaled( _vm.metadata.thumbnail, PHOTO_SIZE, PHOTO_SIZE );
+		if ( _vm.modelInfo.thumbnail )
+			bmd = drawScaled( _vm.modelInfo.thumbnail, PHOTO_SIZE, PHOTO_SIZE );
 		var pic:Image = new Image( new Bitmap( bmd ), PHOTO_SIZE, PHOTO_SIZE );
 		_photoContainer.addElement( pic );
 	}
@@ -193,10 +192,6 @@ public class WindowModelDetail extends VVPopup {
 		RegionEvent.create( ModelBaseEvent.CHANGED, 0, Region.currentRegion.guid );
 		RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid );
 
-	    if ( _vm.metadata.changed ) {
-            ModelMetadataEvent.create( ModelBaseEvent.CHANGED, 0, _vm.modelInfo.guid, _vm.metadata );
-            ModelMetadataEvent.create( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, _vm.metadata );
-        }
         if ( _vm.modelInfo.changed ) {
             ModelInfoEvent.create( ModelBaseEvent.CHANGED, 0, _vm.modelInfo.guid, _vm.modelInfo );
             ModelInfoEvent.create( ModelBaseEvent.SAVE, 0,_vm.modelInfo.guid, _vm.modelInfo );

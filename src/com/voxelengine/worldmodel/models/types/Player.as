@@ -44,7 +44,7 @@ import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 public class Player extends PersistenceObject
 {
     static public const DEFAULT_PLAYER:String = "DefaultPlayer";
-    static private const REFERENCE_AVATAR:String = "7FAECF4C-6139-BAB8-790C-635F5EF526F5";
+    static private const REFERENCE_AVATAR:String = "DefaultPlayer";
 
     public function get role():Role { return RoleCache.roleGet( dbo ? dbo.role : null ) }
 
@@ -75,7 +75,7 @@ public class Player extends PersistenceObject
 		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 		dbo = $dbo;
 		if ( $dbo ) {
-			guid = dbo.key;
+            _guid = dbo.key;
 			if ( null == $dbo.modelGuid ) {
 				// Assign the Avatar the default avatar
 				dbo.modelGuid = REFERENCE_AVATAR;
@@ -90,8 +90,8 @@ public class Player extends PersistenceObject
 				dbo.modifiedDate = new Date().toUTCString();
 				dbo.createdDate = new Date().toUTCString();
 Log.out( "onPlayerLoadedAction - HACK TO NOT SAVE NEW PLAYER DATA", Log.WARN );
-				dbo.role = Role.USER;
-				dbo.save();
+//				dbo.role = Role.USER;
+//				dbo.save();
 			}
 			// Don't modify the modelGuid, change it in the DB if needed
 			var pi:PlayerInfo = new PlayerInfo( instanceGuid, null );

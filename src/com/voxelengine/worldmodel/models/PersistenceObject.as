@@ -38,7 +38,7 @@ public class PersistenceObject
 	public function get creator():String { return dbo.creator; }
 
 
-	private var 	_guid:String;
+    protected var 	_guid:String;
 	public function get guid():String  { return _guid; }
 	public function set guid(value:String):void	{
 //		if ( _guid != value && Globals.isGuid( _guid ) && Globals.isGuid( value ) )

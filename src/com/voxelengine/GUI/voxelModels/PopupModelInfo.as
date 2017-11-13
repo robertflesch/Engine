@@ -19,30 +19,27 @@ import org.flashapi.swing.constants.*;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.GUI.panels.*;
 import com.voxelengine.GUI.*;
 import com.voxelengine.GUI.components.*;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.ModelInfo;
-import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
-public class PopupMetadataAndModelInfo extends VVPopup
+public class PopupModelInfo extends VVPopup
 {
     static private var _s_inExistance:int = 0;
     static public function get inExistance():int { return _s_inExistance; }
-    static private var _s_currentInstance:PopupMetadataAndModelInfo = null;
-    static public function get currentInstance():PopupMetadataAndModelInfo { return _s_currentInstance; }
+    static private var _s_currentInstance:PopupModelInfo = null;
+    static public function get currentInstance():PopupModelInfo { return _s_currentInstance; }
     static private const WIDTH:int = 330;
 
     private var _photoContainer:Container 		= new Container( width, 128 );
 
-    private var _mmd:ModelMetadata = null;
     private var _mi:ModelInfo = null;
 
-    public function PopupMetadataAndModelInfo( $mmd:ModelMetadata )
+    public function PopupModelInfo($mi:ModelInfo )
     {
         super( "Model Metadata and Info" );
         autoSize = false;
@@ -55,11 +52,11 @@ public class PopupMetadataAndModelInfo extends VVPopup
         _s_inExistance++;
         _s_currentInstance = this;
 
-        _mmd = $mmd;
+        _mi = $mi;
 
         ModelInfoEvent.addListener( ModelBaseEvent.ADDED, modelInfoRetreived );
         ModelInfoEvent.addListener( ModelBaseEvent.RESULT, modelInfoRetreived );
-        ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, _mmd.guid, null );
+        ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, _mi.guid, null );
 
         onCloseFunction = closeFunction;
         defaultCloseOperation = ClosableProperties.CALL_CLOSE_FUNCTION;
@@ -73,18 +70,18 @@ public class PopupMetadataAndModelInfo extends VVPopup
         //addElement( new ComponentSpacer( WIDTH, 25 ) );
 
         addElement( new ComponentTextInput( "Model Name "
-                , function ($e:TextEvent):void { _mmd.name = $e.target.text; setChanged(); }
-                , _mmd.name ? _mmd.name : "Unnamed Model"
+                , function ($e:TextEvent):void { _mi.name = $e.target.text; setChanged(); }
+                , _mi.name ? _mi.name : "Unnamed Model"
                 , WIDTH ) );
 
         addElement( new ComponentTextArea( "Description "
-                , function ($e:TextEvent):void { _mmd.description = $e.target.text; setChanged(); }
-                , _mmd.description ? _mmd.description : "No Description"
+                , function ($e:TextEvent):void { _mi.description = $e.target.text; setChanged(); }
+                , _mi.description ? _mi.description : "No Description"
                 , WIDTH ) );
 
         addElement( new ComponentTextInput( "HashTags"
-                , function ($e:TextEvent):void { _mmd.hashTags = $e.target.text; setChanged(); }
-                , _mmd.hashTags
+                , function ($e:TextEvent):void { _mi.hashTags = $e.target.text; setChanged(); }
+                , _mi.hashTags
                 , WIDTH ) );
 
     }
@@ -106,17 +103,17 @@ public class PopupMetadataAndModelInfo extends VVPopup
     }
 
     private function modelInfoRetreived( $mie:ModelInfoEvent ):void {
-        if ( $mie.modelGuid == _mmd.guid ) {
+        if ( $mie.modelGuid == _mi.guid ) {
             ModelInfoEvent.removeListener(ModelBaseEvent.ADDED, modelInfoRetreived);
             ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, modelInfoRetreived);
-            _mi = $mie.vmi;
+            _mi = $mie.modelInfo;
             addModelInfo();
         }
     }
 
     private function addPermissions():void {
         var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
-        ebco.rootObject = _mmd.permissions;
+        ebco.rootObject = _mi.permissions;
         ebco.title = " permissions ";
         ebco.paddingTop = 7;
         ebco.width = WIDTH;
@@ -125,7 +122,7 @@ public class PopupMetadataAndModelInfo extends VVPopup
 
     private function addAdvanced():void {
         var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
-        ebco.rootObject = _mmd;
+        ebco.rootObject = _mi;
         ebco.title = " advanced ";
         ebco.paddingTop = 7;
         ebco.width = WIDTH;
@@ -138,9 +135,9 @@ public class PopupMetadataAndModelInfo extends VVPopup
     private function newPhoto( $me:UIMouseEvent ):void {
         var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _mi.guid );
         var bmpd:BitmapData = Renderer.renderer.modelShot( vm );
-        _mmd.thumbnail = drawScaled( bmpd, PHOTO_CAPTURE_WIDTH, PHOTO_HEIGHT );
+        _mi.thumbnail = drawScaled( bmpd, PHOTO_CAPTURE_WIDTH, PHOTO_HEIGHT );
         addPhoto();
-        ModelMetadataEvent.create( ModelBaseEvent.CHANGED, 0, _mmd.guid, _mmd );
+        ModelInfoEvent.create( ModelBaseEvent.CHANGED, 0, _mi.guid, _mi );
     }
 
     static private function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
@@ -161,8 +158,8 @@ public class PopupMetadataAndModelInfo extends VVPopup
         addElement(_photoContainer);
         _photoContainer.removeElements();
         var bmd:BitmapData = null;
-        if ( _mmd.thumbnail )
-            bmd = drawScaled( _mmd.thumbnail, PHOTO_WIDTH, PHOTO_HEIGHT );
+        if ( _mi.thumbnail )
+            bmd = drawScaled( _mi.thumbnail, PHOTO_WIDTH, PHOTO_HEIGHT );
         var pic:Image = new Image( new Bitmap( bmd ), PHOTO_WIDTH, PHOTO_HEIGHT );
         _photoContainer.addElement( pic );
         _photoContainer.addElement( new ComponentSpacer( WIDTH ) );
@@ -173,7 +170,7 @@ public class PopupMetadataAndModelInfo extends VVPopup
     }
 
     private function setChanged():void {
-		_mmd.changed = true;
+		_mi.changed = true;
 		_mi.changed = true;
     }
 
@@ -181,10 +178,6 @@ public class PopupMetadataAndModelInfo extends VVPopup
         _s_inExistance--;
         _s_currentInstance = null;
 
-        if ( _mmd.changed ) {
-            ModelMetadataEvent.create( ModelBaseEvent.CHANGED, 0, _mi.guid, _mmd );
-            ModelMetadataEvent.create( ModelBaseEvent.SAVE, 0, _mi.guid, _mmd );
-        }
         if ( _mi.changed ) {
             ModelInfoEvent.create( ModelBaseEvent.CHANGED, 0, _mi.guid, _mi );
             ModelInfoEvent.create( ModelBaseEvent.SAVE, 0, _mi.guid, _mi );

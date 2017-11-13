@@ -194,7 +194,7 @@ public class  UserInventory extends QuickInventory
 
 	}
 	private function inventoryLoaded(e:InventoryEvent):void {
-		//Log.out( "UserInventory.inventoryLoaded - ENTER - owner: " + _owner + "  e.owner: " + e.owner, Log.WARN );
+		//Log.out( "UserInventory.inventoryLoaded - ENTER - owningModel: " + _owner + "  e.owningModel: " + e.owningModel, Log.WARN );
 		if ( e.owner == _owner ) {
 			InventoryEvent.removeListener( InventoryEvent.RESPONSE, inventoryLoaded );
 			_inventoryLoaded = true;
@@ -209,7 +209,7 @@ public class  UserInventory extends QuickInventory
 			}
 		}
 //		else
-//			Log.out( "UserInventory.inventoryLoaded - for non active guid: " + e.owner, Log.WARN );
+//			Log.out( "UserInventory.inventoryLoaded - for non active guid: " + e.owningModel, Log.WARN );
 	}
 	
 	/////////// start drag and drop //////////////////////////////////////////////////////

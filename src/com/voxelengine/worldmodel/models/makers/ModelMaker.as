@@ -9,12 +9,9 @@ package com.voxelengine.worldmodel.models.makers
 {
 import com.voxelengine.Log
 import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ModelMetadataEvent
 import com.voxelengine.events.ModelBaseEvent
 import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.WindowSplashEvent
 import com.voxelengine.worldmodel.models.InstanceInfo
-import com.voxelengine.worldmodel.models.types.Avatar;
 
 /**
 	 * ...
@@ -40,21 +37,9 @@ public class ModelMaker extends ModelMakerBase {
 		requestModelInfo();
 	}
 	
-	override protected function retrievedModelInfo($mie:ModelInfoEvent):void  {
-		if (ii.modelGuid == $mie.modelGuid ) {
-			//Log.out( "ModelMaker.retrievedModelInfo - ii: " + ii.toString() + "  modelInfo: " + $mie.vmi );
-			removeMIEListeners();
-			_modelInfo = $mie.vmi;
-			addMetadataListeners();
-			ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null );
-		}
-	}
-
-
-	
 	// once they both have been retrieved, we can make the object
 	override protected function attemptMake():void {
-		if ( null != _modelMetadata && null != modelInfo ) {
+		if ( null != modelInfo ) {
 			//Log.out( "ModelMaker.attemptMake - ii: " + ii.toString() )
 			_vm = make();
 			if ( _vm ) {

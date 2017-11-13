@@ -48,8 +48,8 @@ public class Ship extends ControllableVoxelModel
 		super( ii );
 	}
 
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
-		super.init( $mi, $vmm, $buildState );
+	override public function init( $mi:ModelInfo, $buildState:String = ModelMakerBase.MAKING ):void {
+		super.init( $mi, $buildState );
 		// TODO These should be loading from the json file
 		clipVelocityFactor = SHIP_CLIP_FACTOR;
 		//_turnRate = 20;
@@ -141,7 +141,7 @@ public class Ship extends ControllableVoxelModel
 		{
 			if ( name != "" )
 			{
-				if ( engine.metadata.name == name )
+				if ( engine.modelInfo.name == name )
 					engine.start( val, this );
 
 			}

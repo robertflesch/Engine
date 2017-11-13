@@ -34,9 +34,12 @@ public class PermissionsRegion extends PermissionsBase
 	public function get guest():Boolean  { return dbo.permissions.guest; }
 	public function set guest(value:Boolean):void  { dbo.permissions.guest = value; }
 
-	public function PermissionsRegion( $owner:PersistenceObject, $guid:String ) {
-		super( $owner, $guid );
+	public function PermissionsRegion() {
+        super();
+    }
 
+    override public function fromObject( $owner:PersistenceObject ):void {
+		super.fromObject( $owner )
 		if ( !dbo.permissions.guests )
 			dbo.permissions.guests = false;
 		//$info.permissions.editors = [];

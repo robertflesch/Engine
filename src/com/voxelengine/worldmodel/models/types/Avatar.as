@@ -32,7 +32,6 @@ import com.voxelengine.worldmodel.oxel.OxelBad;
 import com.voxelengine.worldmodel.weapons.Bomb;
 import com.voxelengine.worldmodel.weapons.Gun;
 import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.ModelInfo;
 
 
@@ -120,8 +119,8 @@ public class Avatar extends ControllableVoxelModel {
         }
     }
 
-    override public function init($mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING):void {
-        super.init($mi, $vmm, $buildState);
+    override public function init($mi:ModelInfo, $buildState:String = ModelMakerBase.MAKING):void {
+        super.init($mi, $buildState);
         // should just do this for the players avatar
         hasInventory = true;
         instanceInfo.usesCollision = true;

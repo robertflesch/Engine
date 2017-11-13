@@ -8,8 +8,6 @@
 package com.voxelengine.worldmodel.models.makers
 {
 
-import com.voxelengine.renderer.Renderer;
-import com.voxelengine.worldmodel.models.OxelPersistence;
 
 import flash.display.BitmapData;
 import flash.geom.Matrix;
@@ -20,13 +18,12 @@ import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.GUI.WindowModelMetadata;
+import com.voxelengine.GUI.WindowModelInfo;
 import com.voxelengine.server.Network;
+import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
@@ -64,21 +61,20 @@ public class ModelMakerImport extends ModelMakerBase {
 	override protected function attemptMake():void {
 		//Log.out( "ModelMakerImport - attemptMake: " + ii.toString() );
         // for imports we have no metadata, so we go ahead and either generate it, or prompt the user for it.
-		if ( null != modelInfo && null == _modelMetadata ) {
+		if ( null != modelInfo ) {
 			// The new guid is generated in the Window or in the hidden metadata creation
+            modelInfo.description = ii.modelGuid + " - Imported";
+            modelInfo.name = ii.modelGuid;
+            modelInfo.owner = Network.userId;
 			if ( _prompt ) {
 				//Log.out( "ModelMakerImport - attemptMake: gathering metadata " + ii.toString() );
-				ModelMetadataEvent.addListener( ModelMetadataEvent.DATA_COLLECTED, metadataFromUI );
-				new WindowModelMetadata( ii, WindowModelMetadata.TYPE_IMPORT ); }
+				ModelInfoEvent.addListener( ModelInfoEvent.DATA_COLLECTED, metadataFromUI );
+				new WindowModelInfo( ii, _modelInfo, WindowModelInfo.TYPE_IMPORT ); }
 			else {
 				//Log.out( "ModelMakerImport - attemptMake: generating metadata " + ii.toString() );
-				_modelMetadata = new ModelMetadata( ii.modelGuid );
-				_modelMetadata.description = ii.modelGuid + " - Imported";
-				_modelMetadata.name = ii.modelGuid;
-				_modelMetadata.owner = Network.userId;
 				attemptMakeRetrieveParentModelInfo(); }
 		}
-		else if ( null == modelInfo && null == _modelMetadata )
+		else if ( null == modelInfo )
 			Log.out( "ModelMakerImport - attemptMake: null == modelInfo && null == _modelMetadata " + ii.toString(), Log.ERROR );
 		else if ( null == modelInfo )
 			Log.out( "ModelMakerImport - attemptMake: null == modelInfo " + ii.toString(), Log.ERROR );
@@ -88,10 +84,9 @@ public class ModelMakerImport extends ModelMakerBase {
 	}
 	
 	// The metadata has been collected in the UI
-	private function metadataFromUI( $mme:ModelMetadataEvent):void {
-		if ( $mme.modelGuid == modelInfo.guid ) {
-			ModelMetadataEvent.removeListener( ModelMetadataEvent.DATA_COLLECTED, metadataFromUI );
-			_modelMetadata = $mme.modelMetadata;
+	private function metadataFromUI( $mi:ModelInfoEvent):void {
+		if ( $mi.modelGuid == modelInfo.guid ) {
+            ModelInfoEvent.removeListener( ModelInfoEvent.DATA_COLLECTED, metadataFromUI );
 			// Now check if this has a parent model, if so, get the animation class from the parent.
 			//Log.out( "ModelMakerImport.metadataFromUI: " + ii.toString() );
 			attemptMakeRetrieveParentModelInfo();
@@ -102,15 +97,15 @@ public class ModelMakerImport extends ModelMakerBase {
 		if ( parentModelGuid ) {
 			//Log.out("ModelMakerImport.attemptMakeRetrieveParentModelInfo - retrieveParentModelInfo " + ii.toString());
 			retrieveParentModelInfo();
-			_modelMetadata.childOf = parentModelGuid;
+            modelInfo.childOf = parentModelGuid;
 		}
 		else {
 			//Log.out("ModelMakerImport.attemptMakeRetrieveParentModelInfo - completeMake " + ii.toString());
 			if ( modelInfo.modelClass ) {
 				var modelClass:String = modelInfo.modelClass;
-				_modelMetadata.animationClass = AnimationCache.requestAnimationClass(modelClass);
+                modelInfo.animationClass = AnimationCache.requestAnimationClass(modelClass);
 			} else
-				_modelMetadata.animationClass = AnimationCache.MODEL_UNKNOWN;
+                modelInfo.animationClass = AnimationCache.MODEL_UNKNOWN;
 
 			completeMake();
 		}
@@ -127,8 +122,8 @@ public class ModelMakerImport extends ModelMakerBase {
 			if ( $mie.modelGuid == _topMostModelGuid ) {
 				//Log.out("ModelMakerImport.parentModelInfoResult: " + ii.toString());
 				removeParentModelInfoListener();
-				var modelClass:String = $mie.vmi.modelClass;
-				_modelMetadata.animationClass = AnimationCache.requestAnimationClass( modelClass );
+				var modelClass:String = $mie.modelInfo.modelClass;
+                modelInfo.animationClass = AnimationCache.requestAnimationClass( modelClass );
 				completeMake();
 			}
 		}
@@ -157,7 +152,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	private var waitForChildren:Boolean;
 	private function completeMake():void {
 		//Log.out("ModelMakerImport.completeMake: " + ii.toString());
-		if ( null != modelInfo && null != _modelMetadata ) {
+		if ( null != modelInfo ) {
 
 			_vm = make();
 			if ( _vm ) {
@@ -167,7 +162,7 @@ public class ModelMakerImport extends ModelMakerBase {
 
 				if ( false == modelInfo.childrenLoaded ) { // its true if they are loaded or the model has no children.
 					waitForChildren = true;
-                    Log.out( "ModelMakerImport.completeMake - adding listener for CHILD_LOADING_COMPLETE description: " + _modelMetadata.description, Log.WARN );
+                    Log.out( "ModelMakerImport.completeMake - adding listener for CHILD_LOADING_COMPLETE description: " + modelInfo.description, Log.WARN );
 					ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady);
 				}
 
@@ -178,12 +173,12 @@ public class ModelMakerImport extends ModelMakerBase {
 			}
 		}
 		else
-			Log.out( "ModelMakerImport.completeMake ERROR - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
+			Log.out( "ModelMakerImport.completeMake ERROR - modelInfo: " + modelInfo, Log.WARN );
 
 		function childrenAllReady( $ode:ModelLoadingEvent):void {
 			if ( modelInfo.guid == $ode.data.parentModelGuid ) {
                 waitForChildren = false;
-				Log.out( "ModelMakerImport.allChildrenReady - modelInfo.guid: " + modelInfo.guid + "  modelMetadata.description: " + _modelMetadata.description, Log.WARN );
+				Log.out( "ModelMakerImport.allChildrenReady - modelInfo.guid: " + modelInfo.guid + "  modelInfo.description: " + modelInfo.description, Log.WARN );
 				ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
 				// If the oxel loads before the children are ready this doesn't work.
                 markComplete( true );
@@ -229,17 +224,15 @@ public class ModelMakerImport extends ModelMakerBase {
 				Log.out( "ModelMakerImport.markComplete - Unknown error causing failure : " + ii.modelGuid, Log.ERROR );
 
 			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
-			ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
 			super.markComplete( $success );
 		}
 	}
 
 	private function importComplete():void {
-		if ( !Globals.isGuid( _modelMetadata.guid ) ) {
+		if ( !Globals.isGuid( modelInfo.guid ) ) {
 			var newGuid:String = Globals.getUID();
 			Log.out( "ModelMakerImport.markComplete setting guids to " + newGuid );
 
-			_modelMetadata.guid = newGuid;
 			modelInfo.guid 		= newGuid;
 			ii.modelGuid 		= newGuid;
 		}
@@ -261,17 +254,15 @@ public class ModelMakerImport extends ModelMakerBase {
 
 		// This works for simple models, but not for deep hierarchies
 		var bmpd:BitmapData = Renderer.renderer.modelShot( _vm );
-		_vm.metadata.thumbnail = drawScaled( bmpd, 128, 128 );
+		_vm.modelInfo.thumbnail = drawScaled( bmpd, 128, 128 );
 
-		ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
 		ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
 		_vm.complete = true;
 
 		modelInfo.changed = true;
-		_modelMetadata.changed = true;
 		_vm.save();
 
-		Log.out("ModelMakerImport.quadsComplete - needed info found: " + _modelMetadata.description );
+		Log.out("ModelMakerImport.quadsComplete - needed info found: " + modelInfo.description );
 		// The function Chunk.quadsBuildPartialComplete publishes these event in this order
 		// OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, _op);
 		// OxelDataEvent.create(OxelDataEvent.OXEL_BUILD_COMPLETE, 0, _guid, _op);

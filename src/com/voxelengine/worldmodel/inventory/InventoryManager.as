@@ -12,11 +12,10 @@ import com.voxelengine.Log;
 import com.voxelengine.events.CharacterSlotEvent;
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 	/**
@@ -50,9 +49,9 @@ public class InventoryManager
         if ( ownerModel ) {
             var attachToModel:VoxelModel = ownerModel.modelInfo.childModelFindByName( $slotName );
             if ( attachToModel ) {
-                ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, metadataLoadedForAttachment );
-                ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, metadataLoadedForAttachment );
-                ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, $modelGuid, null );
+                ModelInfoEvent.addListener( ModelBaseEvent.ADDED, metadataLoadedForAttachment );
+                ModelInfoEvent.addListener( ModelBaseEvent.RESULT, metadataLoadedForAttachment );
+                ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, $modelGuid, null );
             }
             else {
                 Log.out( "InventoryManager.addModelToModel - attachmentModel not found guid: " + $slotName );
@@ -61,14 +60,14 @@ public class InventoryManager
                 Log.out( "InventoryManager.addModelToModel - ownerModel not found guid: " + $ownerGuid );
         }
 
-        function metadataLoadedForAttachment( $mde:ModelMetadataEvent ):void {
-            ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, metadataLoadedForAttachment );
-            ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, metadataLoadedForAttachment );
+        function metadataLoadedForAttachment( $mde:ModelInfoEvent ):void {
+            ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, metadataLoadedForAttachment );
+            ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, metadataLoadedForAttachment );
             var ii:InstanceInfo = new InstanceInfo();
             ii.controllingModel = attachToModel;
             ii.dynamicObject = true;
             ii.rotationSetComp(90, 0, 0);
-            var oxelSize:int = $mde.modelMetadata.bound;
+            var oxelSize:int = $mde.modelInfo.bound;
             oxelSize = (1 << oxelSize)/2;
             ii.positionSetComp(0, -oxelSize, -oxelSize);
             ii.modelGuid = $modelGuid;
@@ -102,10 +101,10 @@ public class InventoryManager
 
 //	static private function save( e:InventoryEvent ):void {
 //		if ( Globals.online ) {
-//			if ( null == _s_inventoryByGuid[e.owner] && null != e.result )
-//				_s_inventoryByGuid[e.owner] = e.result as Inventory;
+//			if ( null == _s_inventoryByGuid[e.owningModel] && null != e.result )
+//				_s_inventoryByGuid[e.owningModel] = e.result as Inventory;
 //
-//			var inv:Inventory = _s_inventoryByGuid[e.owner];
+//			var inv:Inventory = _s_inventoryByGuid[e.owningModel];
 ////			if ( null != inv ) {
 ////				inv.save();
 ////			}
@@ -118,10 +117,10 @@ public class InventoryManager
 //
 //	static private function saveForce( e:InventoryEvent ):void {
 //		if ( Globals.online ) {
-//			if ( null == _s_inventoryByGuid[e.owner] && null != e.result )
-//				_s_inventoryByGuid[e.owner] = e.result as Inventory;
+//			if ( null == _s_inventoryByGuid[e.owningModel] && null != e.result )
+//				_s_inventoryByGuid[e.owningModel] = e.result as Inventory;
 //
-//			var inv:Inventory = _s_inventoryByGuid[e.owner];
+//			var inv:Inventory = _s_inventoryByGuid[e.owningModel];
 ////			if ( null != inv ) {
 ////				inv.changed = true;
 ////				inv.save();

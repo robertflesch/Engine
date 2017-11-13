@@ -93,7 +93,7 @@ package org.flashapi.swing.constants {
 		
 		/**
 		 * 	Scrollbar are displayed within the container object if the children exceed
-		 * 	the dimension of the owner.
+		 * 	the dimension of the owningModel.
 		 */
 		public static const AUTO:String = "auto";
 	}

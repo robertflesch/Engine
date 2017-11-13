@@ -100,7 +100,7 @@ public class InstanceInfo extends Location	{
 	public function get life():Vector3D 						{ return _life; }
 	
 	// this is the VoxelModel that the instanceInfo belongs to.
-	// mainly used to identify owner and send info backup the chain.
+	// mainly used to identify owningModel and send info backup the chain.
 	private var _owner:VoxelModel 								= null;               			// INSTANCE NOT EXPORTED
 	public function get owner():VoxelModel  					{ return _owner; }
 	public function set owner(val:VoxelModel):void 				{

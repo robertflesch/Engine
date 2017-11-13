@@ -12,7 +12,6 @@ import com.voxelengine.GUI.components.VVTextInput;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.pools.GrainCursorPool;
@@ -316,7 +315,6 @@ public class WindowPictureImport extends VVPopup {
                 removeListeners();
                 (new Alert( LanguageManager.localizedStringGet( "picture_import_failed" ) )).display();
                 ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
-                ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
             }
         }
 
@@ -392,17 +390,17 @@ public class WindowPictureImport extends VVPopup {
                 diffPos = diffPos.add(lav);
                 vm.instanceInfo.positionSet = diffPos;
                 vm.instanceInfo.rotationSetComp( 0, 90, 0 );
-                vm.metadata.hashTags = "#architecture#window#stained";
+                vm.modelInfo.hashTags = "#architecture#window#stained";
 
                 OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE,  quadsComplete );
             }
 
             function quadsComplete( $ode:OxelDataEvent ):void {
-                if (vm.metadata.guid == $ode.modelGuid) {
+                if (vm.modelInfo.guid == $ode.modelGuid) {
                     OxelDataEvent.removeListener(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, quadsComplete);
                     var bmpd:BitmapData = Renderer.renderer.modelShot( vm );
-                    vm.metadata.thumbnail = drawScaled(bmpd, 128, 128);
-                    ModelMetadataEvent.create(ModelBaseEvent.CHANGED, 0, vm.metadata.guid, vm.metadata);
+                    vm.modelInfo.thumbnail = drawScaled(bmpd, 128, 128);
+                    ModelInfoEvent.create(ModelBaseEvent.CHANGED, 0, vm.modelInfo.guid, vm.modelInfo);
                 }
             }
 

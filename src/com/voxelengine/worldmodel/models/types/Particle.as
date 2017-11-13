@@ -27,8 +27,8 @@ import flash.display3D.Context3D;
 			super( instanceInfo );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
-			super.init( $mi, $vmm, $buildState );
+		override public function init( $mi:ModelInfo, $buildState:String = ModelMakerBase.MAKING ):void {
+			super.init( $mi, $buildState );
 		}
 
 		override public function update(context:Context3D, elapsedTimeMS:int):void 

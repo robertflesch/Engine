@@ -474,7 +474,7 @@ public class VoxelVerseGUI extends EventDispatcher
 			WeaponEvent.dispatch( new WeaponEvent( WeaponEvent.FIRE, _gunTest,  _gunTest.armory.currentSelection() ) );
 //			ps.accuracy = 0;
 //			ps.velocity = 1200;
-//			ps.owner = VoxelModel.controlledModel.instanceInfo.instanceGuid;
+//			ps.owningModel = VoxelModel.controlledModel.instanceInfo.instanceGuid;
 //			ps.onModelEvent( new ModelEvent( WeaponEvent.FIRE, "" ) );
 
 			_projectileEnabled = false;

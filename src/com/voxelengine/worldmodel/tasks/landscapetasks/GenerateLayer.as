@@ -48,8 +48,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			throw new Error( "REFACTOR with new oxel generation scheme");
 			if ( e.modelGuid == _modelGuid ) {
 				ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoResult );
-				if ( e.vmi.oxelPersistence.oxelCount ) {
-					var oxel:Oxel = e.vmi.oxelPersistence.oxel;
+				if ( e.modelInfo.oxelPersistence.oxelCount ) {
+					var oxel:Oxel = e.modelInfo.oxelPersistence.oxel;
 					if (null == oxel) {
 						Log.out("GenerateLayer.modelInfoResult = no oxel found, waiting on OXEL_READY", Log.WARN);
 						super.complete();

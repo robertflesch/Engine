@@ -36,8 +36,8 @@ import flash.geom.Vector3D;
 			super( instanceInfo );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
-			super.init( $mi, $vmm, $buildState );
+		override public function init( $mi:ModelInfo, $buildState:String = ModelMakerBase.MAKING ):void {
+			super.init( $mi, $buildState );
 			
 			Globals.g_app.dispatchEvent( new TargetEvent( TargetEvent.CREATED, instanceInfo.instanceGuid, _pointValue ) );
 		}

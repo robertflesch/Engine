@@ -46,7 +46,7 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) );
         function dataResult( $mie:ModelInfoEvent):void {
             if ( _modelGuid == $mie.modelGuid ) {
-                _modelInfo = $mie.vmi;
+                _modelInfo = $mie.modelInfo;
                 ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, dataResult );
                 ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, dataResult );
                 ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, dataResultFailed );

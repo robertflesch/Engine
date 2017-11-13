@@ -16,6 +16,7 @@ import com.voxelengine.renderer.lamps.RainbowLight;
 import com.voxelengine.renderer.lamps.ShaderLight;
 import com.voxelengine.renderer.lamps.Torch;
 import com.voxelengine.renderer.shaders.Shader;
+import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 import com.voxelengine.worldmodel.oxel.GrainCursorUtils;
@@ -87,8 +88,6 @@ public class VoxelModel {
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	// This is a reference to the data which is store in the metaDataCache
-	private 	var	_metadata:ModelMetadata;
 	// This is a reference to the data which is store in the modelInfoCache
 	protected 	var	_modelInfo:ModelInfo;
 	// This is a unique instance from the region data or server
@@ -113,9 +112,7 @@ public class VoxelModel {
 	public	function get instanceInfo():InstanceInfo			{ return _instanceInfo; }
 	public	function get modelInfo():ModelInfo 					{ return _modelInfo; }
 	public	function set modelInfo(val:ModelInfo):void			{ _modelInfo = val; }
-	public	function get metadata():ModelMetadata    			{ return _metadata; }
-	public	function set metadata(val:ModelMetadata):void   	{ _metadata = val; }
-	
+
 	public	function get usesGravity():Boolean 					{ return _usesGravity; }
 	public	function set usesGravity(val:Boolean):void 			{ _usesGravity = val; }
 	public	function get cameraContainer():CameraContainer		{ return _cameraContainer; }
@@ -124,7 +121,7 @@ public class VoxelModel {
 	public	function set selected(val:Boolean):void  			{ _selected = val; }
 	public 	function get complete():Boolean						{ return _complete; }
 	public 	function set complete(val:Boolean):void				{ _complete = val; }
-	public 	function 	 toString():String 						{ return metadata.toString() + " ii: " + instanceInfo.toString(); }
+	public 	function 	 toString():String 						{ return modelInfo.toString() + " ii: " + instanceInfo.toString(); }
 
 	private var 			_lastCollisionModel:VoxelModel; 											// INSTANCE NOT EXPORTED
 	public function get		lastCollisionModel():VoxelModel 		{ return _lastCollisionModel; }
@@ -144,21 +141,15 @@ public class VoxelModel {
 
 	public function VoxelModel( $ii:InstanceInfo ):void {
 		_instanceInfo = $ii;
-		_instanceInfo.owner = this; // This tells the instanceInfo that this voxel model is its owner.
+		_instanceInfo.owner = this; // This tells the instanceInfo that this voxel model is its owningModel.
 		_cameraContainer = new CameraContainer( this );
 	}
 	
-	public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
+	public function init( $mi:ModelInfo, $buildState:String = ModelMakerBase.MAKING ):void {
 		_modelInfo = $mi;
-		_modelInfo.owner = this;
-		_metadata = $vmm;
+		_modelInfo.owningModel = this;
 
-		if ( null == _metadata ) {
-			Log.out("VoxelModel.init - IS NULL ModelMetadata valid?", Log.ERROR);
-			return;
-		}
-		
-		if ( metadata.permissions.modify ) {
+		if ( modelInfo.permissions.modify ) {
 //			Log.out( "VoxelModel - added ImpactEvent.EXPLODE for " + _modelInfo.modelClass );
 			ImpactEvent.addListener(ImpactEvent.EXPLODE, impactEventHandler);
 			ImpactEvent.addListener(ImpactEvent.DFIRE, impactEventHandler);
@@ -265,12 +256,12 @@ public class VoxelModel {
 
 	public function childFindByName($name:String, $recursive:Boolean = true ):VoxelModel {
 		// Are we that model?
-		if ( metadata.name == $name )
+		if ( modelInfo.name == $name )
 			return this;
 		
 		// check children
 		for each (var child:VoxelModel in modelInfo.childVoxelModels) {
-			if (child.metadata.name == $name)
+			if (child.modelInfo.name == $name)
 				return child;
 			else { // check its children	
 				var cvm:VoxelModel = child.childFindByName( $name );
@@ -283,7 +274,7 @@ public class VoxelModel {
 	
 	public function childNameList( $nameList:Vector.<String> ):void {
 		for each (var child:VoxelModel in modelInfo.childVoxelModels) {
-			$nameList.push( child.metadata.name );
+			$nameList.push( child.modelInfo.name );
 			child.childNameList( $nameList );
 		}
 	}
@@ -471,7 +462,7 @@ public class VoxelModel {
 	// This function writes to the root oxel, and lets the root find the correct target
 	// it also add flow and lighting
 	public function write( $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
-		if ( _metadata.permissions.modify & PermissionsModel.MODIFY_VOXEL ) {
+		if ( modelInfo.permissions.modify & PermissionsModel.MODIFY_VOXEL ) {
 			(new Alert( "You do not have permission to modify that model").display());
 		}
 		else {
@@ -576,8 +567,8 @@ public class VoxelModel {
 	}
 	
 	public function update($context:Context3D, $elapsedTimeMS:int):void	{
-		//if ( "DragonTailFirst" == metadata.name )
-		//	Log.out( "VoxelModel.update - name: " + metadata.name, Log.DEBUG );
+		//if ( "DragonTailFirst" == modelInfo.name )
+		//	Log.out( "VoxelModel.update - name: " + modelInfo.name, Log.DEBUG );
 		if ( complete && modelInfo.oxelPersistence ) {
 			instanceInfo.update( $elapsedTimeMS );
 			modelInfo.update( $context, $elapsedTimeMS );
@@ -609,7 +600,7 @@ public class VoxelModel {
 	
 	public function release():void {
 		
-		if ( metadata.permissions.modify ) {
+		if ( modelInfo.permissions.modify ) {
 			//ModelEvent.removeListener(ModelEvent.MODEL_MODIFIED, handleModelEvents);
 			ImpactEvent.removeListener( ImpactEvent.EXPLODE, impactEventHandler);
 			ImpactEvent.removeListener( ImpactEvent.DFIRE, impactEventHandler);
@@ -622,7 +613,6 @@ public class VoxelModel {
 		
 		modelInfo.release();
 		instanceInfo.release();
-		metadata.release();	
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -631,12 +621,11 @@ public class VoxelModel {
 	public function save():void
 	{
 		if ( !Globals.online ) {
-			//Log.out( "VoxelModel.save - NOT online, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
+			//Log.out( "VoxelModel.save - NOT online, NOT SAVING name: " + modelInfo.name + "  modelInfo.modelGuid: " + modelInfo.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 			return;
 		}
 			
 		modelInfo.save();
-		metadata.save();
         Region.currentRegion.save()
 	}
 	
@@ -971,12 +960,14 @@ public class VoxelModel {
 			Log.out( "VoxelModel.childAdd - TRYING TO ADD MODEL THIS IS A PARENT", Log.WARN );
 			return;
 		}
-		if ( false == modelInfo.childrenLoaded )
+		//if ( false == modelInfo.childrenLoaded )
+		//	modelInfo.childAdd( $childModel );
+        else if ( modelInfo.permissions.modify & PermissionsModel.MODIFY_CHILD_ADD )
 			modelInfo.childAdd( $childModel );
 		else
-		if ( metadata.permissions.modify )
-			modelInfo.childAdd( $childModel )
-	}
+        	Log.out( "VoxelModel.childAdd - TRYING TO ADD MODEL THIS IS A PARENT", Log.WARN );
+
+    }
 
 
 	protected function dispatchMovementEvent():void {
@@ -1059,8 +1050,8 @@ public class VoxelModel {
 			if ( $children && 0 != $children.length) {
 				for each (var cm:VoxelModel in $children) {
 					if (cm && cm.modelInfo && cm.modelInfo.childrenLoaded) {
-						//Log.out( "VoxelModel.addAnimationsInChildren - is child.metadata.name: " + child.metadata.name + " equal to $at.attachmentName: " + $at.attachmentName );
-						if (cm.metadata.name == $at.attachmentName) {
+						//Log.out( "VoxelModel.addAnimationsInChildren - is child.modelInfo.name: " + child.modelInfo.name + " equal to $at.attachmentName: " + $at.attachmentName );
+						if (cm.modelInfo.name == $at.attachmentName) {
 							cm.stateSetData($at, $scale);
 							return resultChildren; // TODO This does not allow for multiple attachments to same parent with same name, but is faster.
 						}
@@ -1144,7 +1135,7 @@ public class VoxelModel {
 		{
 			//Log.out( "VoxelModel.updateAnimationsInChildren - child: " + child.instanceInfo.name );
 			// Does this child have this name? if so update the transform
-			if (cm.metadata.name == $at.attachmentName)
+			if (cm.modelInfo.name == $at.attachmentName)
 			{
 				for each (var mt:ModelTransform in $at.transforms)
 				{

@@ -50,7 +50,7 @@ public class GenerateCube extends LandscapeTask {
 
 	override public function start():void {
 		super.start();
-		//Log.out("GenerateCube.start");
+		//Log.out("GenerateCube.start guid: " + _modelGuid );
 		// This generates a GENERATION_SUCCESS, which is picked up by the OxelPersistenceCache
 		// which then starts the build process
 

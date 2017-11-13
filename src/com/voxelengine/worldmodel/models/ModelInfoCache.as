@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.server.Network;
+
 import flash.utils.Dictionary;
 
 import com.voxelengine.Log;
@@ -16,7 +18,6 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.events.InventoryEvent;
-import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.utils.JSONUtil;
 import com.voxelengine.utils.StringUtils;
@@ -40,8 +41,13 @@ public class ModelInfoCache
 		ModelInfoEvent.addListener( ModelBaseEvent.GENERATION, 			generationComplete );
 		ModelInfoEvent.addListener( ModelBaseEvent.UPDATE_GUID, 		updateGuid );
 		ModelInfoEvent.addListener( ModelBaseEvent.UPDATE, 				update );
+        ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_TYPE, 		requestType );
+        ModelInfoEvent.addListener( ModelInfoEvent.REASSIGN_STORE, 		reassignToStore );
+        ModelInfoEvent.addListener( ModelInfoEvent.REASSIGN_PUBLIC,		reassignToPublic );
 
-		// These are the events at the persistence layer
+
+
+        // These are the events at the persistence layer
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed );
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, 	loadNotFound );
@@ -50,6 +56,40 @@ public class ModelInfoCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  ModelInfoEvents
 	/////////////////////////////////////////////////////////////////////////////////////////////
+    // This loads the first 100 objects from the users inventory OR the public inventory
+    // TODO - NEED TO ADD HANDLER WHEN MORE THAN 100 ARE NEEDED - RSF 9.14.2017
+    static private var _initializedPublic:Boolean;
+    static private var _initializedPrivate:Boolean;
+    static private function requestType( $mme:ModelInfoEvent ):void {
+
+        //Log.out( "ModelInfoCache.requestType  owningModel: " + $mme.modelGuid, Log.WARN );
+        // For each one loaded this will send out a new ModelMetadataEvent( ModelBaseEvent.ADDED, $mi.guid, $mi ) event
+        if ( false == _initializedPublic && $mme.modelGuid == Network.PUBLIC ) {
+            PersistenceEvent.create( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.BIGDB_TABLE_MODEL_INFO, Network.PUBLIC, null, ModelInfo.BIGDB_TABLE_MODEL_INFO_INDEX_OWNER );
+            _initializedPublic = true;
+        }
+
+        if ( false == _initializedPrivate && $mme.modelGuid == Network.userId ) {
+            PersistenceEvent.create( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.BIGDB_TABLE_MODEL_INFO, Network.userId, null, ModelInfo.BIGDB_TABLE_MODEL_INFO_INDEX_OWNER );
+            _initializedPrivate = true;
+        }
+
+        // This will return models already loaded.
+        for each ( var mi:ModelInfo in _modelInfo ) {
+            if ( mi && mi.owner == $mme.modelGuid ) {
+                Log.out( "ModelInfoCache.requestType RETURN  " +  mi.owner + " ==" + $mme.modelGuid + "  guid: " + mi.guid + "  desc: " + mi.description , Log.WARN );
+                ModelInfoEvent.create( ModelBaseEvent.RESULT_RANGE, $mme.series, mi.guid, mi );
+            }
+            else {
+                if ( mi ) {
+                    Log.out("ModelInfoCache.requestType REJECTING  " + mi.owner + " !=" + $mme.modelGuid + "  guid: " + mi.guid + "  desc: " + mi.description, Log.INFO);
+					return;
+                } else
+                    Log.out( "ModelInfoCache.requestType REJECTING null object: ", Log.WARN );
+            }
+        }
+    }
+	
 	static private function request( $mie:ModelInfoEvent ):void {
 		if ( null == $mie || null == $mie.modelGuid ) { // Validator
 			Log.out( "ModelInfoCache.request requested event or guid is NULL: ", Log.ERROR );
@@ -63,9 +103,9 @@ public class ModelInfoCache
 				_block.add($mie.modelGuid);
 
 				if (true == Globals.online && $mie.fromTables)
-					PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.LOAD_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid));
+					PersistenceEvent.create( PersistenceEvent.LOAD_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid );
 				else
-					PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.LOAD_REQUEST, $mie.series, Globals.MODEL_INFO_EXT, $mie.modelGuid));
+					PersistenceEvent.create( PersistenceEvent.LOAD_REQUEST, $mie.series, Globals.MODEL_INFO_EXT, $mie.modelGuid );
 			}
 			else {
 				if ($mie)
@@ -75,6 +115,22 @@ public class ModelInfoCache
 			}
 		}
 	}
+
+    static private function reassignToStore( $mie:ModelInfoEvent ):void {
+        var mi:ModelInfo = _modelInfo[$mie.modelGuid];
+        if ( mi ) {
+            mi.owner = Network.storeId;
+            mi.save();
+        }
+    }
+
+    static private function reassignToPublic( $mie:ModelInfoEvent ):void {
+        var mi:ModelInfo = _modelInfo[$mie.modelGuid];
+        if ( mi ) {
+            mi.owner = Network.PUBLIC;
+            mi.save();
+        }
+    }
 
 	static private function save(e:ModelInfoEvent):void {
 		for each ( var modelInfo:ModelInfo in _modelInfo )
@@ -102,8 +158,8 @@ public class ModelInfoCache
 			_modelInfo[$mie.modelGuid] = null; 
 			// TODO need to clean up eventually
 			mi = null;
-			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid, null ) );
-			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.DELETE, $mie.modelGuid, null ) );
+			PersistenceEvent.create( PersistenceEvent.DELETE_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid, null );
+			InventoryEvent.create( InventoryEvent.DELETE, $mie.modelGuid, null );
 		}
 	}
 	
@@ -123,27 +179,25 @@ public class ModelInfoCache
 			Log.out( "ModelInfoCache.deleteRecursive - ModelInfo not found $mie" + $mie, Log.ERROR );
 		
 		// Now delete the parents oxelPersistence
-		ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
 		OxelDataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
+		ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
 	}
 
-
-	static private function generationComplete( $mie:ModelInfoEvent ):void  {
-		add( 0, $mie.vmi );
+    static private function generationComplete( $mie:ModelInfoEvent ):void  {
+		add( 0, $mie.modelInfo );
 	}
 
 	static private function update($mie:ModelInfoEvent):void {
 		if ( null == $mie || null == $mie.modelGuid ) { // Validator
-			Log.out("ModelMetadataCache.update - event or guid is NULL: ", Log.ERROR);
+			Log.out("ModelInfoCache.update - event or guid is NULL: ", Log.ERROR);
 			ModelInfoEvent.create(ModelBaseEvent.EXISTS_ERROR, ( $mie ? $mie.series : -1 ), "MISSING", null);
 		} else {
 			var mi:ModelInfo = _modelInfo[$mie.modelGuid];
 			if ( null ==  mi ) {
 				Log.out( "ModelInfoCache.update trying update NULL metadata or guid, adding instead", Log.WARN );
-				add( 0, $mie.vmi );
+				add( 0, $mie.modelInfo );
 			} else {
-				_modelInfo[$mie.modelGuid] = $mie.vmi;
+				_modelInfo[$mie.modelGuid] = $mie.modelInfo;
 			}
 		}
 	}
@@ -178,7 +232,7 @@ public class ModelInfoCache
 			//Log.out( "ModelInfoCache.add modelInfo: " + $mi.toString(), Log.DEBUG );
 			_modelInfo[$mi.guid] = $mi;
 
-			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $series, $mi.guid, $mi ) );
+			ModelInfoEvent.create( ModelBaseEvent.ADDED, $series, $mi.guid, $mi );
 		}
 	}
 
@@ -192,13 +246,14 @@ public class ModelInfoCache
 		var mi:ModelInfo = _modelInfo[$pe.guid];
 		if ( null != mi ) {
 			// we already have it, publishing this results in duplicate items being sent to inventory window.
-			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, mi ) );
+			ModelInfoEvent.create( ModelBaseEvent.RESULT, $pe.series, $pe.guid, mi );
 			Log.out( "ModelInfoCache.loadSucceed - attempting to load duplicate ModelInfo guid: " + $pe.guid, Log.WARN );
 			return;
 		}
 
 		if ( $pe.dbo ) {
 			mi = new ModelInfo( $pe.guid, $pe.dbo, null );
+            mi.init();
 			add( $pe.series, mi );
 		} else if ( $pe.data ) {
 			var fileData:String = String( $pe.data );
@@ -211,10 +266,13 @@ public class ModelInfoCache
 			}
             if ( newObjData.model ) {
 				mi = new ModelInfo($pe.guid, null, newObjData.model);
+				mi.init();
 				Log.out( "ModelInfoCache.loadSucceed - OLD MODEL FOUND IN INFO.", Log.WARN);
 			}
-            else
-			    mi = new ModelInfo( $pe.guid, null, newObjData );
+            else {
+                mi = new ModelInfo($pe.guid, null, newObjData);
+                mi.init();
+            }
 			mi.save();
 
 			add( $pe.series, mi );
@@ -246,5 +304,27 @@ public class ModelInfoCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  End - Persistence Events
 	/////////////////////////////////////////////////////////////////////////////////////////////
+
+    static private var _vectorOfTreeModels:Vector.<ModelInfo> = null;
+    static public function getRandomTree():ModelInfo {
+        if ( null == _vectorOfTreeModels )
+            _vectorOfTreeModels = getTrees();
+        if ( 0 == _vectorOfTreeModels.length )
+            return null;
+        var index:int = int( Math.random() ) * _vectorOfTreeModels.length;
+        var mmd:ModelInfo = _vectorOfTreeModels[index];
+        return mmd;
+
+        function getTrees():Vector.<ModelInfo> {
+            var vectorOfTreeModels:Vector.<ModelInfo> = new Vector.<ModelInfo>();
+            for each( var mmd:ModelInfo in _modelInfo ){
+                if ( mmd && (0 <= mmd.hashTags.indexOf("tree")) ) {
+                    vectorOfTreeModels.push(mmd);
+                }
+            }
+            return vectorOfTreeModels;
+        }
+    }
+
 }
 }

@@ -38,7 +38,7 @@ public class ModelCache
 		var list:Vector.<VoxelModel> = new Vector.<VoxelModel>();
 		for ( var i:int = 0; i < _instances.length; i++ ){
 			var vm:VoxelModel = _instances[i];
-			if ( vm && vm.complete && vm.metadata.permissions.modify && vm != VoxelModel.controlledModel ) // vm.modelInfo.oxelPersistence.oxel
+			if ( vm && vm.complete && vm.modelInfo.permissions.modify && vm != VoxelModel.controlledModel ) // vm.modelInfo.oxelPersistence.oxel
 				list.push(vm);
 		}
 		return list;
@@ -92,7 +92,7 @@ public class ModelCache
 		var results:Vector.<VoxelModel> = new Vector.<VoxelModel>();
 		for ( var i:int= 0; i < _instances.length; i++ ) {
 			var vm:VoxelModel = _instances[i];
-			if ( vm && vm.metadata.guid == $modelGuid )
+			if ( vm && vm.modelInfo.guid == $modelGuid )
 				results.push( vm );
 		}
 		return results;

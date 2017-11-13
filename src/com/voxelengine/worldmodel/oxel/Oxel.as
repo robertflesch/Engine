@@ -8,15 +8,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.oxel
 {
 
-import com.voxelengine.Globals;
-import com.voxelengine.worldmodel.Light;
-import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.ModelMetadata;
-import com.voxelengine.worldmodel.models.ModelMetadataCache;
-import com.voxelengine.worldmodel.models.makers.ModelMaker;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.oxel.GrainCursor;
-import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
+
+import com.voxelengine.worldmodel.models.ModelInfo;
+import com.voxelengine.worldmodel.models.ModelInfoCache;
 
 import flash.geom.Point;
 import flash.geom.Vector3D;
@@ -43,6 +37,10 @@ import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.tasks.landscapetasks.TreeGenerator;
 import com.voxelengine.worldmodel.tasks.flowtasks.Flow;
 import com.voxelengine.worldmodel.models.OxelPersistence;
+import com.voxelengine.worldmodel.Light;
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 /**
  * ...
@@ -2743,7 +2741,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	*/
 
 	static public function growTreeAt( $vm:VoxelModel, $oxel:Oxel ):void {
-		var tree:ModelMetadata = ModelMetadataCache.getRandomTree();
+		var tree:ModelInfo = ModelInfoCache.getRandomTree();
 		if ( tree ) {
 			var treeII:InstanceInfo = new InstanceInfo();
 			treeII.modelGuid = tree.guid;
@@ -2766,7 +2764,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				var upperNeighbor:Oxel = neighbor(Globals.POSY);
 				//trace( "GrownTreesOn upperNeighbor.type: " + upperNeighbor.type + "  this.type: "+ type + "  this.grain: " + gc.grain )
 				if (OxelBad.INVALID_OXEL != upperNeighbor && TypeInfo.AIR == upperNeighbor.type && !upperNeighbor.childrenHas() ) {
-					var tree:ModelMetadata = ModelMetadataCache.getRandomTree();
+					var tree:ModelInfo = ModelInfoCache.getRandomTree();
 					if (tree) {
 						var treeII:InstanceInfo = new InstanceInfo();
 						treeII.instanceGuid = Globals.getUID();

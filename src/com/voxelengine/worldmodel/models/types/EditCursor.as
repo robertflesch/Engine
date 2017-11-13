@@ -34,7 +34,6 @@ import com.voxelengine.events.CursorOperationEvent;
 import com.voxelengine.events.CursorShapeEvent;
 import com.voxelengine.events.CursorSizeEvent;
 import com.voxelengine.events.ObjectHierarchyData;
-import com.voxelengine.GUI.voxelModels.WindowBluePrintCopy;
 import com.voxelengine.pools.GrainCursorPool;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
@@ -44,7 +43,6 @@ import com.voxelengine.worldmodel.oxel.*;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.ModelInfo;
-import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.makers.ModelMakerCursor;
 import com.voxelengine.worldmodel.tasks.flowtasks.CylinderOperation;
 import com.voxelengine.worldmodel.tasks.flowtasks.SphereOperation;
@@ -153,8 +151,8 @@ public class EditCursor extends VoxelModel
 		super( instanceInfo );
 	}
 
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
-		super.init( $mi, $vmm, $buildState );
+	override public function init( $mi:ModelInfo, $buildState:String = ModelMakerBase.MAKING ):void {
+		super.init( $mi, $buildState );
 		addListeners();
 	}
 
@@ -263,7 +261,7 @@ public class EditCursor extends VoxelModel
 		
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.modelGuid = e.om.modelGuid;
-		new ModelMakerCursor( ii, e.om.vmm );
+		new ModelMakerCursor( ii );
 	}
 	
 	////////////////////////////////////////////////
@@ -373,7 +371,7 @@ public class EditCursor extends VoxelModel
 					_pl.state = PlacementLocation.VALID;
 				}
 
-				if ( objectModel && objectModel.metadata.bound < VoxelModel.selectedModel.metadata.bound )
+				if ( objectModel && objectModel.modelInfo.bound < VoxelModel.selectedModel.modelInfo.bound )
 					objectModel.instanceInfo.positionSetComp( _pl.gc.getModelX(), _pl.gc.getModelY(), _pl.gc.getModelZ() );
 				else
 					Log.out( "EditCursor.update - Cusror model is larger then selected model")

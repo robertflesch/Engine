@@ -8,12 +8,6 @@
 
 package com.voxelengine.GUI.inventory {
 
-import com.voxelengine.GUI.voxelModels.PopupMetadataAndModelInfo;
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.worldmodel.PermissionsModel;
-import com.voxelengine.worldmodel.TextureBank;
-import com.voxelengine.worldmodel.models.Role;
-import com.voxelengine.worldmodel.models.types.Player;
 
 import org.flashapi.swing.*;
 import org.flashapi.swing.constants.*;
@@ -21,12 +15,18 @@ import org.flashapi.swing.event.*;
 import org.flashapi.swing.layout.AbsoluteLayout;
 
 import com.voxelengine.Log;
-import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.GUI.voxelModels.PopupModelInfo;
 import com.voxelengine.GUI.*;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.inventory.*;
-import com.voxelengine.worldmodel.models.ModelMetadata;
+import com.voxelengine.worldmodel.PermissionsModel;
+import com.voxelengine.worldmodel.TextureBank;
+import com.voxelengine.worldmodel.models.ModelInfo;
+import com.voxelengine.worldmodel.models.Role;
+import com.voxelengine.worldmodel.models.types.Player;
 
 public class BoxInventory extends VVBox
 {
@@ -34,8 +34,6 @@ public class BoxInventory extends VVBox
 	private var _name:Label;
 	private var _bpValue:Image;
 	private var _editData:Image;
-    private var _salePrice:Image;
-    private var _sellerInfo:Image;
 	private var _objectInfo:ObjectInfo;
 	public function get objectInfo():ObjectInfo { return _objectInfo; }
 	
@@ -62,15 +60,15 @@ public class BoxInventory extends VVBox
 		addElement(_name);
 	}
 	
-	private function thumbnailLoaded( $mme:ModelMetadataEvent ):void {
-		var om:ObjectModel = _objectInfo as ObjectModel;
+	private function thumbnailLoaded( $mme:ModelInfoEvent ):void {
+        var om:ObjectModel = _objectInfo as ObjectModel;
 		if ( $mme.modelGuid == om.modelGuid ) {
-			ModelMetadataEvent.removeListener( ModelMetadataEvent.BITMAP_LOADED, thumbnailLoaded );
-			backgroundTexture = drawScaled( om.vmm.thumbnail, width, height );
+			ModelInfoEvent.removeListener( ModelInfoEvent.BITMAP_LOADED, thumbnailLoaded );
+			backgroundTexture = drawScaled( om.modelInfo.thumbnail, width, height );
 		}
 	}
-	
-	private function metadataChanged( $mme:ModelMetadataEvent ):void {
+
+	private function metadataChanged( $mme:ModelInfoEvent ):void {
 		var om:ObjectModel = _objectInfo as ObjectModel;
 		if ( om && ( $mme.modelGuid == om.modelGuid ) ) {
 			updateObjectInfo( om )
@@ -80,7 +78,7 @@ public class BoxInventory extends VVBox
 	
 	public function updateObjectInfo( $item:ObjectInfo, $displayAddons:Boolean = true ):void {
         // this may or may not have this event registered, but we need to make sure its not in more than one.
-		ModelMetadataEvent.removeListener( ModelBaseEvent.CHANGED, metadataChanged );
+		ModelInfoEvent.removeListener( ModelBaseEvent.UPDATE, metadataChanged );
 		if ( null == $item )
 			return;
 			
@@ -98,17 +96,17 @@ public class BoxInventory extends VVBox
             break;
 		case ObjectInfo.OBJECTINFO_MODEL:
 			var om:ObjectModel = _objectInfo as ObjectModel;
-			if ( om.vmm ) {
-				if ( om.vmm.thumbnailLoaded && om.vmm.thumbnail )
-					backgroundTexture = drawScaled( om.vmm.thumbnail, width, height );
+			if ( om.modelInfo ) {
+				if ( om.modelInfo.thumbnailLoaded && om.modelInfo.thumbnail )
+					backgroundTexture = drawScaled( om.modelInfo.thumbnail, width, height );
 				else
-					ModelMetadataEvent.addListener( ModelMetadataEvent.BITMAP_LOADED, thumbnailLoaded );
+					ModelInfoEvent.addListener( ModelInfoEvent.BITMAP_LOADED, thumbnailLoaded );
 				
 				// listen for changes to this object
-				ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
+				ModelInfoEvent.addListener( ModelBaseEvent.UPDATE, metadataChanged );
 
-				_name.text = om.vmm.name;
-				var permissions:PermissionsModel = om.vmm.permissions;
+				_name.text = om.modelInfo.name;
+				var permissions:PermissionsModel = om.modelInfo.permissions;
 				var modelsOfThisGuid:int = permissions.copyCount;
 				if ( 99999 < modelsOfThisGuid )
 					_count.text = "lots";
@@ -117,7 +115,7 @@ public class BoxInventory extends VVBox
 				else
 					_count.text = String( modelsOfThisGuid );
 
-				setHelp( "guid: " + om.vmm.guid );
+				setHelp( "guid: " + om.modelInfo.guid );
 
 				if ( $displayAddons&& permissions.creator == Network.userId || role.modelPublicEdit ) {
 					_editData = new Image( "editModelData.png", 40, 40, true);
@@ -168,7 +166,6 @@ public class BoxInventory extends VVBox
 			}
 			else {
 				throw new Error( "BoxInventory.updateObjectInfo typeInfo not found for typeId: " + typeId, Log.ERROR );
-				return;
 			}
 
 			var totalOxelsOfThisTypeCount:Number = ov.count / 4096;
@@ -189,9 +186,9 @@ public class BoxInventory extends VVBox
 
 		function editModelData( $me:UIMouseEvent ):void {
 			var t:ObjectModel = _objectInfo as ObjectModel;
-			var vmm:ModelMetadata = t.vmm;
-			if ( vmm && !PopupMetadataAndModelInfo.inExistance )
-				new PopupMetadataAndModelInfo( vmm );
+			var modelInfo:ModelInfo = t.modelInfo;
+			if ( modelInfo && !PopupModelInfo.inExistance )
+				new PopupModelInfo( modelInfo );
 		}
 	}
 

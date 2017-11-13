@@ -37,8 +37,8 @@ public class Dragon extends Beast
 		super( ii );
 	}
 	
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $buildState:String = ModelMakerBase.MAKING ):void {
-		super.init( $mi, $vmm, $buildState );
+	override public function init( $mi:ModelInfo, $buildState:String = ModelMakerBase.MAKING ):void {
+		super.init( $mi, $buildState );
 		
 		// TODO reimplement in handler
 		//MouseKeyboardHandler.backwardEnabled = false;

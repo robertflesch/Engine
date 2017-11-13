@@ -24,7 +24,6 @@ import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
 import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.ModelInfoCache;
-import com.voxelengine.worldmodel.models.ModelMetadataCache;
 import com.voxelengine.worldmodel.models.OxelPersistenceCache;
 import com.voxelengine.worldmodel.models.PlayerInfoCache;
 import com.voxelengine.worldmodel.models.RoleCache;
@@ -37,12 +36,9 @@ import flash.display.Sprite
 import flash.display.StageAlign
 import flash.display.StageScaleMode
 import flash.events.Event
-import flash.events.KeyboardEvent
 import flash.events.MouseEvent
 import flash.events.ErrorEvent
 import flash.events.UncaughtErrorEvent
-import flash.system.Security;
-import flash.ui.Keyboard
 import flash.utils.getTimer
 
 import com.voxelengine.Log
@@ -134,7 +130,6 @@ public class VoxelVerse extends Sprite
 
 		Persistence.addEventHandlers();
         RoleCache.init();
-		ModelMetadataCache.init();
 		ModelInfoCache.init();
         PlayerInfoCache.init();
 		SoundCache.init();

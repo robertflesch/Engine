@@ -67,7 +67,7 @@ public class PopupAmmoList extends VVPopup {
         if ( $mie.modelGuid == _gunModelGuid ){
             ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, modelInfoSuccess );
             ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoSuccess );
-            var mi:ModelInfo = $mie.vmi;
+            var mi:ModelInfo = $mie.modelInfo;
             var weaponType:String = Armory.DEFAULT_WEAPON_TYPE;
             if ( mi.dbo.gun && mi.dbo.gun.weaponType )
                 weaponType = mi.dbo.gun.weaponType;
