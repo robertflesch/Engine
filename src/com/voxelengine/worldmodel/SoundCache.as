@@ -100,7 +100,7 @@ public class SoundCache
 		if ( null == _sounds[$sp.guid] )
 			_sounds[$sp.guid] = $sp;
 		
-		SoundEvent.create( ModelBaseEvent.ADDED, $pe.series, $pe.guid, $sp );
+		SoundEvent.create( ModelBaseEvent.RESULT, $pe.series, $pe.guid, $sp );
 	}
 	
 	static private function loadFailed( $pe:PersistenceEvent ):void {
@@ -148,7 +148,6 @@ public class SoundCache
 	static public function playSound( $guid:String ):void {
 		var snd:AnimationSound = _sounds[ $guid ];
 		if ( !snd ) {
-			SoundEvent.addListener( ModelBaseEvent.ADDED, addSoundAndPlay );
 			SoundEvent.addListener( ModelBaseEvent.RESULT, addSoundAndPlay );
 			SoundEvent.create( ModelBaseEvent.REQUEST, 0, $guid, null, Globals.isGuid( $guid ) );
 			return;
@@ -158,7 +157,6 @@ public class SoundCache
 	}
 	
 	static private function addSoundAndPlay( $se:SoundEvent ):void {
-		SoundEvent.removeListener( ModelBaseEvent.ADDED, addSoundAndPlay );
 		SoundEvent.removeListener( ModelBaseEvent.RESULT, addSoundAndPlay );
 		playSoundInternal( $se.snd );
 	}

@@ -129,14 +129,14 @@ public class RoomConnection
             }
             _block.add(userGuid);
 
-            PlayerInfoEvent.addListener( ModelBaseEvent.ADDED, playerFound );
+            PlayerInfoEvent.addListener( ModelBaseEvent.RESULT, playerFound );
             PlayerInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, playerNotFound );
 			PlayerInfoEvent.create( ModelBaseEvent.REQUEST, userGuid );
         }
     }
 
 	static private function playerFound( $pe:PlayerInfoEvent ):void {
-        PlayerInfoEvent.removeListener( ModelBaseEvent.ADDED, playerFound );
+        PlayerInfoEvent.removeListener( ModelBaseEvent.RESULT, playerFound );
         PlayerInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, playerNotFound );
         _block.clear($pe.guid);
         trace("RoomConnection.playerFound - Model for player avatar retrieved from db");
@@ -150,7 +150,7 @@ public class RoomConnection
 	}
 
     static private function playerNotFound( $pe:PlayerInfoEvent ):void {
-        PlayerInfoEvent.removeListener( ModelBaseEvent.ADDED, playerFound );
+        PlayerInfoEvent.removeListener( ModelBaseEvent.RESULT, playerFound );
         PlayerInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, playerNotFound );
 		Log.out( "RoomConnection.playerNotFound userGuid: " + $pe.guid, Log.ERROR );
     }
@@ -182,14 +182,12 @@ public class RoomConnection
 		pe.direction = new Vector3D( msg.getNumber( index++ ), msg.getNumber( index++ ), msg.getNumber( index++ ) );			
 		var ammoGuid:String = msg.getString( index );
 		AmmoEvent.addListener( ModelBaseEvent.RESULT, ammoDataRecieved );
-		AmmoEvent.addListener( ModelBaseEvent.ADDED, ammoDataRecieved );
 		AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST, 0, ammoGuid, null ) );
 		//index = pe.ammo.fromMessage( msg, index );
 		//trace( "handleProjjectileEvent: " + pe );
 		
 		function ammoDataRecieved(e:AmmoEvent):void {
 			AmmoEvent.removeListener( ModelBaseEvent.RESULT, ammoDataRecieved );
-			AmmoEvent.removeListener( ModelBaseEvent.ADDED, ammoDataRecieved );
 			pe.ammo = e.ammo;
 			ProjectileEvent.dispatch( pe );
 		}

@@ -99,7 +99,7 @@ public class PlayerInfoCache
             //Log.out( "PlayerInfoCache.add PlayerInfo: " + $pi.toString(), Log.DEBUG );
             _playerInfo[$pi.guid] = $pi;
 
-            PlayerInfoEvent.create( ModelBaseEvent.ADDED, $pi.guid, $pi );
+            PlayerInfoEvent.create( ModelBaseEvent.RESULT, $pi.guid, $pi );
         }
     }
 
@@ -122,7 +122,7 @@ import com.voxelengine.events.PersistenceEvent;
             var pi:PlayerInfo = _playerInfo[$pe.guid];
             if (null != pi) {
                 // we already have it, publishing this results in duplicate items being sent to inventory window.
-                PlayerInfoEvent.create(ModelBaseEvent.ADDED, $pe.guid, pi);
+                PlayerInfoEvent.create(ModelBaseEvent.RESULT, $pe.guid, pi);
                 Log.out("PlayerInfoCache.loadSucceed - attempting to load duplicate PlayerInfo guid: " + $pe.guid, Log.WARN);
                 return;
             }

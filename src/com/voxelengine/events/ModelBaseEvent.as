@@ -29,7 +29,7 @@ public class ModelBaseEvent extends Event
 	static public const REQUEST_TYPE:String					= "REQUEST_TYPE";
 	//// the response to a REQUEST or REQUEST_TYPE is one or mode ADDED messages
 	//// tells us the manager has add this from persistance
-	static public const ADDED:String						= "ADDED";
+	//static public const ADDED:String						= "ADDED";
 	static public const RESULT:String						= "RESULT";
     static public const RESULT_RANGE:String					= "RESULT_RANGE";
 	static public const REQUEST_FAILED:String				= "REQUEST_FAILED";

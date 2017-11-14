@@ -24,7 +24,7 @@ public final class ProjectilePool
 	public static function initialize( $initialPoolSize:uint, $growthValue:uint ):void { 
 		_currentPoolSize = $initialPoolSize;
 		_growthValue = $growthValue;
-		AmmoEvent.addListener( ModelBaseEvent.ADDED, ammoAdded )
+		AmmoEvent.addListener( ModelBaseEvent.RESULT, ammoAdded )
 	} 
 	
 	static private function ammoAdded(e:AmmoEvent):void {

@@ -76,7 +76,7 @@ public class AmmoCache {
 		else {
 			Log.out( "AmmoCache.add Trying to add the same ammo twice " + $pe.toString(), Log.WARN );
 		}
-		AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, $ammo ) );
+		AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.RESULT, $pe.series, $pe.guid, $ammo ) );
 	}
 	
 	static private function loadSucceed( $pe:PersistenceEvent):void {

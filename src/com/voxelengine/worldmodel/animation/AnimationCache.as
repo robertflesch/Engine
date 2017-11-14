@@ -129,7 +129,7 @@ public class AnimationCache
 		var ani:Animation =  _animations[$pe.guid];
 		if ( null != ani ) {
 			// we already have it, publishing this results in duplicate items
-			AnimationEvent.create( ModelBaseEvent.ADDED, $pe.series, $pe.other, $pe.guid, ani );
+			AnimationEvent.create( ModelBaseEvent.RESULT, $pe.series, $pe.other, $pe.guid, ani );
 			Log.out( "AnimationCache.loadSucceed - attempting to load duplicate AnimationC guid: " + $pe.guid, Log.WARN );
 			return;
 		}
@@ -177,7 +177,7 @@ public class AnimationCache
 		var ani:Animation =  _animations[$ani.guid];
 		if ( null == ani ) {
 			_animations[$ani.guid] = $ani;
-			AnimationEvent.create( ModelBaseEvent.ADDED, $pe.series, $pe.other, $ani.guid, $ani );
+			AnimationEvent.create( ModelBaseEvent.RESULT, $pe.series, $pe.other, $ani.guid, $ani );
 		}
 	}
 	
@@ -229,12 +229,12 @@ public class AnimationCache
 		var guidArray:Array = $ae.aniGuid.split( ":" );
 		var oldGuid:String = guidArray[0];
 		var newGuid:String = guidArray[1];
-		Log.out( "AnimationCache.updateGuid - oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.WARN );
+		//Log.out( "AnimationCache.updateGuid - oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.WARN );
 		var ani:Animation = _animations[oldGuid];
 		if ( ani ) {
 			_animations[oldGuid] = null;
 			_animations[newGuid] = ani;
-			Log.out( "AnimationCache.updateGuid - updating oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.WARN );
+			//Log.out( "AnimationCache.updateGuid - updating oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.WARN );
 		}
 		else {
 			_animations[newGuid] = ani;

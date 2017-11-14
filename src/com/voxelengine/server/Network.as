@@ -87,6 +87,7 @@ public class Network
 			_userId = $client.connectUserId;
 			_client = $client;
 			Globals.online = true;
+			Log.out( "Network.connectSuccess - Dispathing LOGIN_SUCCESS");
 			LoginEvent.dispatch( new LoginEvent( LoginEvent.LOGIN_SUCCESS ) );
 		}
 	}

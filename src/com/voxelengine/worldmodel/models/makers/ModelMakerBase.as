@@ -118,13 +118,11 @@ public class ModelMakerBase {
 	}
 
 	protected function addMIEListeners():void {
-		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retrievedModelInfo );
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retrievedModelInfo );
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );
 	}
 
 	protected function removeMIEListeners():void {
-		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retrievedModelInfo );
 		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retrievedModelInfo );
 		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );
 	}
@@ -158,11 +156,10 @@ public class ModelMakerBase {
 		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
 		OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
 		OxelDataEvent.addListener( ModelBaseEvent.RESULT, oxelPersistenceComplete );
-		OxelDataEvent.addListener( ModelBaseEvent.ADDED, oxelPersistenceComplete );
 	}
 
 	protected function removeODEListeners():void {
-		OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelPersistenceComplete );
+        //Log.out( "ModelMakerBase.removeODEListeners guid: " + modelInfo.guid , Log.WARN );
 		OxelDataEvent.removeListener( ModelBaseEvent.RESULT, oxelPersistenceComplete );
 		OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
 		OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
@@ -170,11 +167,9 @@ public class ModelMakerBase {
 	}
 
 	protected function oxelPersistenceComplete($ode:OxelDataEvent):void {
-		//Log.out( "ModelMakerBase.oxelPersistenceComplete  $ode.modelGuid: " + $ode.modelGuid + " type: " + $ode.type , Log.WARN );
 		if ($ode.modelGuid == modelInfo.guid ) {
-			//Log.out( "ModelMakerBase.oxelPersistenceComplete type: " + $ode.type  + "  guid: " + modelInfo.guid , Log.WARN );
-			if ( $ode.type == ModelBaseEvent.RESULT )
-				removeODEListeners();
+            //Log.out( "ModelMakerBase.oxelPersistenceComplete MINE    guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid + " type: " + $ode.type , Log.WARN );
+            removeODEListeners();
 
 			modelInfo.oxelPersistence = $ode.oxelPersistence;
 			// This is before quads have been built
@@ -186,10 +181,9 @@ public class ModelMakerBase {
 			_vm.complete = true;
 			if ( _vm && addToRegionWhenComplete )
 				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vm );
-			if ( $ode.type == ModelBaseEvent.RESULT )
-				markComplete( true );
+			markComplete( true );
 		} //else {
-			//Log.out( "ModelMakerBase.oxelPersistenceComplete guid: " + modelInfo.guid + "  is REJECTING guid: " + $ode.modelGuid, Log.WARN );
+        	//Log.out( "ModelMakerBase.oxelPersistenceComplete NOT MINE guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid + " type: " + $ode.type , Log.WARN );
 		//}
 	}
 
@@ -203,11 +197,11 @@ public class ModelMakerBase {
 
 	protected function oxelBuildFailed($ode:OxelDataEvent):void {
 		if ($ode.modelGuid == modelInfo.guid ) {
+            //Log.out("ModelMakerBase.oxelBuildFailed - Error generating OXEL data guid: " + $ode.modelGuid, Log.ERROR);
 			removeODEListeners();
 			modelInfo.oxelPersistence = null;
 			_vm.dead = true;
 			markComplete( false );
-			Log.out("ModelMakerBase.oxelBuildFailed - Error generating OXEL data guid: " + $ode.modelGuid, Log.ERROR);
 		}
 	}
 

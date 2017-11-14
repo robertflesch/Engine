@@ -124,7 +124,6 @@ public class Gun extends ControllableVoxelModel
 
 		if ( gunInfo.ammos ) {
 			AmmoEvent.addListener( ModelBaseEvent.RESULT, result );
-			AmmoEvent.addListener( ModelBaseEvent.ADDED, result );
 			AmmoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, resultFailed );
 			var ammosJson:Object = gunInfo.ammos;
 			for each ( var ammoInfo:Object in ammosJson ) {
@@ -158,7 +157,6 @@ public class Gun extends ControllableVoxelModel
 		if ( 0 == _ammoCount ) {
 			GunEvent.dispatch(new GunEvent(GunEvent.AMMO_LOAD_COMPLETE, instanceInfo.modelGuid, instanceInfo.instanceGuid));
 			AmmoEvent.removeListener( ModelBaseEvent.RESULT, result );
-			AmmoEvent.removeListener( ModelBaseEvent.ADDED, result );
 			AmmoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, resultFailed );
 			save();
 		}

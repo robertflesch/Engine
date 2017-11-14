@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.GUI.inventory {
 
 
+import com.voxelengine.GUI.inventory.BoxInventory;
 import com.voxelengine.events.ModelInfoEvent;
 
 import flash.display.DisplayObject;
@@ -80,7 +81,9 @@ public class InventoryPanelModel extends VVContainer
 	private var _currentRow:Container;
     private var _source:String;
 	private var _category:String = MODEL_CAT_ALL;
-    private var _seriesModelMetadataEvent:int;
+    private var _currentSeries:int;
+    private function get currentSeries():int { return _currentSeries; }
+    private function set currentSeries( $val:int ):void { _currentSeries = $val; }
 
 	public function InventoryPanelModel( $parent:VVContainer, $source:String ) {
 		super( $parent );
@@ -91,13 +94,10 @@ public class InventoryPanelModel extends VVContainer
 		FunctionRegistry.functionAdd( importObjectIPM, "importObjectIPM" );
 		FunctionRegistry.functionAdd( importObjectStainedGlass, "importObjectStainedGlass" );
 
-		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, addModelInfoEvent );
-        ModelInfoEvent.addListener( ModelBaseEvent.RESULT_RANGE, resultRangeModelInfoEvent );
-//        ModelInfoEvent.addListener( ModelBaseEvent.UPDATE, updateModel );
+        ModelInfoEvent.addListener( ModelBaseEvent.RESULT, addModelInfoEvent );
         ModelInfoEvent.addListener( ModelBaseEvent.DELETE, removeModelInfoEvent );
+        ModelInfoEvent.addListener( ModelBaseEvent.RESULT_RANGE, resultRangeModelInfoEvent );
         ModelInfoEvent.addListener( ModelInfoEvent.REASSIGN_PUBLIC, reassignPublicModelInfoEvent );
-		// This was causing model to be added twice when importing.
-		//ModelInfoEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, addModelInfoEvent );
 
 		upperTabsAdd();
 		addItemContainer();
@@ -193,13 +193,14 @@ public class InventoryPanelModel extends VVContainer
 			addTools();
 		}
 
-        _seriesModelMetadataEvent = ModelBaseEvent.seriesCounter;
+        currentSeries = ModelBaseEvent.seriesCounter;
+		trace( "IPM.displaySelectedSource series: " + currentSeries );
 		if ( _source == WindowInventoryNew.INVENTORY_PUBLIC )
-            ModelInfoEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.PUBLIC, null );
+            ModelInfoEvent.create( ModelBaseEvent.REQUEST_TYPE, currentSeries, Network.PUBLIC, null );
 		else if ( _source == WindowInventoryNew.INVENTORY_OWNED )
-			ModelInfoEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.userId, null );
+			ModelInfoEvent.create( ModelBaseEvent.REQUEST_TYPE, currentSeries, Network.userId, null );
 		else
-            ModelInfoEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.storeId, null );
+            ModelInfoEvent.create( ModelBaseEvent.REQUEST_TYPE, currentSeries, Network.storeId, null );
 	}
 
     // TODO I see problem here when language is different then what is in TypeInfo RSF - 11.16.14
@@ -222,17 +223,21 @@ public class InventoryPanelModel extends VVContainer
 	}
 
     private function resultRangeModelInfoEvent( $mie:ModelInfoEvent ):void {
-		if ( $mie.series == _seriesModelMetadataEvent )
+        //trace( "IPM.resultRangeModelInfoEvent series: " + currentSeries + "  $mie.series: " + $mie.series );
+		if ( $mie.series == currentSeries )
         	addModel( $mie );
 		else
-        Log.out( "IPM.resultRangeModelInfoEvent $mie.series: (" + $mie.series + ") != _seriesModelMetadataEvent (" + _seriesModelMetadataEvent + ")" );
+        	Log.out( "IPM.resultRangeModelInfoEvent $mie.series: (" + $mie.series + ") != _seriesModelMetadataEvent (" + currentSeries + ")" );
     }
 
 	private function addModelInfoEvent( $mie:ModelInfoEvent ):void {
 		// I only want the results from the series I asked for, or from models being added outside a series, like a generated or new model
         //Log.out( "IPM.addModelInfoEvent series: " + $mme.series +  "  guid: " + $mme.modelGuid );
-		addModel( $mie );
+        var box:BoxInventory = findBoxWithModelGuid( $mie.modelInfo.guid );
+		if ( null == box )
+			addModel( $mie );
 	}
+
     private function addModel( $mie:ModelInfoEvent ):void {
         var om:ObjectModel = new ObjectModel(null, $mie.modelGuid);
         om.modelInfo = $mie.modelInfo;
@@ -377,10 +382,10 @@ public class InventoryPanelModel extends VVContainer
         var rows:int = _itemContainer.numElements;
         var countMax:int = MODEL_CONTAINER_WIDTH / MODEL_IMAGE_WIDTH;
         var row:Container;
-		for ( var i:int; i < rows; i++ ){
-             row = _itemContainer[i];
-            for ( var i:int=0; i < countMax; i++ ) {
-                var bie:* = row.getElementAt( i );
+		for ( var i:int = 0; i < rows; i++ ){
+            row = (_itemContainer.getElementAt( i ) as Element).getElement() as Container;
+            for ( var j:int=0; j < countMax; j++ ) {
+                var bie:* = row.getElementAt( j );
                 var bi:* = bie.getElement();
                 var box:BoxInventory = bi as BoxInventory;
                 if ( box.objectInfo && ObjectInfo.OBJECTINFO_MODEL == box.objectInfo.objectType ){
@@ -542,10 +547,10 @@ public class InventoryPanelModel extends VVContainer
 	}			
 	
 	override protected function onRemoved( event:UIOEvent ):void {
-		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, addModelInfoEvent );
-		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, addModelInfoEvent );
-		ModelInfoEvent.removeListener( ModelBaseEvent.DELETE, removeModelInfoEvent );
-		//ModelInfoEvent.removeListener( ModelBaseEvent.IMPORT_COMPLETE, addModelInfoEvent );
+        ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, addModelInfoEvent );
+        ModelInfoEvent.removeListener( ModelBaseEvent.DELETE, removeModelInfoEvent );
+        ModelInfoEvent.removeListener( ModelBaseEvent.RESULT_RANGE, resultRangeModelInfoEvent );
+        ModelInfoEvent.removeListener( ModelInfoEvent.REASSIGN_PUBLIC, reassignPublicModelInfoEvent );
 	}
 }
 }

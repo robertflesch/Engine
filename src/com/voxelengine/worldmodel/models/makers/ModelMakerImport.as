@@ -138,13 +138,11 @@ public class ModelMakerImport extends ModelMakerBase {
 
 		function addParentModelInfoListener():void {
 			ModelInfoEvent.addListener( ModelBaseEvent.RESULT, parentModelInfoResult );
-			ModelInfoEvent.addListener( ModelBaseEvent.ADDED, parentModelInfoResult );
 			ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed );
 		}
 
 		function removeParentModelInfoListener():void {
 			ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, parentModelInfoResult);
-			ModelInfoEvent.removeListener(ModelBaseEvent.ADDED, parentModelInfoResult);
 			ModelInfoEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed);
 		}
 	}
@@ -239,17 +237,20 @@ public class ModelMakerImport extends ModelMakerBase {
 
 		modelInfo.brandChildren();
 
-		if ( !ii.controllingModel ) {
+		if ( !ii.controllingModel && modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount ) {
 			// Only do this for top level models.
 			var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 16)/2;
 			// this gives me corner.
-			var msCamPos:Vector3D = VoxelModel.controlledModel.cameraContainer.current.position;
-			var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld( msCamPos );
+			const cm:VoxelModel = VoxelModel.controlledModel;
+			if ( cm ) {
+                var msCamPos:Vector3D = cm.cameraContainer.current.position;
+                var adjCameraPos:Vector3D = cm.modelToWorld(msCamPos);
 
-			var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector( new Vector3D( -(radius + 8), adjCameraPos.y-radius, -radius * 3 ) );
-			var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet();
-			diffPos = diffPos.add(lav);
-			_vm.instanceInfo.positionSet = diffPos;
+                var lav:Vector3D = cm.instanceInfo.invModelMatrix.deltaTransformVector(new Vector3D(-(radius + 8), adjCameraPos.y - radius, -radius * 3));
+                var diffPos:Vector3D = cm.wsPositionGet();
+                diffPos = diffPos.add(lav);
+                _vm.instanceInfo.positionSet = diffPos;
+            }
 		}
 
 		// This works for simple models, but not for deep hierarchies
@@ -264,7 +265,6 @@ public class ModelMakerImport extends ModelMakerBase {
 
 		Log.out("ModelMakerImport.quadsComplete - needed info found: " + modelInfo.description );
 		// The function Chunk.quadsBuildPartialComplete publishes these event in this order
-		// OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, _op);
 		// OxelDataEvent.create(OxelDataEvent.OXEL_BUILD_COMPLETE, 0, _guid, _op);
 		// So we dont want to do this until OXEL_BUILD_COMPLETE is complete
 		// super.markComplete(true);

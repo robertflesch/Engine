@@ -49,7 +49,6 @@ public class InventoryManager
         if ( ownerModel ) {
             var attachToModel:VoxelModel = ownerModel.modelInfo.childModelFindByName( $slotName );
             if ( attachToModel ) {
-                ModelInfoEvent.addListener( ModelBaseEvent.ADDED, metadataLoadedForAttachment );
                 ModelInfoEvent.addListener( ModelBaseEvent.RESULT, metadataLoadedForAttachment );
                 ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, $modelGuid, null );
             }
@@ -61,7 +60,6 @@ public class InventoryManager
         }
 
         function metadataLoadedForAttachment( $mde:ModelInfoEvent ):void {
-            ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, metadataLoadedForAttachment );
             ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, metadataLoadedForAttachment );
             var ii:InstanceInfo = new InstanceInfo();
             ii.controllingModel = attachToModel;

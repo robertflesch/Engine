@@ -32,16 +32,17 @@ public class ModelInfoCache
 	public function ModelInfoCache() {}
 	
 	static public function init():void {
-		// These are the requests that are handled
-		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST, 			request );
+        ModelInfoEvent.addListener( ModelBaseEvent.REQUEST, 			request );				// ModelBaseEvent.RESULT
+																								// ModelBaseEvent.REQUEST_FAILED - object returned was invalid
+																								// ModelBaseEvent.EXISTS_ERROR - Malformed
+        ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_TYPE, 		requestType );			// ModelBaseEvent.RESULT_RANGE
+        ModelInfoEvent.addListener( ModelBaseEvent.UPDATE, 				update );				// ModelBaseEvent.EXISTS_ERROR - Malformed
 		ModelInfoEvent.addListener( ModelBaseEvent.EXISTS_REQUEST, 		checkIfExists );
 		ModelInfoEvent.addListener( ModelBaseEvent.SAVE, 				save );
 		ModelInfoEvent.addListener( ModelBaseEvent.DELETE, 				deleteHandler );
 		ModelInfoEvent.addListener( ModelInfoEvent.DELETE_RECURSIVE, 	deleteRecursive );
 		ModelInfoEvent.addListener( ModelBaseEvent.GENERATION, 			generationComplete );
 		ModelInfoEvent.addListener( ModelBaseEvent.UPDATE_GUID, 		updateGuid );
-		ModelInfoEvent.addListener( ModelBaseEvent.UPDATE, 				update );
-        ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_TYPE, 		requestType );
         ModelInfoEvent.addListener( ModelInfoEvent.REASSIGN_STORE, 		reassignToStore );
         ModelInfoEvent.addListener( ModelInfoEvent.REASSIGN_PUBLIC,		reassignToPublic );
 
@@ -60,8 +61,10 @@ public class ModelInfoCache
     // TODO - NEED TO ADD HANDLER WHEN MORE THAN 100 ARE NEEDED - RSF 9.14.2017
     static private var _initializedPublic:Boolean;
     static private var _initializedPrivate:Boolean;
+    static private var _currentSeries:int;
     static private function requestType( $mme:ModelInfoEvent ):void {
 
+        _currentSeries = $mme.series;
         //Log.out( "ModelInfoCache.requestType  owningModel: " + $mme.modelGuid, Log.WARN );
         // For each one loaded this will send out a new ModelMetadataEvent( ModelBaseEvent.ADDED, $mi.guid, $mi ) event
         if ( false == _initializedPublic && $mme.modelGuid == Network.PUBLIC ) {
@@ -77,15 +80,17 @@ public class ModelInfoCache
         // This will return models already loaded.
         for each ( var mi:ModelInfo in _modelInfo ) {
             if ( mi && mi.owner == $mme.modelGuid ) {
-                Log.out( "ModelInfoCache.requestType RETURN  " +  mi.owner + " ==" + $mme.modelGuid + "  guid: " + mi.guid + "  desc: " + mi.description , Log.WARN );
+                //Log.out( "ModelInfoCache.requestType RETURN  " +  mi.owner + " ==" + $mme.modelGuid + "  guid: " + mi.guid + "  desc: " + mi.description , Log.WARN );
                 ModelInfoEvent.create( ModelBaseEvent.RESULT_RANGE, $mme.series, mi.guid, mi );
             }
             else {
                 if ( mi ) {
-                    Log.out("ModelInfoCache.requestType REJECTING  " + mi.owner + " !=" + $mme.modelGuid + "  guid: " + mi.guid + "  desc: " + mi.description, Log.INFO);
-					return;
-                } else
-                    Log.out( "ModelInfoCache.requestType REJECTING null object: ", Log.WARN );
+                    //Log.out("ModelInfoCache.requestType REJECTING  " + mi.owner + " !=" + $mme.modelGuid + "  guid: " + mi.guid + "  desc: " + mi.description, Log.INFO);
+					continue;
+                } else {
+                    Log.out("ModelInfoCache.requestType REJECTING null object: ", Log.WARN);
+                    continue;
+                }
             }
         }
     }
@@ -109,7 +114,7 @@ public class ModelInfoCache
 			}
 			else {
 				if ($mie)
-					ModelInfoEvent.create(ModelBaseEvent.RESULT, $mie.series, $mie.modelGuid, mi);
+					ModelInfoEvent.create( ModelBaseEvent.RESULT, $mie.series, $mie.modelGuid, mi);
 				else
 					Log.out("ModelInfoCache.request ModelInfoEvent is NULL: ", Log.WARN);
 			}
@@ -223,16 +228,16 @@ public class ModelInfoCache
 	//  Internal Methods
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	static private function add( $series:int, $mi:ModelInfo ):void {
-		if ( null == $mi || null == $mi.guid ) {
-			//Log.out( "ModelInfoCache.add trying to add NULL modelInfo or guid", Log.WARN );
-			return;
-		}
 		// check to make sure is not already there
 		if ( null ==  _modelInfo[$mi.guid] ) {
 			//Log.out( "ModelInfoCache.add modelInfo: " + $mi.toString(), Log.DEBUG );
 			_modelInfo[$mi.guid] = $mi;
-
-			ModelInfoEvent.create( ModelBaseEvent.ADDED, $series, $mi.guid, $mi );
+			if ( $series == _currentSeries )
+                ModelInfoEvent.create( ModelBaseEvent.RESULT_RANGE, $series, $mi.guid, $mi );
+			else
+				ModelInfoEvent.create( ModelBaseEvent.RESULT, $series, $mi.guid, $mi );
+		} else {
+            Log.out( "ModelInfoCache.add - ModelInfo already exists", Log.ERROR );
 		}
 	}
 
@@ -246,7 +251,10 @@ public class ModelInfoCache
 		var mi:ModelInfo = _modelInfo[$pe.guid];
 		if ( null != mi ) {
 			// we already have it, publishing this results in duplicate items being sent to inventory window.
-			ModelInfoEvent.create( ModelBaseEvent.RESULT, $pe.series, $pe.guid, mi );
+            if ( $pe.series == _currentSeries )
+                ModelInfoEvent.create( ModelBaseEvent.RESULT_RANGE, $pe.series, $pe.guid, mi );
+            else
+                ModelInfoEvent.create( ModelBaseEvent.RESULT, $pe.series, $pe.guid, mi );
 			Log.out( "ModelInfoCache.loadSucceed - attempting to load duplicate ModelInfo guid: " + $pe.guid, Log.WARN );
 			return;
 		}

@@ -54,7 +54,6 @@ public class ObjectModel extends ObjectInfo
 		_objectType = values[0];
 		modelGuid = values[1];
 		_displayAddons = false;
-		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, modelInfoAdded );
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, modelInfoAdded );
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, modelInfoFailed );
 		ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, modelGuid, null );
@@ -64,7 +63,6 @@ public class ObjectModel extends ObjectInfo
 	private function modelInfoFailed(e:ModelInfoEvent):void
 	{
 		if ( modelGuid == e.modelGuid ) {
-			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, modelInfoAdded );
             ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoAdded );
 			ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, modelInfoFailed );
 			//_owner remove me!
@@ -79,7 +77,6 @@ public class ObjectModel extends ObjectInfo
 	private function modelInfoAdded(e:ModelInfoEvent):void
 	{
 		if ( modelGuid == e.modelGuid ) {
-			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, modelInfoAdded );
 			ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoAdded );
 			ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, modelInfoFailed );
             _mi = e.modelInfo;

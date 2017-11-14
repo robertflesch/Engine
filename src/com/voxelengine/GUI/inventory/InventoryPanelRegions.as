@@ -49,7 +49,6 @@ public class InventoryPanelRegions extends VVContainer
 		
 //		upperTabsAdd();
 		addItemContainer();
-        RegionEvent.addListener( ModelBaseEvent.ADDED, regionLoadedEvent );
         RegionEvent.addListener( ModelBaseEvent.RESULT, regionLoadedEvent );
         displaySelectedSource( $dataSource );
 	}
@@ -62,7 +61,6 @@ public class InventoryPanelRegions extends VVContainer
 		_listbox1 = new ListBox( width, 15 );
 		_itemContainer.addElement( _listbox1 );
 		eventCollector.addEvent( _listbox1, UIMouseEvent.CLICK, editThisRegion );
-		RegionEvent.addListener( ModelBaseEvent.ADDED, regionLoadedEvent );
 		RegionEvent.addListener( ModelBaseEvent.RESULT, regionLoadedEvent );
 		RegionEvent.addListener( ModelBaseEvent.CHANGED, regionInfoChanged );
 	}
@@ -99,7 +97,6 @@ public class InventoryPanelRegions extends VVContainer
 			
 		var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
 		if ( li ) {
-			RegionEvent.removeListener( ModelBaseEvent.ADDED, regionLoadedEvent );
 			RegionEvent.removeListener( ModelBaseEvent.RESULT, regionLoadedEvent );
 //			var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_REGIONS );
 			new WindowRegionDetail( li.data, null );
@@ -107,7 +104,6 @@ public class InventoryPanelRegions extends VVContainer
 	}
 	
 	override protected function onRemoved( event:UIOEvent ):void {
-		RegionEvent.removeListener( ModelBaseEvent.ADDED, regionLoadedEvent );
 		RegionEvent.removeListener( ModelBaseEvent.RESULT, regionLoadedEvent );
 		RegionEvent.removeListener( ModelBaseEvent.CHANGED, regionInfoChanged );
 	}

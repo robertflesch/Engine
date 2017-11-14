@@ -52,13 +52,11 @@ public class AssignModelAndChildrenToPublicOwnership {
         }
 
         function addMIEListeners():void {
-            ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retrievedModelInfo );
             ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retrievedModelInfo );
             ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );
         }
 
         function removeMIEListeners():void {
-            ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retrievedModelInfo );
             ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retrievedModelInfo );
             ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );
         }

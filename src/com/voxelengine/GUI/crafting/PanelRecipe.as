@@ -116,7 +116,7 @@ public class PanelRecipe extends PanelBase
 //            craftItemII.positionSet 		= point;
             _instanceGuid = craftItemII.instanceGuid		= Globals.getUID();
             craftItemII.name				= _craftedItem.name;
-            OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, templateComplete );
+            OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, templateComplete );
             ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
             new ModelMaker( craftItemII, true , false );
         }
@@ -125,7 +125,7 @@ public class PanelRecipe extends PanelBase
 
     private function modelLoadComplete( $mle:ModelLoadingEvent ): void {
         if ( $mle.data.modelGuid == _craftedItem.templateId ) {
-            OxelDataEvent.removeListener(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, templateComplete);
+            OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, templateComplete);
             ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete);
 
             var ms:ModelStatisics = $mle.vm.modelInfo.oxelPersistence.statistics;
@@ -144,7 +144,7 @@ public class PanelRecipe extends PanelBase
 	// its built and ready to have its materials replaced
 	private function templateComplete(  $ode:OxelDataEvent ): void {
 		if ( $ode.modelGuid == _craftedItem.templateId ){
-            OxelDataEvent.removeListener( OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, templateComplete );
+            OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, templateComplete );
             ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
 
             var oxel:Oxel = $ode.oxelPersistence.oxel;

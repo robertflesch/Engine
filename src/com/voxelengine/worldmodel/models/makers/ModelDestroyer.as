@@ -71,13 +71,11 @@ public class ModelDestroyer {
 
         function addListeners():void {
             ModelInfoEvent.addListener( ModelBaseEvent.RESULT, dataResult );
-            ModelInfoEvent.addListener( ModelBaseEvent.ADDED, dataResult );
             ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, dataResultFailed );
         }
 
         function removeListeners():void {
             ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, dataResult);
-            ModelInfoEvent.removeListener(ModelBaseEvent.ADDED, dataResult);
             ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, dataResultFailed );
         }
     }

@@ -110,7 +110,6 @@ public class WindowSandboxList extends VVPopup
 
 		Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 		
-		RegionEvent.addListener( ModelBaseEvent.ADDED, regionLoadedEvent );
 		RegionEvent.addListener( ModelBaseEvent.RESULT, regionLoadedEvent );
 		
 		displaySelectedRegionList( openType );
@@ -159,7 +158,6 @@ public class WindowSandboxList extends VVPopup
 
 	override protected function onRemoved( event:UIOEvent ):void {
 		super.onRemoved( event );
-		RegionEvent.removeListener( ModelBaseEvent.ADDED, regionLoadedEvent );
 		RegionEvent.removeListener( ModelBaseEvent.RESULT, regionLoadedEvent );
 		
 		Globals.g_app.dispatchEvent( new VVWindowEvent( VVWindowEvent.WINDOW_CLOSING, label ) );

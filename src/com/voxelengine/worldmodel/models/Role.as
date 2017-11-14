@@ -30,7 +30,7 @@ public class Role  extends PersistenceObject {
     static private var _s_defaultRole:Role = null;
     static public function get defaultRole() :Role {
         if ( !_s_defaultRole )
-            _s_defaultRole = new Role( Network.LOCAL, null );
+            _s_defaultRole = new Role( Network.LOCAL, new DatabaseObject( BIGDB_TABLE_ROLES, "0", "0", 0, true, null) );
         return _s_defaultRole;
     }
 

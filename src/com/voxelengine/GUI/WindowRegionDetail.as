@@ -70,7 +70,6 @@ public class WindowRegionDetail extends VVPopup
 		width = WIDTH;
 
 		if ( $regionID ) {	
-			RegionEvent.addListener( ModelBaseEvent.ADDED, collectRegionInfo );
 			RegionEvent.addListener( ModelBaseEvent.RESULT, collectRegionInfo );
 			RegionEvent.create( ModelBaseEvent.REQUEST, 0, $regionID );
 		}
@@ -82,14 +81,13 @@ public class WindowRegionDetail extends VVPopup
 			_region.desc = "Please enter region description here";
             _region.changed = true;
 
-            collectRegionInfo( new RegionEvent( ModelBaseEvent.ADDED, 0, _region.guid, _region ) );
+            collectRegionInfo( new RegionEvent( ModelBaseEvent.RESULT, 0, _region.guid, _region ) );
 		}
 		
 	}
 	
 	private function collectRegionInfo( $re:RegionEvent ):void 
 	{
-		RegionEvent.removeListener( ModelBaseEvent.ADDED, collectRegionInfo );
 		RegionEvent.removeListener( ModelBaseEvent.RESULT, collectRegionInfo );
 		_region =  $re.data as Region;
 

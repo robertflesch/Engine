@@ -21,7 +21,6 @@ public class OxelDataEvent extends ModelBaseEvent
 	static public const OXEL_FACES_BUILT_COMPLETE:String	= "OXEL_FACES_BUILT_COMPLETE";
 	static public const OXEL_QUADS_BUILT_PARTIAL:String		= "OXEL_QUADS_BUILT_PARTIAL";
 	static public const OXEL_QUADS_BUILT_FAIL:String		= "OXEL_QUADS_BUILT_FAIL";
-	static public const OXEL_QUADS_BUILT_COMPLETE:String	= "OXEL_QUADS_BUILT_COMPLETE";
 	static public const OXEL_BUILD_COMPLETE:String			= "OXEL_BUILD_COMPLETE";
 	static public const OXEL_BUILD_FAILED:String			= "OXEL_BUILD_FAILED";
 

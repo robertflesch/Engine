@@ -124,7 +124,6 @@ public class Animation extends PersistenceObject
 
 		if ( dbo.sound ) {
             _animationSound = null;
-            SoundEvent.addListener( ModelBaseEvent.ADDED, soundAdded );
             SoundEvent.addListener( ModelBaseEvent.RESULT, soundAdded );
             if ( dbo.sound.guid )
                 SoundEvent.create( ModelBaseEvent.REQUEST, 0, dbo.sound.guid );
@@ -151,7 +150,6 @@ public class Animation extends PersistenceObject
     private function soundAdded( $se:SoundEvent ):void {
         if ( ModelMakerBase.isImporting )
             SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID_COMPLETE, updateSoundGuid );
-        SoundEvent.removeListener( ModelBaseEvent.ADDED, soundAdded );
         SoundEvent.removeListener( ModelBaseEvent.RESULT, soundAdded );
         _animationSound = $se.snd;
         if ( dbo.sound.soundRangeMax )

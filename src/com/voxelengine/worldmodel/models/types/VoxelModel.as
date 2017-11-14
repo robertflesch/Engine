@@ -179,7 +179,7 @@ public class VoxelModel {
 	protected function processClassJson( $buildState:String ):void {
 		modelInfo.childrenLoad( this, $buildState );
 		modelInfo.scriptsLoad( instanceInfo );
-		modelInfo.animationsLoad();
+		modelInfo.animationsLoad( $buildState );
 	}
 	
 	// The export object is a combination of modelInfo and instanceInfo

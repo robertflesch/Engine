@@ -47,7 +47,6 @@ public class InventoryPanelAnimations extends VVContainer
 //		upperTabsAdd();
         addItemContainer();
         AnimationEvent.addListener( ModelBaseEvent.RESULT, animationEvent );
-        AnimationEvent.addListener( ModelBaseEvent.ADDED, animationEvent );
 
         displaySelectedSource( $dataSource );
     }

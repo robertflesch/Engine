@@ -71,11 +71,11 @@ public class OxelPersistenceCache
 			if ( _block.has( $op.guid ) )
 				_block.clear( $op.guid );
 			_loadingCount--;
-			OxelDataEvent.create( ModelBaseEvent.ADDED, $series, $op.guid, $op );
+			OxelDataEvent.create( ModelBaseEvent.RESULT, $series, $op.guid, $op );
 			new OxelLoadAndBuildManager( $op.guid, $op );
 		} else {
 			Log.out("OxelDataCache.Add trying to add duplicate OxelData", Log.WARN);
-			OxelDataEvent.create(ModelBaseEvent.ADDED, $series, $op.guid, $op);
+			OxelDataEvent.create(ModelBaseEvent.RESULT, $series, $op.guid, $op);
 		}
 	}
 	

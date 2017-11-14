@@ -36,7 +36,6 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 
 		// request the ModelData so that we can get the modelInfo from it.
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, dataResult );
-		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, dataResult );
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, dataResultFailed );
 
 		// make sure everything is saved BEFORE we delete, otherwise the save can come AFTER the delete
@@ -48,7 +47,6 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
             if ( _modelGuid == $mie.modelGuid ) {
                 _modelInfo = $mie.modelInfo;
                 ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, dataResult );
-                ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, dataResult );
                 ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, dataResultFailed );
                 deleteChildrenQuery();
             }
@@ -57,7 +55,6 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
         function dataResultFailed( $mie:ModelInfoEvent):void {
             if ( _modelGuid == $mie.modelGuid ) {
                 ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, dataResult);
-                ModelInfoEvent.removeListener(ModelBaseEvent.ADDED, dataResult);
                 ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, dataResultFailed );
                 deleteChildrenQuery();
             }

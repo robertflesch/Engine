@@ -116,7 +116,6 @@ public class AnimationSound extends PersistenceObject
 	
 	public function reset():void {
 		stop();
-		SoundEvent.removeListener( ModelBaseEvent.ADDED, added );
 		SoundEvent.removeListener( ModelBaseEvent.RESULT, added );
 		SoundEvent.removeListener( ModelBaseEvent.UPDATE_GUID, updateGuid );
 		if (soundRangeMax != 2000)
@@ -128,7 +127,6 @@ public class AnimationSound extends PersistenceObject
 	private function failed( $se:SoundEvent ):void {
 		if ( $se.guid == guid ) {
 			_waitingOnLoad = false;
-			SoundEvent.removeListener(ModelBaseEvent.ADDED, added);
 			SoundEvent.removeListener(ModelBaseEvent.RESULT, added);
 			SoundEvent.removeListener(ModelBaseEvent..REQUEST_FAILED, failed);
 			Log.out("AnimationSound.failed - error: " + $se );
@@ -136,7 +134,6 @@ public class AnimationSound extends PersistenceObject
 	}
 
 	private function added( $se:SoundEvent ):void {
-		SoundEvent.removeListener( ModelBaseEvent.ADDED, added );
 		SoundEvent.removeListener( ModelBaseEvent.RESULT, added );
 		SoundEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failed );
 

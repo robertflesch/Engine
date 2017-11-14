@@ -166,7 +166,7 @@ public class RegionManager
 		//Log.out( "RegionManager.regionAdd - adding region: " + $region.guid, Log.DEBUG );
 		if ( false == regionHas( $region.guid ) ) {
 			_regions.push( $region );
-			RegionEvent.create( ModelBaseEvent.ADDED, ($pe ? $pe.series: 0), $region.guid, $region );
+			RegionEvent.create( ModelBaseEvent.RESULT, ($pe ? $pe.series: 0), $region.guid, $region );
 		}
 		else
 			Log.out( "RegionManager.regionAdd - NOT loading duplicate region: " + $region.guid, Log.DEBUG );
@@ -186,7 +186,7 @@ public class RegionManager
 		EditCursor.createCursor();
 
 		// Add a listener to tell when file has been loaded
-//		RegionEvent.addListener( ModelBaseEvent.ADDED, startingRegionLoaded );
+//		RegionEvent.addListener( ModelBaseEvent.RESULT, startingRegionLoaded );
 		// now request the file be loaded
 //		RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST, 0, $guid ) );
 	}
@@ -202,7 +202,7 @@ public class RegionManager
 
 	private function startingRegionLoaded( $re:RegionEvent):void {
 		// remove this handler
-		RegionEvent.removeListener( ModelBaseEvent.ADDED, startingRegionLoaded );
+		RegionEvent.removeListener( ModelBaseEvent.RESULT, startingRegionLoaded );
 		// now load the file that was designated as the starting region
 		RegionEvent.create( RegionEvent.LOAD, 0, $re.guid, $re.data );
 	}

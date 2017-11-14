@@ -54,7 +54,6 @@ public class PopupModelInfo extends VVPopup
 
         _mi = $mi;
 
-        ModelInfoEvent.addListener( ModelBaseEvent.ADDED, modelInfoRetreived );
         ModelInfoEvent.addListener( ModelBaseEvent.RESULT, modelInfoRetreived );
         ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, _mi.guid, null );
 
@@ -104,7 +103,6 @@ public class PopupModelInfo extends VVPopup
 
     private function modelInfoRetreived( $mie:ModelInfoEvent ):void {
         if ( $mie.modelGuid == _mi.guid ) {
-            ModelInfoEvent.removeListener(ModelBaseEvent.ADDED, modelInfoRetreived);
             ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, modelInfoRetreived);
             _mi = $mie.modelInfo;
             addModelInfo();

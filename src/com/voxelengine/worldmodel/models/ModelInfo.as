@@ -8,6 +8,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+
 import flash.display.Bitmap;
 
 import flash.display.BitmapData;
@@ -353,15 +355,15 @@ public class ModelInfo extends PersistenceObject
 	public 	function set animationsLoaded(value:Boolean):void		{ _animationsLoaded = value; }
 	
 	// Dont load the animations until the model is instaniated
-	public function animationsLoad():void {
+	public function animationsLoad( $buildState:String ):void {
 		_series = 0;
 		animationsLoaded = true;
 		if ( animationInfo ) {
 			for each ( var animData:Object in animationInfo ) {
 				if ( animationsLoaded ){
 					animationsLoaded = false;
-					AnimationEvent.addListener( ModelBaseEvent.DELETE, 		animationDeleteHandler );
-					AnimationEvent.addListener( ModelBaseEvent.ADDED, 		animationAdd );
+                    AnimationEvent.addListener( ModelBaseEvent.RESULT, animationResult );
+					AnimationEvent.addListener( ModelBaseEvent.DELETE, animationDeleteHandler );
 				}
 				_animsRemainingToLoad++; 
 				
@@ -377,12 +379,36 @@ public class ModelInfo extends PersistenceObject
 				AnimationEvent.dispatch( ae );
 			}
 		}
+
+        function animationResult( $ae:AnimationEvent ):void {
+            if ( guid == $ae.modelGuid ) {
+                //Log.out( "ModelInfo.addAnimation " + $ae, Log.WARN );
+                if (_series == $ae.series) {
+                    if ( !Globals.isGuid($ae.ani.guid))
+                        $ae.ani.guid = Globals.getUID();
+                    _animations.push($ae.ani);
+                    if ( $buildState == ModelMakerBase.IMPORTING )
+                    	$ae.ani.save();
+
+                    _animsRemainingToLoad--;
+                    if (0 == _animsRemainingToLoad) {
+                        animationsLoaded = true;
+                        AnimationEvent.removeListener( ModelBaseEvent.RESULT, animationResult );
+                        AnimationEvent.removeListener( ModelBaseEvent.DELETE, animationDeleteHandler );
+                        if ( $buildState == ModelMakerBase.IMPORTING )
+							save();
+                        //Log.out( "ModelInfo.addAnimation safe to save now: " + guid, Log.WARN );
+                    }
+                }
+            }
+        }
+
 	}
 			
 	public function animationsDelete():void {
 		if ( animationInfo ) {
 			Log.out( "ModelInfo.animationsDelete - animations found" );
-			// Dont worry about removing the animations, since the modelInfo is being deleted.
+			// Don't worry about removing the animations, since the modelInfo is being deleted.
 			for each ( var animData:Object in animationInfo ) {
 				Log.out( "ModelInfo.animationsDelete - deleting animation: " + animData.name + "  guid: " + animData.guid );
 				AnimationEvent.create( ModelBaseEvent.DELETE, 0, guid, animData.guid, null );
@@ -390,24 +416,7 @@ public class ModelInfo extends PersistenceObject
 		}
 	}
 
-	public function animationAdd( $ae:AnimationEvent ):void {
-		if ( guid == $ae.modelGuid ) {
-			//Log.out( "ModelInfo.addAnimation " + $ae, Log.WARN );
-			if (_series == $ae.series) {
-				if ( !Globals.isGuid($ae.ani.guid))
-						$ae.ani.guid = Globals.getUID();
-				_animations.push($ae.ani);
-				_animsRemainingToLoad--;
-				if (0 == _animsRemainingToLoad) {
-					animationsLoaded = true;
-					AnimationEvent.removeListener(ModelBaseEvent.DELETE, animationDeleteHandler);
-					AnimationEvent.removeListener(ModelBaseEvent.ADDED, animationAdd);
-					//Log.out( "ModelInfo.addAnimation safe to save now: " + guid, Log.WARN );
-				}
-			}
-		}
-	}
-	
+
 	public function animationDeleteHandler( $ae:AnimationEvent ):void {
 		//Log.out( "ModelInfo.animationDelete $ae: " + $ae, Log.WARN );
 		if ( $ae.modelGuid == guid ) {
@@ -436,6 +445,8 @@ public class ModelInfo extends PersistenceObject
 	//  Children functions
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	private 	var			 _childCount:uint;
+    private 	function	 get childCount():uint 							{ return _childCount; }
+    private 	function	 set childCount($val:uint):void 				{ _childCount = $val; }
 
 	private 	var			 _childVoxelModels:Vector.<VoxelModel>			= new Vector.<VoxelModel>; 	// INSTANCE NOT EXPORTED
 	public		function get childVoxelModels():Vector.<VoxelModel>			{ return _childVoxelModels; }
@@ -454,7 +465,6 @@ public class ModelInfo extends PersistenceObject
 
 	public function childrenLoad( $vm:VoxelModel, $buildState:String ):void {
 		childrenLoaded	= true;
-		_childCount = 0;
 		if ( !dbo || !dbo.children )
 			return;
 		
@@ -463,6 +473,7 @@ public class ModelInfo extends PersistenceObject
 			// Only want to add the listener once
 			if ( true == childrenLoaded ) {
 				childrenLoaded	= false;
+                //Log.out( "VoxelModel.childrenLoad - guid: " + guid + " is addListener( ModelEvent.CHILD_MODEL_ADDED)" );
 				ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 			}
 			var ii:InstanceInfo = new InstanceInfo();
@@ -479,8 +490,8 @@ public class ModelInfo extends PersistenceObject
 			// Since this is a child object, it automatically get added to the parent.
 			// So add to cache just adds it to parent instance.
 			//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
-			_childCount++;
-			//Log.out( "VoxelModel.childrenLoad - calling load on ii: " + ii + "  childCount: " + _childCount );
+			childCount = childCount + 1;
+			//Log.out( "VoxelModel.childrenLoad - the " + guid + " is loading child guid: " + ii.modelGuid + "  childCount: " + childCount );
             if ( $buildState == ModelMakerBase.IMPORTING )
                 new ModelMakerImport( ii, false );
             if ( $buildState == ModelMakerBase.CLONING ) {
@@ -496,21 +507,25 @@ public class ModelInfo extends PersistenceObject
 	}
 
     protected function onChildAdded( $me:ModelEvent ):void {
+		// does the child's parent guid == this objects guid, if so its our child
 		if ( $me.vm && $me.vm.instanceInfo.controllingModel && $me.vm.instanceInfo.controllingModel.modelInfo.guid == guid ) {
-			_childCount--;
-//			Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children remaining: " + _childCount, Log.WARN );
+			childCount = childCount - 1;
+			Log.out( "ModelInfo.onChildAdded - MY CHILD - parent guid: " + guid + "  childGuid: " + $me.vm.modelInfo.guid + "  children remaining: " + _childCount, Log.WARN );
             checkChildCountForZero( $me.vm, $me.vm.modelInfo.guid );
+		}
+		else {
+            Log.out( "ModelInfo.onChildAdded - NOT MY CHILD - parent guid: " + guid + "  childGuid: " + $me.vm.modelInfo.guid, Log.WARN );
 		}
 	}
 
     public function onChildAddFailure( $childGuid:String ):void {
         	Log.out( "ModelInfo.onChildAddFailure - this model: " + guid + "  childModel.modelGuid: " + $childGuid );
-            _childCount--;
+        	childCount = childCount - 1;
             checkChildCountForZero( null, $childGuid );
     }
 
 	private function checkChildCountForZero( $vm:VoxelModel, $childModelGuid:String ):void {
-        if (0 == _childCount) {
+        if (0 == childCount) {
 //			Log.out( "ModelInfo.checkChildCountForZero - modelInfo: " + guid + "  children COMPLETE", Log.WARN );
             ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded);
             childrenLoaded = true;
@@ -715,7 +730,7 @@ public class ModelInfo extends PersistenceObject
 	override public function save( $validateGuid:Boolean = true ):Boolean {
 
 		if ( false == animationsLoaded || false == childrenLoaded) {
-			Log.out("ModelInfo.save - NOT Saving guid: " + guid + " NEED Animations or children to complete", Log.WARN);
+			Log.out("ModelInfo.save - NOT guid: " + guid + " NEEDs " + (animationsLoaded?"":"Animations ") + (childrenLoaded?"":"Children") + " to complete", Log.WARN);
 			return false;
 		}
 
@@ -723,6 +738,7 @@ public class ModelInfo extends PersistenceObject
             oxelPersistence.save();
         }
 
+        Log.out("ModelInfo.save -     guid: " + guid, Log.WARN);
 		if ( !super.save( $validateGuid ) )
 			return false;
 

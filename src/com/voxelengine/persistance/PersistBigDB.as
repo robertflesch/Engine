@@ -134,7 +134,8 @@ public class PersistBigDB
 		PlayerIOPersistenceEvent.removeListener( PlayerIOPersistenceEvent.PERSISTANCE_NO_DB, loadTypeNoDB );
 				
 		function loadTypeSucceed( dba:Array ):void {
-			Log.out( "PersistRegion.loadType.succeed - regions loaded: " + dba.length, Log.DEBUG );
+			Log.out( "PersistBigDB.loadType.succeed - regions loaded: " + dba.length, Log.DEBUG );
+			// TODO - I will have to add handler here for when I have more than 99 items - RSF 11.14.2017
 			for each ( var $dbo:DatabaseObject in dba )
 			{
 				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $dbo.key, $dbo, false ) );

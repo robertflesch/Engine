@@ -51,7 +51,6 @@ public class PopupAmmoList extends VVPopup {
         addElement( new Label( "Click Ammo to add to Gun" ) );
         addElement( _listBox );
 
-        ModelInfoEvent.addListener( ModelBaseEvent.ADDED, modelInfoSuccess );
         ModelInfoEvent.addListener( ModelBaseEvent.RESULT, modelInfoSuccess );
         ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, _gunModelGuid, null );
 
@@ -65,13 +64,11 @@ public class PopupAmmoList extends VVPopup {
 
     private function modelInfoSuccess( $mie:ModelInfoEvent ):void {
         if ( $mie.modelGuid == _gunModelGuid ){
-            ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, modelInfoSuccess );
             ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoSuccess );
             var mi:ModelInfo = $mie.modelInfo;
             var weaponType:String = Armory.DEFAULT_WEAPON_TYPE;
             if ( mi.dbo.gun && mi.dbo.gun.weaponType )
                 weaponType = mi.dbo.gun.weaponType;
-            AmmoEvent.addListener( ModelBaseEvent.ADDED, addAmmo );
             AmmoEvent.addListener( ModelBaseEvent.RESULT, addAmmo );
             AmmoEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, weaponType, null );
         }
@@ -91,7 +88,6 @@ public class PopupAmmoList extends VVPopup {
     override protected function onRemoved( event:UIOEvent ):void {
         super.onRemoved( event );
 
-        AmmoEvent.removeListener( ModelBaseEvent.ADDED, addAmmo );
         AmmoEvent.removeListener( ModelBaseEvent.RESULT, addAmmo );
         Globals.g_app.dispatchEvent( new VVWindowEvent( VVWindowEvent.WINDOW_CLOSING, label ) );
         _s_currentInstance = null;

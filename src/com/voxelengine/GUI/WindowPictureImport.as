@@ -392,12 +392,12 @@ public class WindowPictureImport extends VVPopup {
                 vm.instanceInfo.rotationSetComp( 0, 90, 0 );
                 vm.modelInfo.hashTags = "#architecture#window#stained";
 
-                OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE,  quadsComplete );
+                OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE,  quadsComplete );
             }
 
             function quadsComplete( $ode:OxelDataEvent ):void {
                 if (vm.modelInfo.guid == $ode.modelGuid) {
-                    OxelDataEvent.removeListener(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, quadsComplete);
+                    OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, quadsComplete);
                     var bmpd:BitmapData = Renderer.renderer.modelShot( vm );
                     vm.modelInfo.thumbnail = drawScaled(bmpd, 128, 128);
                     ModelInfoEvent.create(ModelBaseEvent.CHANGED, 0, vm.modelInfo.guid, vm.modelInfo);

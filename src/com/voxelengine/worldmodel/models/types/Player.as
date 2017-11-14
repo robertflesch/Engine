@@ -5,27 +5,21 @@
   authorship protected under United States Copyright Act.
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
-package com.voxelengine.worldmodel.models.types
-{
+package com.voxelengine.worldmodel.models.types {
+import com.voxelengine.events.ModelInfoEvent;
 
+import flash.geom.Vector3D;
+
+import playerio.DatabaseObject;
+import playerio.PlayerIOError;
+
+import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.PlayerInfoEvent;
 import com.voxelengine.events.WindowSplashEvent;
-import com.voxelengine.worldmodel.models.RoleCache;
-import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
-
-import flash.events.TimerEvent;
-
-import flash.geom.Vector3D;
-import flash.utils.Timer;
-
-import playerio.DatabaseObject;
-import playerio.PlayerIOError;
-
-import com.voxelengine.Log;
 import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.LoginEvent;
 import com.voxelengine.events.ModelLoadingEvent;
@@ -40,41 +34,53 @@ import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
+import com.voxelengine.worldmodel.models.RoleCache;
 
 public class Player extends PersistenceObject
 {
     static public const DEFAULT_PLAYER:String = "DefaultPlayer";
-    static private const REFERENCE_AVATAR:String = "DefaultPlayer";
+    //static private const REFERENCE_AVATAR:String = "494A4E90-2442-D717-40CD-5D51FA790A8A";
+    static private const REFERENCE_AVATAR:String = "8E26C353-6AF8-DBD8-2486-9C56326BF047";
+    static public const BIGDB_TABLE_PLAYER_OBJECTS:String = "PlayerObjects";
 
-    public function get role():Role { return RoleCache.roleGet( dbo ? dbo.role : null ) }
+    public function get role():Role 				{ return RoleCache.roleGet( dbo ? dbo.role : null ) }
+    public function get instanceGuid():String 		{ return dbo ? dbo.instanceGuid: DEFAULT_PLAYER; }
 
-    private static var _s_player:Player = null;
-	public static function get player():Player { return _s_player; }
+    private static var _s_player:Player;
+	public static function get player():Player 		{
+        if ( null == _s_player ) {
+            _s_player = new Player();
+            _s_player.init();
+		}
+		return _s_player;
+	}
 
 	static private var _vm:Avatar;
-	static public function get pm():Avatar { return _vm; }
-
-    public function get instanceGuid():String { return dbo ? dbo.instanceGuid: DEFAULT_PLAYER; }
+	static public function get pm():Avatar 			{ return _vm; }
 
 	public function Player() {
-		super( "local", "PlayerObjects" );
-		Log.out( "Player.construct" );
-		LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, onLogin );
-		RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, onRegionLoad );
-		InventorySlotEvent.addListener( InventorySlotEvent.DEFAULT_REQUEST, defaultSlotDataRequest );
+		// DO NOT DO ANYTHING IN STATIC OBJECTS CONSTRUCTORS
+		super( Network.LOCAL, BIGDB_TABLE_PLAYER_OBJECTS );
+	}
 
-		function onLogin( $event:LoginEvent ):void {
-			LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, onLogin );
-			Log.out( "Player.onLogin - retrieve player info from Persistence", Log.DEBUG );
-			// request that the database load the player Object
-			Persistence.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
-		}
+	private function init():void {
+        Log.out( "Player.init" );
+        LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, onLogin );
+        RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, onRegionLoad );
+        InventorySlotEvent.addListener( InventorySlotEvent.DEFAULT_REQUEST, defaultSlotDataRequest );
+
+        function onLogin( $event:LoginEvent ):void {
+            LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, onLogin );
+            Log.out( "Player.onLogin - retrieve player info from Persistence", Log.DEBUG );
+            // request that the database load the player Object
+            Persistence.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
+        }
 	}
 
     public function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
 		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 		dbo = $dbo;
-		if ( $dbo ) {
+		if ( dbo ) {
             _guid = dbo.key;
 			if ( null == $dbo.modelGuid ) {
 				// Assign the Avatar the default avatar
@@ -98,6 +104,9 @@ Log.out( "onPlayerLoadedAction - HACK TO NOT SAVE NEW PLAYER DATA", Log.WARN );
 			pi.modelGuid = dbo.modelGuid;
 			PlayerInfoEvent.create( ModelBaseEvent.SAVE, instanceGuid, pi );
 			createPlayer( dbo.modelGuid, instanceGuid );
+
+            InventoryEvent.addListener( InventoryEvent.SAVE_REQUEST, savePlayerObject );
+            InventoryEvent.dispatch(new InventoryEvent(InventoryEvent.REQUEST, Network.userId, Player.player.dbo));
 		}
 		else {
 			Log.out( "Avatar.onPlayerLoadedAction - ERROR, failed to create new record for new players?", Log.ERROR );
@@ -105,11 +114,6 @@ Log.out( "onPlayerLoadedAction - HACK TO NOT SAVE NEW PLAYER DATA", Log.WARN );
 	}
 
 	static public function createPlayer( $modelGuid:String, $instanceGuid:String ):void {
-
-		if ( null == _s_player ) {
-			_s_player = new Player();
-		}
-
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.modelGuid = $modelGuid;
         ii.instanceGuid = $instanceGuid;
@@ -127,11 +131,46 @@ Log.out( "onPlayerLoadedAction - HACK TO NOT SAVE NEW PLAYER DATA", Log.WARN );
 			new ModelMakerGenerate(ii, model, true);
 		}
 		else {
-            var addToRegion:Boolean = true;
-			var addToCount:Boolean = false;
-			new ModelMaker(ii, addToRegion, addToCount);
+            requestModelInfo();
 		}
+
+        function requestModelInfo():void {
+            addMIEListeners();
+            ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null );
+        }
+        function addMIEListeners():void {
+            ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retrievedModelInfo );
+            ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );
+        }
+        function removeMIEListeners():void {
+            ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retrievedModelInfo );
+            ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );
+        }
+        function retrievedModelInfo($mie:ModelInfoEvent):void  {
+            if (ii.modelGuid == $mie.modelGuid ) {
+                removeMIEListeners();
+
+				// Force the model class to avatar, this allows me to use any model as an avatar
+                $mie.modelInfo.modelClass = "Avatar";
+                const addToRegion:Boolean = true;
+                const addToCount:Boolean = false;
+                new ModelMaker(ii, addToRegion, addToCount );
+            }
+        }
+        function failedModelInfo( $mie:ModelInfoEvent):void  {
+            if ( ii.modelGuid == $mie.modelGuid ) {
+                removeMIEListeners();
+                Log.out( "Player.failedData - ii: " + ii.toString(), Log.ERROR );
+            }
+        }
 	}
+
+
+
+
+
+
+
 
 	static public function onPlayerLoadError(error:PlayerIOError):void {
 		Log.out("Player.onPlayerLoadError", Log.ERROR, error );
@@ -142,14 +181,14 @@ Log.out( "onPlayerLoadedAction - HACK TO NOT SAVE NEW PLAYER DATA", Log.WARN );
 			Log.out( "Player.playerModelLoaded");
 			ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 
-            if ( Player.player.dbo ) {
-                InventoryEvent.addListener( InventoryEvent.SAVE_REQUEST, savePlayerObject );
-				InventoryEvent.dispatch(new InventoryEvent(InventoryEvent.REQUEST, Network.userId, Player.player.dbo));
-            }
-			else {
-				if ( Globals.online )
-					Log.out( "Player.playerModelLoaded - NO PLAYER.player.dbo objectHierarchy: " + $mle.data, Log.ERROR );
-			}
+//            if ( Player.player.dbo ) {
+//                InventoryEvent.addListener( InventoryEvent.SAVE_REQUEST, savePlayerObject );
+//				InventoryEvent.dispatch(new InventoryEvent(InventoryEvent.REQUEST, Network.userId, Player.player.dbo));
+//            }
+//			else {
+//				if ( Globals.online )
+//					Log.out( "Player.playerModelLoaded - NO PLAYER.player.dbo objectHierarchy: " + $mle.data, Log.ERROR );
+//			}
 
 //			if ( REFERENCE_AVATAR == $mle.vm.modelInfo.guid ) {
 //				_vm = $mle.vm as Avatar;
