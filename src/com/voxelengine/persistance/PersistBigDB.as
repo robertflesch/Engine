@@ -10,6 +10,8 @@ package com.voxelengine.persistance
 import com.voxelengine.worldmodel.RegionManager;
 import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.animation.AnimationSound;
+import com.voxelengine.worldmodel.crafting.Recipe;
+import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.PlayerInfoCache;
 import com.voxelengine.worldmodel.models.Role;
 
@@ -49,8 +51,10 @@ public class PersistBigDB
 			return true;
 		else if ( AnimationCache.BIGDB_TABLE_ANIMATIONS == $pe.table )
 			return true;
-		else if ( Globals.BIGDB_TABLE_MODEL_INFO == $pe.table )	
+		else if ( ModelInfo.BIGDB_TABLE_MODEL_INFO == $pe.table )
 			return true;
+        else if ( Recipe.BIGDB_TABLE_RECIPE == $pe.table )
+            return true;
 		else if ( AnimationSound.BIGDB_TABLE_SOUNDS == $pe.table )
 			return true;
         else if ( Role.BIGDB_TABLE_ROLES == $pe.table )
@@ -134,7 +138,8 @@ public class PersistBigDB
 		PlayerIOPersistenceEvent.removeListener( PlayerIOPersistenceEvent.PERSISTANCE_NO_DB, loadTypeNoDB );
 				
 		function loadTypeSucceed( dba:Array ):void {
-			Log.out( "PersistBigDB.loadType.succeed - regions loaded: " + dba.length, Log.DEBUG );
+            var temp:PersistenceEvent = $pe;
+			Log.out( "PersistBigDB.loadTypeSucceed - from table: " + $pe.table + "  loaded: " + dba.length, Log.DEBUG );
 			// TODO - I will have to add handler here for when I have more than 99 items - RSF 11.14.2017
 			for each ( var $dbo:DatabaseObject in dba )
 			{

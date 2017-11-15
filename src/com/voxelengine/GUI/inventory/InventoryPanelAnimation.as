@@ -19,13 +19,6 @@ package com.voxelengine.GUI.inventory {
 	
 	public class InventoryPanelAnimation extends VVContainer
 	{
-		// TODO need a more central location for these
-        static public const MODEL_CAT_ARCHITECTURE:String = "architecture";
-        static public const MODEL_CAT_CHARACTERS:String = "characters";
-        static public const MODEL_CAT_PLANTS:String = "plants";
-        static public const MODEL_CAT_FURNITURE:String = "furniture";
-		
-		private var _barUpper:TabBar = new TabBar();
 		// This hold the items to be displayed
 		private var _itemContainer:Container;
 		
@@ -33,40 +26,14 @@ package com.voxelengine.GUI.inventory {
 			super( this );
 			autoSize = true;
 			layout.orientation = LayoutOrientation.VERTICAL;
-			
-			upperTabsAdd();
 			addItemContainer();
 		}
 		
-		private function upperTabsAdd():void {
-			_barUpper.name = "upper";
-			// TODO I should really iterate thru the types and collect the categories - RSF
-            _barUpper.addItem( LanguageManager.localizedStringGet( MODEL_CAT_ARCHITECTURE ), MODEL_CAT_ARCHITECTURE );
-			_barUpper.addItem( LanguageManager.localizedStringGet( MODEL_CAT_CHARACTERS ), MODEL_CAT_CHARACTERS );
-            _barUpper.addItem( LanguageManager.localizedStringGet( MODEL_CAT_PLANTS ), MODEL_CAT_PLANTS );
-            _barUpper.addItem( LanguageManager.localizedStringGet( MODEL_CAT_FURNITURE ), MODEL_CAT_FURNITURE );
-			_barUpper.setButtonsWidth( 128 );
-			_barUpper.selectedIndex = 0;
-            eventCollector.addEvent( _barUpper, ListEvent.ITEM_CLICKED, selectCategory );
-            addGraphicElements( _barUpper );
-		}
-
 		private function addItemContainer():void {
 			_itemContainer = new Container();
 			_itemContainer.autoSize = true;
 			_itemContainer.layout.orientation = LayoutOrientation.VERTICAL;
 			addElement( _itemContainer );
-		}
-		
-		private function selectCategory(e:ListEvent):void 
-		{			
-			displaySelectedCategory( e.target.value );	
-		}
-		
-		// TODO I see problem here when langauge is different then what is in TypeInfo RSF - 11.16.14
-		// That is if I use the target "Name"
-		private function displaySelectedCategory( category:String ):void
-		{	
 		}
 	}
 }

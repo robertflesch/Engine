@@ -9,7 +9,9 @@ package com.voxelengine.persistance
 {
 import com.voxelengine.worldmodel.RegionManager;
 import com.voxelengine.worldmodel.animation.AnimationSound;
-import com.voxelengine.worldmodel.crafting.CraftingManager;
+import com.voxelengine.worldmodel.crafting.Recipe;
+import com.voxelengine.worldmodel.crafting.RecipeCache;
+import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
@@ -45,13 +47,13 @@ public class PersistURL
 
 	static private function isSupportedTable( $pe:PersistenceEvent ):Boolean {
 
-		if ( RegionManager.REGION_EXT == $pe.table )
+    	if ( ModelInfo.MODEL_INFO_EXT == $pe.table )
+            _filePath = Globals.modelPath + $pe.guid + $pe.table;
+		else if ( RegionManager.REGION_EXT == $pe.table )
 			_filePath = Globals.regionPath + $pe.guid + $pe.table;
 		else if ( Globals.IVM_EXT == $pe.table )
 			_filePath = Globals.modelPath + $pe.guid + $pe.table;
-		else if ( Globals.MODEL_INFO_EXT == $pe.table )
-			_filePath = Globals.modelPath + $pe.guid + $pe.table;
-        else if ( CraftingManager.CRAFTING_EXT == $pe.table )
+        else if ( Recipe.RECIPE_EXT == $pe.table )
 			_filePath = Globals.appPath + "VoxelVerse/assets/crafting/" + $pe.guid + $pe.table;
         else if ( Globals.LANG_EXT == $pe.table )
             _filePath = Globals.appPath + "VoxelVerse" + $pe.guid;

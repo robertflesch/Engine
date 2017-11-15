@@ -6,6 +6,9 @@ authorship protected under United States Copyright Act.
 Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.crafting {
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.server.Network;
+
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
@@ -17,7 +20,7 @@ import com.voxelengine.GUI.VVPopup;
 import com.voxelengine.GUI.VoxelVerseGUI;
 import com.voxelengine.GUI.LanguageManager;
 import com.voxelengine.events.CraftingEvent;
-import com.voxelengine.worldmodel.crafting.CraftingManager;
+import com.voxelengine.worldmodel.crafting.RecipeCache;
 import com.voxelengine.worldmodel.crafting.Recipe;
 
 
@@ -44,13 +47,11 @@ public class WindowCrafting extends VVPopup
 		addElement( _recipeList );
 		
 		// This makes sure the crafting manager is running
-		CraftingManager.instance;
-		
 		display();
 		
 		addEventListener(UIOEvent.REMOVED, onRemoved );
-		CraftingEvent.addListener( CraftingEvent.RECIPE_LOADED, onRecipeLoaded );
-		CraftingEvent.dispatch( new CraftingEvent( CraftingEvent.RECIPE_LOAD_PUBLIC, null, null ) );
+		CraftingEvent.addListener( ModelBaseEvent.RESULT, onRecipe );
+		CraftingEvent.create( ModelBaseEvent.RESULT_RANGE, Network.userId, null );
 	}
 	
 	private function onResized(e:UIOEvent):void 
@@ -74,7 +75,7 @@ public class WindowCrafting extends VVPopup
 		addElement( _panelRecipe );
 	}
 	
-	private function onRecipeLoaded(e:CraftingEvent):void 
+	private function onRecipe(e:CraftingEvent):void
 	{
 		_recipeList.addItem( e.name, e.recipe );
 	}
@@ -82,7 +83,7 @@ public class WindowCrafting extends VVPopup
 	override protected function onRemoved( event:UIOEvent ):void
 	{
 		super.onRemoved( event );
-		CraftingEvent.removeListener( CraftingEvent.RECIPE_LOADED, onRecipeLoaded );
+		CraftingEvent.removeListener( ModelBaseEvent.RESULT, onRecipe );
 		_recipeList = null;
 		_selectedRecipe = null;
 		_panelRecipe = null;

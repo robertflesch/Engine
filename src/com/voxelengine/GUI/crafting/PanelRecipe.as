@@ -9,13 +9,9 @@ package com.voxelengine.GUI.crafting
 {
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.crafting.CraftingManager;
-import com.voxelengine.worldmodel.crafting.items.CraftedItem;
+import com.voxelengine.worldmodel.crafting.RecipeCache;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelStatisics;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
@@ -29,7 +25,6 @@ import org.flashapi.swing.constants.*;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.GUI.panels.PanelBase;
-import com.voxelengine.GUI.VoxelVerseGUI;
 import com.voxelengine.worldmodel.crafting.Recipe;
 import com.voxelengine.GUI.LanguageManager;
 
@@ -41,9 +36,8 @@ public class PanelRecipe extends PanelBase
 	private var _panelBonuses:PanelBonuses;
 	private var _panelPreview:PanelPreview;
 	private var _recipeDesc:Label;
-    private var _recipe:Label;
-	
-	private var _craftedItem:CraftedItem;
+
+	private var _recipe:Recipe;
 	
 	public function PanelRecipe( $parent:PanelBase, $widthParam:Number, $heightParam:Number, $recipe:Recipe )
 	{
@@ -53,9 +47,9 @@ public class PanelRecipe extends PanelBase
 		padding = 0;
 		layout.orientation = LayoutOrientation.VERTICAL;
 		
-		var craftedClass:Class = CraftingManager.getClass( $recipe.className );
+		var craftedClass:Class = RecipeCache.getClass( $recipe.className );
 		if ( craftedClass )
-			_craftedItem = new craftedClass( $recipe );
+            _recipe = new craftedClass( $recipe );
 		
 		_recipeDesc = new Label( "", 300 );
 		addElement( _recipeDesc );
@@ -97,8 +91,8 @@ public class PanelRecipe extends PanelBase
 	override public function close():void 
 	{
 		//super.onRemoved(e);
-		_craftedItem.cancel();
-		_craftedItem = null;
+//		_craftedItem.cancel();
+		_recipe = null;
 		_panelForumla.remove();
 		_panelBonuses.remove();
 		_panelMaterials.remove();
@@ -110,12 +104,12 @@ public class PanelRecipe extends PanelBase
     private var _instanceGuid:String;
 	private function craft( e:UIMouseEvent ):void {
 		// create model using templateID and replace the components with materials
-        if ( _craftedItem ) {
+        if ( _recipe ) {
             var craftItemII:InstanceInfo 	= new InstanceInfo();
-            craftItemII.modelGuid			= _craftedItem.templateId;
+            craftItemII.modelGuid			= _recipe.templateId;
 //            craftItemII.positionSet 		= point;
             _instanceGuid = craftItemII.instanceGuid		= Globals.getUID();
-            craftItemII.name				= _craftedItem.name;
+            craftItemII.name				= _recipe.name;
             OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, templateComplete );
             ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
             new ModelMaker( craftItemII, true , false );
@@ -124,7 +118,7 @@ public class PanelRecipe extends PanelBase
 	}
 
     private function modelLoadComplete( $mle:ModelLoadingEvent ): void {
-        if ( $mle.data.modelGuid == _craftedItem.templateId ) {
+        if ( $mle.data.modelGuid == _recipe.templateId ) {
             OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, templateComplete);
             ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete);
 
@@ -143,7 +137,7 @@ public class PanelRecipe extends PanelBase
 
 	// its built and ready to have its materials replaced
 	private function templateComplete(  $ode:OxelDataEvent ): void {
-		if ( $ode.modelGuid == _craftedItem.templateId ){
+		if ( $ode.modelGuid == _recipe.templateId ){
             OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, templateComplete );
             ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
 
@@ -169,9 +163,9 @@ public class PanelRecipe extends PanelBase
 		}
 	}
 	
-	public function get craftedItem():CraftedItem 
+	public function get recipe():Recipe
 	{
-		return _craftedItem;
+		return _recipe;
 	}
 }
 }

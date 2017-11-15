@@ -20,7 +20,6 @@ public class Globals  {
 
 	// Yahoo Game Networks Big DB table names
 	static public const BIGDB_TABLE_INVENTORY:String = "inventory";
-	static public const BIGDB_TABLE_MODEL_INFO:String = "modelInfo";
 	static public const BIGDB_TABLE_TREE_INFO:String = "treeInfo";
 	static public const BIGDB_TABLE_OXEL_DATA:String = "oxelData";
 	static public const BIGDB_TABLE_AMMO:String = "ammo";
@@ -32,7 +31,6 @@ public class Globals  {
     static public const LANG_EXT:String = ".xml";
 	static public const APP_EXT:String = ".json";
 	static public const IVM_EXT:String = ".ivm";
-	static public const MODEL_INFO_EXT:String = ".mjson";
     static public const TEXTURE_PNG_EXT:String = ".png";
     static public const TEXTURE_PG_EXT:String = ".jpg";
 	static public const ANI_EXT:String = ".ajson";

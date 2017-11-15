@@ -13,8 +13,7 @@ import com.voxelengine.worldmodel.crafting.Material;
 import com.voxelengine.worldmodel.crafting.Recipe;
 import com.voxelengine.worldmodel.TypeInfo;
 
-public class CraftedItem extends Recipe
-{
+public class CraftedItem
 	private var _materialsUsed:Vector.<TypeInfo> = new Vector.<TypeInfo>();
 	private var _bonusesUsed:Vector.<TypeInfo> = new Vector.<TypeInfo>();
 	

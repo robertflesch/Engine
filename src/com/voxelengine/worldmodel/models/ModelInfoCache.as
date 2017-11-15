@@ -68,12 +68,12 @@ public class ModelInfoCache
         //Log.out( "ModelInfoCache.requestType  owningModel: " + $mme.modelGuid, Log.WARN );
         // For each one loaded this will send out a new ModelMetadataEvent( ModelBaseEvent.ADDED, $mi.guid, $mi ) event
         if ( false == _initializedPublic && $mme.modelGuid == Network.PUBLIC ) {
-            PersistenceEvent.create( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.BIGDB_TABLE_MODEL_INFO, Network.PUBLIC, null, ModelInfo.BIGDB_TABLE_MODEL_INFO_INDEX_OWNER );
+            PersistenceEvent.create( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, ModelInfo.BIGDB_TABLE_MODEL_INFO, Network.PUBLIC, null, ModelInfo.BIGDB_TABLE_MODEL_INFO_INDEX_OWNER );
             _initializedPublic = true;
         }
 
         if ( false == _initializedPrivate && $mme.modelGuid == Network.userId ) {
-            PersistenceEvent.create( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.BIGDB_TABLE_MODEL_INFO, Network.userId, null, ModelInfo.BIGDB_TABLE_MODEL_INFO_INDEX_OWNER );
+            PersistenceEvent.create( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, ModelInfo.BIGDB_TABLE_MODEL_INFO, Network.userId, null, ModelInfo.BIGDB_TABLE_MODEL_INFO_INDEX_OWNER );
             _initializedPrivate = true;
         }
 
@@ -108,9 +108,9 @@ public class ModelInfoCache
 				_block.add($mie.modelGuid);
 
 				if (true == Globals.online && $mie.fromTables)
-					PersistenceEvent.create( PersistenceEvent.LOAD_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid );
+					PersistenceEvent.create( PersistenceEvent.LOAD_REQUEST, $mie.series, ModelInfo.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid );
 				else
-					PersistenceEvent.create( PersistenceEvent.LOAD_REQUEST, $mie.series, Globals.MODEL_INFO_EXT, $mie.modelGuid );
+					PersistenceEvent.create( PersistenceEvent.LOAD_REQUEST, $mie.series, ModelInfo.MODEL_INFO_EXT, $mie.modelGuid );
 			}
 			else {
 				if ($mie)
@@ -163,7 +163,7 @@ public class ModelInfoCache
 			_modelInfo[$mie.modelGuid] = null; 
 			// TODO need to clean up eventually
 			mi = null;
-			PersistenceEvent.create( PersistenceEvent.DELETE_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid, null );
+			PersistenceEvent.create( PersistenceEvent.DELETE_REQUEST, $mie.series, ModelInfo.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid, null );
 			InventoryEvent.create( InventoryEvent.DELETE, $mie.modelGuid, null );
 		}
 	}
@@ -245,7 +245,7 @@ public class ModelInfoCache
 	//  Persistence Events
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	static private function loadSucceed( $pe:PersistenceEvent):void {
-		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
+		if ( ModelInfo.BIGDB_TABLE_MODEL_INFO != $pe.table && ModelInfo.MODEL_INFO_EXT != $pe.table )
 			return;
 
 		var mi:ModelInfo = _modelInfo[$pe.guid];
@@ -292,7 +292,7 @@ public class ModelInfoCache
 	}
 
 	static private function loadFailed( $pe:PersistenceEvent ):void {
-		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
+		if ( ModelInfo.BIGDB_TABLE_MODEL_INFO != $pe.table && ModelInfo.MODEL_INFO_EXT != $pe.table )
 			return;
 		Log.out( "ModelInfoCache.loadFailed PersistenceEvent: " + $pe.toString(), Log.WARN );
 		if ( _block.has( $pe.guid ) )
@@ -301,7 +301,7 @@ public class ModelInfoCache
 	}
 	
 	static private function loadNotFound( $pe:PersistenceEvent):void {
-		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
+		if ( ModelInfo.BIGDB_TABLE_MODEL_INFO != $pe.table && ModelInfo.MODEL_INFO_EXT != $pe.table )
 			return;
 		Log.out( "ModelInfoCache.loadNotFound PersistenceEvent: " + $pe.toString(), Log.WARN );
 		if ( _block.has( $pe.guid ) )

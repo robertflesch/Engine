@@ -21,6 +21,7 @@ import com.voxelengine.renderer.shaders.Shader;
 import com.voxelengine.worldmodel.ConfigManager;
 import com.voxelengine.worldmodel.SoundCache;
 import com.voxelengine.worldmodel.animation.AnimationCache;
+import com.voxelengine.worldmodel.crafting.RecipeCache;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
 import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.ModelInfoCache;
@@ -137,6 +138,7 @@ public class VoxelVerse extends Sprite
 		OxelPersistenceCache.init();
 		AnimationCache.init();
 		ModelCacheUtils.init();
+        RecipeCache.init();
 
 		InventoryManager.init();
 		MouseKeyboardHandler.init();

@@ -11,15 +11,19 @@ package com.voxelengine.worldmodel.crafting.items {
 	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.crafting.Material;
 	import com.voxelengine.worldmodel.crafting.Recipe;
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
-	/**
+/**
 	 * ...
 	 * @author Bob
 	 */
-	public class Pick extends CraftedItem
+	public class Pick extends VoxelModel
 	{
-		public function Pick( $recipe:Recipe ) {
-			super( $recipe );
+		public function Pick() {
+			var ii:InstanceInfo = new InstanceInfo();
+
+			super(ii);
 		}
 	}
 }

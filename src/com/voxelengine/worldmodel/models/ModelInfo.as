@@ -7,9 +7,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-
 import flash.display.Bitmap;
 
 import flash.display.BitmapData;
@@ -52,6 +49,8 @@ import com.voxelengine.worldmodel.oxel.OxelBad;
 
 public class ModelInfo extends PersistenceObject
 {
+    static public const MODEL_INFO_EXT:String = ".mjson";
+    static public const BIGDB_TABLE_MODEL_INFO:String = "modelInfo";
     static public const BIGDB_TABLE_MODEL_INFO_INDEX_OWNER:String = "owner";
     static public const BIGDB_TABLE_MODEL_INFO_INDEX_CREATOR:String = "creator";
 	private const DEFAULT_BOUND:int                       = 10;
@@ -146,7 +145,7 @@ public class ModelInfo extends PersistenceObject
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public function ModelInfo( $guid:String, $dbo:DatabaseObject, $newData:Object ):void  {
-		super( $guid, Globals.BIGDB_TABLE_MODEL_INFO );
+		super( $guid, BIGDB_TABLE_MODEL_INFO );
 
 		if ( null == $dbo)
 			assignNewDatabaseObject();

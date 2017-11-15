@@ -11,48 +11,30 @@ import com.voxelengine.worldmodel.crafting.Recipe;
 import flash.events.Event;
 import flash.events.EventDispatcher;
 
-/**
- * ...
- * @author Robert Flesch - RSF 
- */
-public class CraftingEvent extends Event
+public class CraftingEvent extends ModelBaseEvent
 {
-	static public const RECIPE_LOAD_PUBLIC:String			= "RECIPE_LOAD_PUBLIC";
-	static public const RECIPE_LOADED:String				= "RECIPE_LOADED";
-	
 	private var _name:String;
+    public function get name():String { return _name; }
 	private var _recipe:Recipe;
-	
-	public function CraftingEvent( $type:String, $name:String, $recipe:Recipe )
-	{
-		super( $type );
+    public function get recipe():Recipe { return _recipe; }
+
+	public function CraftingEvent( $type:String, $name:String, $recipe:Recipe ) {
+		super( $type, 0 );
 		_recipe = $recipe;
 		_name = $name;
 	}
 	
-	public override function clone():Event
-	{
+	public override function clone():Event {
 		return new CraftingEvent(type, _name, _recipe );
 	}
    
-	public override function toString():String
-	{
+	public override function toString():String {
 		return formatToString("CraftingEvent", "bubbles", "cancelable") + " name: " + _name + " recipe: " + _recipe.toString();
 	}
-	
-	public function get name():String 
-	{
-		return _name;
-	}
-	
-	public function get recipe():Recipe 
-	{
-		return _recipe;
-	}
-	
+
 	///////////////// Event handler interface /////////////////////////////
 
-	// Used to distribue all persistance messages
+	// Used to distribute all persistence messages
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 
 	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
@@ -61,10 +43,6 @@ public class CraftingEvent extends Event
 
 	static public function removeListener( $type:String, $listener:Function, $useCapture:Boolean=false) : void {
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
-	}
-
-	static public function dispatch( $event:CraftingEvent ) : Boolean {
-		return _eventDispatcher.dispatchEvent( $event );
 	}
 
     static public function create( $type:String, $name:String, $recipe:Recipe ) : Boolean {

@@ -7,8 +7,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.crafting {
 	import com.voxelengine.events.CraftingItemEvent;
-	import com.voxelengine.worldmodel.crafting.items.CraftedItem;
-	import org.flashapi.swing.*;
+import com.voxelengine.worldmodel.crafting.Recipe;
+
+import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
 	
@@ -50,7 +51,7 @@ package com.voxelengine.GUI.crafting {
 		
 		private function onStatsUpdated(e:CraftingItemEvent):void 
 		{
-			var ci:CraftedItem = (_parent as PanelRecipe).craftedItem;
+			var ci:Recipe = (_parent as PanelRecipe).recipe;
 			if ( ci.hasMetRequirements() ) {
 				_damageLabel.text = "Damage: " + ci.estimate( "damage" );
 				_speedLabel.text = "Speed: " + ci.estimate( "speed" );

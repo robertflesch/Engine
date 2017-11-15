@@ -35,7 +35,7 @@ public class AnimationCache
 	static public const MODEL_QUADRUPED:String =  "MODEL_QUADRUPED";
 
     static public const BIGDB_TABLE_ANIMATIONS:String = "animations";
-    static public const BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER:String = "owningModel";
+    static public const BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER:String = "owner";
 
 
     static public const MODEL_UNKNOWN:String =  "MODEL_UNKNOWN";
@@ -85,7 +85,7 @@ public class AnimationCache
         // This will return models already loaded.
         for each ( var ani:Animation in _animations ) {
             if ( ani && ani.owner == $mme.modelGuid ) {
-                Log.out( "ModelMetadataCache.requestType RETURN  " +  ani.owner + " ==" + $mme.modelGuid + "  guid: " + ani.guid + "  desc: " + ani.description , Log.WARN );
+                //Log.out( "ModelMetadataCache.requestType RETURN  " +  ani.owner + " ==" + $mme.modelGuid + "  guid: " + ani.guid + "  desc: " + ani.description , Log.WARN );
                 AnimationEvent.create( ModelBaseEvent.RESULT, $mme.series, "", ani.guid, ani );
             }
             else {
@@ -172,7 +172,7 @@ public class AnimationCache
 			Log.out( "AnimationCache.Add trying to add NULL animations or guid", Log.WARN );
 			return;
 		}
-        trace( $ani.name + "\t Owner: " + $ani.owner + "\t Desc: " + $ani.description  + "\t Class: " + $ani.animationClass + "  guid: " + $ani.guid );
+        //Log.out( "AnimationCache.add name: " + $ani.name + "\t Owner: " + $ani.owner + "\t Desc: " + $ani.description  + "\t Class: " + $ani.animationClass + "  guid: " + $ani.guid );
 
 		var ani:Animation =  _animations[$ani.guid];
 		if ( null == ani ) {
