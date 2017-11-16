@@ -34,7 +34,7 @@ import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.GUI.VVPopup;
 
-public class WindowRegisterCaptcha extends VVPopup
+public class PopupRegisterCaptcha extends VVPopup
 {
     private const LI_WIDTH:int = 160;
     private const LABEL_WIDTH:int = 112;
@@ -65,7 +65,7 @@ public class WindowRegisterCaptcha extends VVPopup
     private var _retrievingCaptchaImage:Class;
 
 
-    public function WindowRegisterCaptcha()
+    public function PopupRegisterCaptcha()
     {
         super( "Register" );
         showCloseButton = false;
@@ -155,7 +155,7 @@ public class WindowRegisterCaptcha extends VVPopup
 
         // have to enenable the captcha in playerio in quick connect
         captchaLoad();
-        Log.out( "WindowRegisterCaptcha - BYPASSING CAPTCHA until fixed by PlayerIO", Log.WARN );
+        Log.out( "PopupRegisterCaptcha - BYPASSING CAPTCHA until fixed by PlayerIO", Log.WARN );
         //bypassCaptcha();
 
         display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
@@ -236,7 +236,7 @@ public class WindowRegisterCaptcha extends VVPopup
         }
 
         function onCaptchaLoadError( $error:IOErrorEvent):void {
-            Log.out("WindowRegisterCaptcha.onCaptchaLoadError: " + $error.formatToString, Log.ERROR );
+            Log.out("PopupRegisterCaptcha.onCaptchaLoadError: " + $error.formatToString, Log.ERROR );
         }
     }
 
@@ -261,7 +261,7 @@ public class WindowRegisterCaptcha extends VVPopup
 
 
         function onCaptchaReLoadError( $error:IOErrorEvent):void {
-            Log.out("WindowRegisterCaptcha.onCaptchaReLoadError: " + $error.formatToString, Log.ERROR );
+            Log.out("PopupRegisterCaptcha.onCaptchaReLoadError: " + $error.formatToString, Log.ERROR );
         }
     }
 
@@ -272,7 +272,7 @@ public class WindowRegisterCaptcha extends VVPopup
     }
 
     private function captchaFailure( $error:PlayerIOError):void {
-        Log.out("WindowRegisterCaptcha.captchaFailure: " + $error.message, Log.ERROR, $error );
+        Log.out("PopupRegisterCaptcha.captchaFailure: " + $error.message, Log.ERROR, $error );
     }
 
     private function captchaReload($event:UIMouseEvent):void {

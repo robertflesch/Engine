@@ -242,7 +242,7 @@ public class WindowLogin extends VVPopup
 	// register new account
 	////////////////////////////////////////////////////////////////////////////////
 	private function registerButtonHandler(event:UIMouseEvent):void {
-		new WindowRegister();
+		new PopupRegister();
 		remove();
 	}
 

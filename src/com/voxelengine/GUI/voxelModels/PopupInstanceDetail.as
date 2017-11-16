@@ -30,7 +30,7 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 import org.flashapi.swing.plaf.spas.VVUI;
 
-public class WindowModelDetail extends VVPopup {
+public class PopupInstanceDetail extends VVPopup {
 	static private const WIDTH:int = 330;
 	static private const PHOTO_SIZE:int = 128;
 
@@ -38,7 +38,7 @@ public class WindowModelDetail extends VVPopup {
 	private var _vm:VoxelModel = null;
 	private var _baseLightLevel:int = 0;
 
-	public function WindowModelDetail( $vm:VoxelModel )
+	public function PopupInstanceDetail($vm:VoxelModel )
 	{
 		super( "Instance Details" );
 		autoSize = false;

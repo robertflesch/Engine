@@ -45,7 +45,7 @@ import com.voxelengine.events.VVMouseEvent;
 
 import com.voxelengine.GUI.actionBars.UserInventory;
 import com.voxelengine.GUI.inventory.WindowInventoryNew;
-import com.voxelengine.GUI.voxelModels.WindowModelDetail;
+import com.voxelengine.GUI.voxelModels.PopupInstanceDetail;
 import com.voxelengine.GUI.voxelModels.WindowRegionModels;
 import com.voxelengine.GUI.crafting.WindowCharacter;
 
@@ -395,7 +395,7 @@ public class VoxelVerseGUI extends EventDispatcher
 				
 			if ( Keyboard.N == e.keyCode )
 				if ( VoxelModel.selectedModel )
-					new WindowModelDetail( VoxelModel.selectedModel );
+					new PopupInstanceDetail( VoxelModel.selectedModel );
 				
 			if ( Keyboard.C == e.keyCode )
 				new WindowCharacter();

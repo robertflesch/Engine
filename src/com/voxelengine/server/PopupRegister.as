@@ -36,7 +36,7 @@ import playerio.Client;
 	import com.voxelengine.Log;
 	import com.voxelengine.GUI.VVPopup;
 	
-	public class WindowRegister extends VVPopup
+	public class PopupRegister extends VVPopup
 	{
 		private const LI_WIDTH:int = 160;
 		private const LABEL_WIDTH:int = 112;
@@ -70,7 +70,7 @@ import playerio.Client;
 		private var _retrievingCaptchaImage:Class;
 				
 		
-		public function WindowRegister()
+		public function PopupRegister()
 		{
 			super( "Register" );
 			showCloseButton = false;
@@ -151,7 +151,7 @@ import playerio.Client;
 			
 			// have to enenable the captcha in playerio in quick connect
 			//captchaLoad();
-			Log.out( "WindowRegister - BYPASSING CAPTCHA until fixed by PlayerIO", Log.WARN );
+			Log.out( "PopupRegister - BYPASSING CAPTCHA until fixed by PlayerIO", Log.WARN );
 			bypassCaptcha();
 			
 			display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
@@ -304,7 +304,7 @@ import playerio.Client;
 			}
 							
 			function onCaptchaLoadError( $error:IOErrorEvent):void {
-				Log.out("WindowRegister.onCaptchaLoadError: " + $error.formatToString, Log.ERROR );
+				Log.out("PopupRegister.onCaptchaLoadError: " + $error.formatToString, Log.ERROR );
 			}		
 		}
 		
@@ -333,7 +333,7 @@ import playerio.Client;
 			
 							
 			function onCaptchaReLoadError( $error:IOErrorEvent):void {
-				Log.out("WindowRegister.onCaptchaReLoadError: " + $error.formatToString, Log.ERROR );
+				Log.out("PopupRegister.onCaptchaReLoadError: " + $error.formatToString, Log.ERROR );
 			}		
 		}		
 
@@ -344,7 +344,7 @@ import playerio.Client;
 		}
 		
 		private function captchaFailure( $error:PlayerIOError):void {
-			Log.out("WindowRegister.captchaFailure: " + $error.message, Log.ERROR, $error );
+			Log.out("PopupRegister.captchaFailure: " + $error.message, Log.ERROR, $error );
 		}		
 		
 		private function captchaReload($me:UIMouseEvent):void {

@@ -30,7 +30,7 @@ import com.voxelengine.worldmodel.models.ModelInfo;
 import org.flashapi.swing.event.ButtonsGroupEvent;
 import org.flashapi.swing.event.UIMouseEvent;
 
-public class WindowModelInfo extends VVPopup
+public class PopupCollectModelInfo extends VVPopup
 {
 	private var _name:VVLabelInput;
 	private var _desc:VVLabelInput;
@@ -43,7 +43,7 @@ public class WindowModelInfo extends VVPopup
 	public static const TYPE_IMPORT:int = 0;
 	public static const TYPE_EDIT:int = 1;
 	
-	public function WindowModelInfo($ii:InstanceInfo, $mi:ModelInfo, windowType:int )
+	public function PopupCollectModelInfo($ii:InstanceInfo, $mi:ModelInfo, windowType:int )
 	{
 		// This one will require some farther thought
 		_type = windowType;
@@ -112,7 +112,7 @@ public class WindowModelInfo extends VVPopup
 			
 			addElement( new HorizontalSeparator( width ) );		
 			
-Log.out( "WindowModelInfo - need drop down list of Bind types", Log.WARN );			
+Log.out( "PopupCollectModelInfo - need drop down list of Bind types", Log.WARN );
 			var rbTransferGroup:RadioButtonGroup = new RadioButtonGroup( this );
 			eventCollector.addEvent( rbTransferGroup, ButtonsGroupEvent.GROUP_CHANGED
 								   , function (event:ButtonsGroupEvent):void {  _mi.permissions.binding = (0 == event.target.index ?  PermissionsModel.BIND_MODIFY :  PermissionsModel.BIND_NONE ) } );
@@ -124,7 +124,7 @@ Log.out( "WindowModelInfo - need drop down list of Bind types", Log.WARN );
 			
 			addElement( new HorizontalSeparator( width ) );		
 			
-Log.out( "WindowModelInfo.dataReceived - NOT SHOWING MODIFY OPTIONS", Log.WARN);
+Log.out( "PopupCollectModelInfo.dataReceived - NOT SHOWING MODIFY OPTIONS", Log.WARN);
 //			var rbModifyGroup:RadioButtonGroup = new RadioButtonGroup( this );
 //			eventCollector.addEvent( rbModifyGroup, ButtonsGroupEvent.GROUP_CHANGED
 //								   , function (event:ButtonsGroupEvent):void {  _mi.permissions.modify = (0 == event.target.index ?  true :  false ) } );

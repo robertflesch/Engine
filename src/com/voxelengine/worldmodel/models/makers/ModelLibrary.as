@@ -8,6 +8,7 @@
 
 package com.voxelengine.worldmodel.models.makers
 {
+import com.voxelengine.worldmodel.crafting.items.Pick;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 
 import flash.utils.getDefinitionByName;
@@ -26,6 +27,8 @@ import flash.utils.getDefinitionByName;
         public static function getAsset ( assetLinkageID : String ) : Class
         {
 			{
+                //noinspection BadExpressionStatementJS
+                Pick;
 				//noinspection BadExpressionStatementJS
 				Projectile;
 				//noinspection BadExpressionStatementJS

@@ -129,7 +129,7 @@ public class AnimationCache
 		var ani:Animation =  _animations[$pe.guid];
 		if ( null != ani ) {
 			// we already have it, publishing this results in duplicate items
-			AnimationEvent.create( ModelBaseEvent.RESULT, $pe.series, $pe.other, $pe.guid, ani );
+			//AnimationEvent.create( ModelBaseEvent.RESULT, $pe.series, $pe.other, $pe.guid, ani );
 			Log.out( "AnimationCache.loadSucceed - attempting to load duplicate AnimationC guid: " + $pe.guid, Log.WARN );
 			return;
 		}

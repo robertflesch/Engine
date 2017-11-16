@@ -75,7 +75,48 @@ public class BoxInventory extends VVBox
 		}
 	}
 	
-	
+	public function updateModelInfo( $mi:ModelInfo, $displayAddons:Boolean = true ):void {
+        if ( $mi ) {
+            if ( $mi.thumbnailLoaded && $mi.thumbnail )
+                backgroundTexture = drawScaled( $mi.thumbnail, width, height );
+            else
+                ModelInfoEvent.addListener( ModelInfoEvent.BITMAP_LOADED, thumbnailLoaded );
+
+            // listen for changes to this object
+            ModelInfoEvent.addListener( ModelBaseEvent.UPDATE, metadataChanged );
+
+            _name.text = $mi.name;
+            var permissions:PermissionsModel = $mi.permissions;
+            var modelsOfThisGuid:int = permissions.copyCount;
+            if ( 99999 < modelsOfThisGuid )
+                _count.text = "lots";
+            else if ( -1 == modelsOfThisGuid )
+                _count.text = "∞";
+            else
+                _count.text = String( modelsOfThisGuid );
+
+            setHelp( "guid: " + $mi.guid );
+
+            var role:Role = Player.player.role;
+            if ( $displayAddons&& permissions.creator == Network.userId || role.modelPublicEdit ) {
+                _editData = new Image( "editModelData.png", 40, 40, true);
+                $evtColl.addEvent(_editData, UIMouseEvent.CLICK, editModelData);
+                if (128 == width)
+                    _editData.x = _editData.y = 0;
+                addElement(_editData)
+            } else if (_editData) {
+                removeElement(_editData);
+                _editData = null;
+            }
+        }
+        function editModelData( $me:UIMouseEvent ):void {
+            var t:ObjectModel = _objectInfo as ObjectModel;
+            var modelInfo:ModelInfo = t.modelInfo;
+            if ( modelInfo && !PopupModelInfo.inExistance )
+                new PopupModelInfo( modelInfo );
+        }
+	}
+
 	public function updateObjectInfo( $item:ObjectInfo, $displayAddons:Boolean = true ):void {
         // this may or may not have this event registered, but we need to make sure its not in more than one.
 		ModelInfoEvent.removeListener( ModelBaseEvent.UPDATE, metadataChanged );
@@ -86,48 +127,16 @@ public class BoxInventory extends VVBox
 		data = $item;
 		_name.text = "";
 
-        var role:Role = Player.player.role;
         //if ( role.modelNominate && role.modelPromote ) {
 
-            switch ( $item.objectType ) {
+        switch ( $item.objectType ) {
 		case ObjectInfo.OBJECTINFO_EMPTY:
 			reset();
             backgroundTexture = $item.backgroundTexture(width);
             break;
 		case ObjectInfo.OBJECTINFO_MODEL:
-			var om:ObjectModel = _objectInfo as ObjectModel;
-			if ( om.modelInfo ) {
-				if ( om.modelInfo.thumbnailLoaded && om.modelInfo.thumbnail )
-					backgroundTexture = drawScaled( om.modelInfo.thumbnail, width, height );
-				else
-					ModelInfoEvent.addListener( ModelInfoEvent.BITMAP_LOADED, thumbnailLoaded );
-				
-				// listen for changes to this object
-				ModelInfoEvent.addListener( ModelBaseEvent.UPDATE, metadataChanged );
-
-				_name.text = om.modelInfo.name;
-				var permissions:PermissionsModel = om.modelInfo.permissions;
-				var modelsOfThisGuid:int = permissions.copyCount;
-				if ( 99999 < modelsOfThisGuid )
-					_count.text = "lots";
-				else if ( -1 == modelsOfThisGuid )
-					_count.text = "∞";
-				else
-					_count.text = String( modelsOfThisGuid );
-
-				setHelp( "guid: " + om.modelInfo.guid );
-
-				if ( $displayAddons&& permissions.creator == Network.userId || role.modelPublicEdit ) {
-					_editData = new Image( "editModelData.png", 40, 40, true);
-					$evtColl.addEvent(_editData, UIMouseEvent.CLICK, editModelData);
-					if (128 == width)
-						_editData.x = _editData.y = 0;
-					addElement(_editData)
-				} else if (_editData) {
-					removeElement(_editData);
-					_editData = null;
-				}
-			}
+            var om:ObjectModel = _objectInfo as ObjectModel;
+            updateModelInfo( om.modelInfo, $displayAddons );
 			break;
 			
 		case ObjectInfo.OBJECTINFO_ACTION:
@@ -184,12 +193,6 @@ public class BoxInventory extends VVBox
 			break;
 		}
 
-		function editModelData( $me:UIMouseEvent ):void {
-			var t:ObjectModel = _objectInfo as ObjectModel;
-			var modelInfo:ModelInfo = t.modelInfo;
-			if ( modelInfo && !PopupModelInfo.inExistance )
-				new PopupModelInfo( modelInfo );
-		}
 	}
 
 	override protected function onRemoved( event:UIOEvent ):void {

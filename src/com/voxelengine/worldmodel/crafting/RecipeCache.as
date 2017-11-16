@@ -105,7 +105,7 @@ public class RecipeCache
 	static private function add( $rec:Recipe ):void {
 		// check to make sure is not already there
 		if ( null ==  _recipes[$rec.guid] ) {
-			//Log.out( "ModelInfoCache.add modelInfo: " + $mi.toString(), Log.DEBUG );
+			//Log.out( "RecipeCache.add modelInfo: " + $mi.toString(), Log.DEBUG );
 			_recipes[$rec.guid] = $rec;
 			CraftingEvent.create( ModelBaseEvent.RESULT, $rec.guid, $rec );
 		} else {
@@ -116,14 +116,14 @@ public class RecipeCache
 	static private function loadFailed( $pe:PersistenceEvent ):void {
         if ( Recipe.BIGDB_TABLE_RECIPE != $pe.table && Recipe.RECIPE_EXT != $pe.table )
 			return;
-		Log.out( "ModelInfoCache.loadFailed PersistenceEvent: " + $pe.toString(), Log.WARN );
+		Log.out( "RecipeCache.loadFailed PersistenceEvent: " + $pe.toString(), Log.WARN );
         CraftingEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.guid, null );
 	}
 
 	static private function loadNotFound( $pe:PersistenceEvent):void {
         if ( Recipe.BIGDB_TABLE_RECIPE != $pe.table && Recipe.RECIPE_EXT != $pe.table )
 			return;
-		Log.out( "ModelInfoCache.loadNotFound PersistenceEvent: " + $pe.toString(), Log.WARN );
+		Log.out( "RecipeCache.loadNotFound PersistenceEvent: " + $pe.toString(), Log.WARN );
         CraftingEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.guid, null );
 	}
 

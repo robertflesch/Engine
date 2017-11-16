@@ -64,6 +64,7 @@ public class Recipe extends PersistenceObject
 		dbo.recipe.subcat		= "Invalid";
         dbo.recipe.preview		= "none.jpg";
         dbo.recipe.templateId	= "";
+        changed = true;
     }
 
 	public function init():void {
@@ -128,16 +129,17 @@ public class Recipe extends PersistenceObject
     public function hasMetRequirements():Boolean {
         var matFound:Boolean;
         for each ( var matReq:Material in _materialsRequired ) {
-            matFound = false;
             if ( true == matReq.optional )
                 continue;
+            matFound = false;
             for each ( var matsUsed:TypeInfo in _materialsUsed ) {
                 if ( matReq.category == matsUsed.category ) {
                     matFound = true;
                     break;
                 }
             }
-            if ( !matFound )
+            // Any REQUIRED missing material causes it to fail
+            if ( false == matFound )
                 return false;
         }
         return true;
@@ -161,7 +163,7 @@ public class Recipe extends PersistenceObject
     }
 
     public function estimate( $property:String ):String {
-        Log.out( "CraftedItem.estimate for " + $property );
+        Log.out( "Recipe.estimate for " + $property );
 
         var estimateMats:Number = calculateMaterialsFactor( $property );
         if ( 0 == estimateMats )
@@ -211,7 +213,7 @@ public class Recipe extends PersistenceObject
                 return;
             }
         }
-        Log.out( "CraftedItem.materialRemove - material: " + $typeInfo.category + " NOT FOUND" );
+        Log.out( "Recipe.materialRemove - material: " + $typeInfo.category + " NOT FOUND" );
     }
 
     private function bonusRemove( $typeInfo:TypeInfo ):void {
@@ -225,7 +227,7 @@ public class Recipe extends PersistenceObject
             }
         }
 
-        Log.out( "CraftedItem.bonusRemove - bonus: " + $typeInfo.category + " NOT FOUND" );
+        Log.out( "Recipe.bonusRemove - bonus: " + $typeInfo.category + " NOT FOUND" );
     }
 
     private function onMaterialDropped(e:CraftingItemEvent):void {

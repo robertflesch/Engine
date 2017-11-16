@@ -8,7 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models.types
 {
 import com.adobe.utils.Hex;
-import com.voxelengine.GUI.voxelModels.WindowBluePrintCopy;
+import com.voxelengine.GUI.voxelModels.PopupBluePrintCopy;
 import com.voxelengine.renderer.lamps.BlackLamp;
 import com.voxelengine.renderer.lamps.Lamp;
 import com.voxelengine.renderer.lamps.LampBright;
@@ -148,6 +148,8 @@ public class VoxelModel {
 	public function init( $mi:ModelInfo, $buildState:String = ModelMakerBase.MAKING ):void {
 		_modelInfo = $mi;
 		_modelInfo.owningModel = this;
+		if ( null == _modelInfo.owningModel )
+				Log.out( "ModelInfo.init = null owning object");
 
 		if ( modelInfo.permissions.modify ) {
 //			Log.out( "VoxelModel - added ImpactEvent.EXPLODE for " + _modelInfo.modelClass );

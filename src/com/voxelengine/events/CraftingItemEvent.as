@@ -22,7 +22,8 @@ public class CraftingItemEvent extends Event
 	static public const MATERIAL_DROPPED:String				= "MATERIAL_DROPPED";
 	static public const MATERIAL_REMOVED:String				= "MATERIAL_REMOVED";
 	static public const STATS_UPDATED:String				= "STATS_UPDATED";
-	
+    static public const REQUIREMENTS_MET:String				= "REQUIREMENTS_MET";
+
 	
 	private var _typeInfo:TypeInfo;
 	

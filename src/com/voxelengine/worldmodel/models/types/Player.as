@@ -40,7 +40,7 @@ public class Player extends PersistenceObject
 {
     static public const DEFAULT_PLAYER:String = "DefaultPlayer";
     //static private const REFERENCE_AVATAR:String = "494A4E90-2442-D717-40CD-5D51FA790A8A";
-    static private const REFERENCE_AVATAR:String = "8E26C353-6AF8-DBD8-2486-9C56326BF047";
+    static private const REFERENCE_AVATAR:String = "FAFC84B1-B3A2-726D-E016-0A6C8A80ABC1";
     static public const BIGDB_TABLE_PLAYER_OBJECTS:String = "PlayerObjects";
 
     public function get role():Role 				{ return RoleCache.roleGet( dbo ? dbo.role : null ) }
@@ -97,7 +97,7 @@ public class Player extends PersistenceObject
 				dbo.createdDate = new Date().toUTCString();
 Log.out( "onPlayerLoadedAction - HACK TO NOT SAVE NEW PLAYER DATA", Log.WARN );
 //				dbo.role = Role.USER;
-//				dbo.save();
+				dbo.save();
 			}
 			// Don't modify the modelGuid, change it in the DB if needed
 			var pi:PlayerInfo = new PlayerInfo( instanceGuid, null );

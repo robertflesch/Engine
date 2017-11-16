@@ -6,30 +6,31 @@
  Unauthorized reproduction, translation, or display is prohibited.
  ==============================================================================*/
 
-package com.voxelengine.GUI.voxelModels
-{
-import com.voxelengine.renderer.Renderer;
+package com.voxelengine.GUI.voxelModels {
 
 import flash.events.Event;
+import flash.events.MouseEvent;
 
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
-import org.flashapi.swing.plaf.spas.VVUI;
 
 import com.voxelengine.Globals
 import com.voxelengine.GUI.VVPopup
 import com.voxelengine.worldmodel.models.types.VoxelModel
 import com.voxelengine.worldmodel.models.makers.ModelMakerClone
 import com.voxelengine.GUI.LanguageManager
+import com.voxelengine.renderer.Renderer;
 
-	public class WindowBluePrintCopy extends VVPopup
+import org.flashapi.swing.event.UIMouseEvent;
+
+public class PopupBluePrintCopy extends VVPopup
 	{
-		static private var _instance:WindowBluePrintCopy;
-		static public function exists():Boolean { return null == _instance ? false : true }
+		static private var _instance:PopupBluePrintCopy;
+		static public function exists():Boolean { return null != _instance }
 		
 		private var _vm:VoxelModel;
-		public function WindowBluePrintCopy( $vm:VoxelModel ) {
+		public function PopupBluePrintCopy($vm:VoxelModel ) {
 			_instance = this;
 			_vm = $vm;
 	
@@ -48,11 +49,11 @@ import com.voxelengine.GUI.LanguageManager
 		}
 		
 		protected function clone():void {
-			new ModelMakerClone( _vm.instanceInfo, _vm.metadata, _vm.modelInfo );
+			new ModelMakerClone( _vm.instanceInfo, _vm.modelInfo );
 		}
 		
 	private function addButtonPanel():void {
-		if ( 0 == _vm.metadata.permissions.copyCount ) {
+		if ( 0 == _vm.modelInfo.permissions.copyCount ) {
 			addElement( new Label( "You have no copies left to make of this object, and it is not editable", width - padding * 2 ) )
 		}
 		else {
@@ -65,17 +66,13 @@ import com.voxelengine.GUI.LanguageManager
 		
 		var revert:Button = new Button( LanguageManager.localizedStringGet( "Dont create copy, do nothing" ));
 		revert.autoSize = false;
-		revert.addEventListener(UIMouseEvent.CLICK, revertHandler );
+		revert.addEventListener(UIMouseEvent.CLICK, function (event: MouseEvent ):void  { remove() } );
 		revert.width = width - padding * 2;
 		revert.height = height/2 - padding;
 		addElement( revert )
 	}
 
-	private function revertHandler(event:UIMouseEvent):void  {
-		remove()
-	}
-
-	private  function saveHandler(event:UIMouseEvent):void  {
+	private  function saveHandler(event:MouseEvent):void  {
 		
 		clone();
 		remove()
@@ -86,7 +83,7 @@ import com.voxelengine.GUI.LanguageManager
 	}
 
 	// Window events
-	private function onRemoved( event:UIOEvent ):void {
+	private function onRemoved( event:Event ):void {
 		_instance = null;
 		Globals.g_app.stage.removeEventListener(Event.RESIZE, onResizeHeading );
 		removeEventListener(UIOEvent.REMOVED, onRemoved );

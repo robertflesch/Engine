@@ -20,7 +20,7 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.GUI.WindowModelInfo;
+import com.voxelengine.GUI.PopupCollectModelInfo;
 import com.voxelengine.server.Network;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.models.InstanceInfo;
@@ -69,7 +69,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			if ( _prompt ) {
 				//Log.out( "ModelMakerImport - attemptMake: gathering metadata " + ii.toString() );
 				ModelInfoEvent.addListener( ModelInfoEvent.DATA_COLLECTED, metadataFromUI );
-				new WindowModelInfo( ii, _modelInfo, WindowModelInfo.TYPE_IMPORT ); }
+				new PopupCollectModelInfo( ii, _modelInfo, PopupCollectModelInfo.TYPE_IMPORT ); }
 			else {
 				//Log.out( "ModelMakerImport - attemptMake: generating metadata " + ii.toString() );
 				attemptMakeRetrieveParentModelInfo(); }

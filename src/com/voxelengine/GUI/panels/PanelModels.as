@@ -27,7 +27,7 @@ import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.UIRegionModelEvent;
 import com.voxelengine.GUI.*;
 import com.voxelengine.GUI.inventory.WindowInventoryNew;
-import com.voxelengine.GUI.voxelModels.WindowModelDetail;
+import com.voxelengine.GUI.voxelModels.PopupInstanceDetail;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -275,7 +275,7 @@ public class PanelModels extends PanelBase
 		_detailButton.x = 5;
 		_detailButton.width = btnWidth;
 		_detailButton.enabled = false;
-		_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, function ($e:UIMouseEvent):void { new WindowModelDetail( VoxelModel.selectedModel ); } );
+		_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, function ($e:UIMouseEvent):void { new PopupInstanceDetail( VoxelModel.selectedModel ); } );
 		container.addElement( _detailButton );
 
 		if ( Globals.isDebug ) {

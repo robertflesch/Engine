@@ -20,7 +20,7 @@ C:\dev\VoxelVerse\src\com\voxelengine\GUI\ToolBar.as                            
 C:\dev\VoxelVerse\src\com\voxelengine\GUI\WindowModels.as                                                        47             27            298
 C:\dev\VoxelVerse\src\com\voxelengine\worldmodel\GrainCursorSimple.as                                            56             73            272
 C:\dev\VoxelVerse\src\com\voxelengine\worldmodel\ModelTransform.as                                               32             20            267
-C:\dev\VoxelVerse\src\com\voxelengine\GUI\WindowModelDetail.as                                                   40             40            260
+C:\dev\VoxelVerse\src\com\voxelengine\GUI\WindowInstanceDetailail.as                                                   40             40            260
 C:\dev\VoxelVerse\src\com\voxelengine\worldmodel\Beast.as                                                        47             42            260
 C:\dev\VoxelVerse\src\com.voxelengine.utils.\transitions\properties\ColorShortcuts.as                             77            148            246
 C:\dev\VoxelVerse\src\com.voxelengine.utils.\transitions\Equations.as                                             63            411            240
@@ -67,7 +67,7 @@ C:\dev\VoxelVerse\src\com.voxelengine.utils.\MP3Pitch.as                        
 C:\dev\VoxelVerse\src\com.voxelengine.utils.\SmokeSmoke.as                                                        22              5            120
 C:\dev\VoxelVerse\src\com.voxelengine.utils.\MP3Loop.as                                                           31             20            120
 C:\dev\VoxelVerse\src\com\voxelengine\worldmodel\ModelStatisics.as                                               17             18            119
-C:\dev\VoxelVerse\src\com\voxelengine\server\WindowRegister.as                                                   19              8            116
+C:\dev\VoxelVerse\src\com\voxelengine\server\PopupRegisteras                                                   19              8            116
 C:\dev\VoxelVerse\src\com\voxelengine\worldmodel\tasks\landscapetasks\AddAxes.as                                 23             17            116
 C:\dev\VoxelVerse\src\com\voxelengine\GUI\WindowInventory.as                                                     17             16            112
 C:\dev\VoxelVerse\src\com.voxelengine.utils.\Bitlist.as                                                           48             71            111

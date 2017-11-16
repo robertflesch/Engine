@@ -94,7 +94,7 @@ public class InventoryPanelModel extends VVContainer
 		FunctionRegistry.functionAdd( importObjectIPM, "importObjectIPM" );
 		FunctionRegistry.functionAdd( importObjectStainedGlass, "importObjectStainedGlass" );
 
-        ModelInfoEvent.addListener( ModelBaseEvent.RESULT, addModelInfoEvent );
+        ModelInfoEvent.addListener( ModelBaseEvent.CHANGED, modelInfoChanged );
         ModelInfoEvent.addListener( ModelBaseEvent.DELETE, removeModelInfoEvent );
         ModelInfoEvent.addListener( ModelBaseEvent.RESULT_RANGE, resultRangeModelInfoEvent );
         ModelInfoEvent.addListener( ModelInfoEvent.REASSIGN_PUBLIC, reassignPublicModelInfoEvent );
@@ -230,19 +230,20 @@ public class InventoryPanelModel extends VVContainer
         	Log.out( "IPM.resultRangeModelInfoEvent $mie.series: (" + $mie.series + ") != _seriesModelMetadataEvent (" + currentSeries + ")" );
     }
 
-	private function addModelInfoEvent( $mie:ModelInfoEvent ):void {
+	private function modelInfoChanged( $mie:ModelInfoEvent ):void {
 		// I only want the results from the series I asked for, or from models being added outside a series, like a generated or new model
-        //Log.out( "IPM.addModelInfoEvent series: " + $mme.series +  "  guid: " + $mme.modelGuid );
+        //Log.out( "IPM.modelInfoChanged series: " + $mme.series +  "  guid: " + $mme.modelGuid );
         var box:BoxInventory = findBoxWithModelGuid( $mie.modelInfo.guid );
-		if ( null == box )
-			addModel( $mie );
+		if ( null != box )
+            box.updateModelInfo( $mie.modelInfo, true );
 	}
 
     private function addModel( $mie:ModelInfoEvent ):void {
         var om:ObjectModel = new ObjectModel(null, $mie.modelGuid);
+        //Log.out( "IPM.addModel guid: " + $mie.modelInfo.guid + "  " + $mie.modelInfo.name + "  hasTags: " + $mie.modelInfo.hashTags + "  found? " + $mie.modelInfo.hashTags.indexOf(cat));
         om.modelInfo = $mie.modelInfo;
         var cat:String = _category.toLowerCase();
-        //Log.out( "IPM.addModelInfoEvent cat: " + cat + "  hasTags: " + $mme.modelMetadata.hashTags + "  found? " + $mme.modelMetadata.hashTags.indexOf(cat));
+        //Log.out( "IPM.addModel cat: " + cat + "  hasTags: " + $mie.modelInfo.hashTags + "  found? " + $mie.modelInfo.hashTags.indexOf(cat));
         if ( "all" == cat )
             qualifyAndPlaceModel(om);
         else if ( 0 <= $mie.modelInfo.hashTags.indexOf(cat))
@@ -346,7 +347,6 @@ public class InventoryPanelModel extends VVContainer
 
 		}
 	}
-
 
 	private function addEmptyRow( $countMax:int ):void {
 		_currentRow = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_HEIGHT );
@@ -547,7 +547,7 @@ public class InventoryPanelModel extends VVContainer
 	}			
 	
 	override protected function onRemoved( event:UIOEvent ):void {
-        ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, addModelInfoEvent );
+        ModelInfoEvent.removeListener( ModelBaseEvent.CHANGED, modelInfoChanged );
         ModelInfoEvent.removeListener( ModelBaseEvent.DELETE, removeModelInfoEvent );
         ModelInfoEvent.removeListener( ModelBaseEvent.RESULT_RANGE, resultRangeModelInfoEvent );
         ModelInfoEvent.removeListener( ModelInfoEvent.REASSIGN_PUBLIC, reassignPublicModelInfoEvent );

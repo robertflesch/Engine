@@ -250,12 +250,15 @@ public class ModelInfoCache
 
 		var mi:ModelInfo = _modelInfo[$pe.guid];
 		if ( null != mi ) {
-			// we already have it, publishing this results in duplicate items being sent to inventory window.
-            if ( $pe.series == _currentSeries )
-                ModelInfoEvent.create( ModelBaseEvent.RESULT_RANGE, $pe.series, $pe.guid, mi );
-            else
-                ModelInfoEvent.create( ModelBaseEvent.RESULT, $pe.series, $pe.guid, mi );
-			Log.out( "ModelInfoCache.loadSucceed - attempting to load duplicate ModelInfo guid: " + $pe.guid, Log.WARN );
+            // we already have it, publishing this results in duplicate items being sent to inventory window.
+            if ($pe.series == _currentSeries) {
+            	//ModelInfoEvent.create( ModelBaseEvent.RESULT_RANGE, $pe.series, $pe.guid, mi );
+				// Do nothing we are already getting it back
+        	}
+            else {
+                ModelInfoEvent.create(ModelBaseEvent.RESULT, $pe.series, $pe.guid, mi);
+                Log.out( "ModelInfoCache.loadSucceed - attempting to load duplicate ModelInfo guid: " + $pe.guid, Log.WARN );
+            }
 			return;
 		}
 

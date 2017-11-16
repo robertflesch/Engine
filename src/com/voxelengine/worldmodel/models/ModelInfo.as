@@ -252,8 +252,8 @@ public class ModelInfo extends PersistenceObject
 			OxelDataEvent.create( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null );
 		}
         changed = true;
-		if ( null != _owningModel.instanceInfo.controllingModel )
-            _owningModel.instanceInfo.controllingModel.modelInfo.changed = true;
+		if ( owningModel && null != owningModel.instanceInfo.controllingModel )
+            owningModel.instanceInfo.controllingModel.modelInfo.changed = true;
 	}
 
 	public function update( $context:Context3D, $elapsedTimeMS:int ):void {
@@ -348,11 +348,14 @@ public class ModelInfo extends PersistenceObject
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//  start animation operations
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	protected 	var		_animationsLoaded:Boolean;
-	private 	var 	_animsRemainingToLoad:int;
+	protected 	var		_animationsLoaded:Boolean = true;
 	public 	function get animationsLoaded():Boolean 				{ return _animationsLoaded; }
-	public 	function set animationsLoaded(value:Boolean):void		{ _animationsLoaded = value; }
-	
+	public 	function set animationsLoaded(value:Boolean):void		{
+		Log.out( "ModelInfo.animationsLoaded: " + value );
+		_animationsLoaded = value;
+	}
+    private 	var 	_animsRemainingToLoad:int;
+
 	// Dont load the animations until the model is instaniated
 	public function animationsLoad( $buildState:String ):void {
 		_series = 0;
@@ -451,9 +454,12 @@ public class ModelInfo extends PersistenceObject
 	public		function get childVoxelModels():Vector.<VoxelModel>			{ return _childVoxelModels; }
 	public		function 	 childVoxelModelsGet():Vector.<VoxelModel>		{ return _childVoxelModels; } // This is so the function can be passed as parameter
 
-	private 	var			_childrenLoaded:Boolean;
+	private 	var			_childrenLoaded:Boolean = true;
 	public		function get childrenLoaded():Boolean 				{ return _childrenLoaded; }
-	public		function set childrenLoaded(value:Boolean):void  	{ _childrenLoaded = value; }
+	public		function set childrenLoaded(value:Boolean):void  	{
+        Log.out( "ModelInfo.childrenLoaded: " + value );
+		_childrenLoaded = value;
+	}
 	/////////////////////
 	public		function 	 unloadedChildCount():int		{
 		var count:int = 0;
@@ -509,12 +515,12 @@ public class ModelInfo extends PersistenceObject
 		// does the child's parent guid == this objects guid, if so its our child
 		if ( $me.vm && $me.vm.instanceInfo.controllingModel && $me.vm.instanceInfo.controllingModel.modelInfo.guid == guid ) {
 			childCount = childCount - 1;
-			Log.out( "ModelInfo.onChildAdded - MY CHILD - parent guid: " + guid + "  childGuid: " + $me.vm.modelInfo.guid + "  children remaining: " + _childCount, Log.WARN );
+			//Log.out( "ModelInfo.onChildAdded - MY CHILD - parent guid: " + guid + "  childGuid: " + $me.vm.modelInfo.guid + "  children remaining: " + _childCount, Log.WARN );
             checkChildCountForZero( $me.vm, $me.vm.modelInfo.guid );
 		}
-		else {
-            Log.out( "ModelInfo.onChildAdded - NOT MY CHILD - parent guid: " + guid + "  childGuid: " + $me.vm.modelInfo.guid, Log.WARN );
-		}
+		//else {
+            //Log.out( "ModelInfo.onChildAdded - NOT MY CHILD - parent guid: " + guid + "  childGuid: " + $me.vm.modelInfo.guid, Log.WARN );
+		//}
 	}
 
     public function onChildAddFailure( $childGuid:String ):void {
@@ -531,7 +537,7 @@ public class ModelInfo extends PersistenceObject
             var ohd:ObjectHierarchyData = new ObjectHierarchyData();
 			// If the child load failed
             if ( null == $vm )
-                ohd.fromNullChildModel( _owningModel, $childModelGuid );
+                ohd.fromNullChildModel( owningModel, $childModelGuid );
 			else
                 ohd.fromModel( $vm );
 
@@ -753,7 +759,10 @@ public class ModelInfo extends PersistenceObject
 	}
 
 	override protected function toObject():void {
-		owningModel.buildExportObject();
+		// IS this a problem if the VM has not been loaded?
+		// I should retain the previous values from dbo, so I think I am ok.
+		if ( owningModel )
+			owningModel.buildExportObject();
 
 		// this updates the original positions, to the current positions...
 		// how do I get original location and position, on animated objects?

@@ -50,8 +50,9 @@ public class WindowCrafting extends VVPopup
 		display();
 		
 		addEventListener(UIOEvent.REMOVED, onRemoved );
-		CraftingEvent.addListener( ModelBaseEvent.RESULT, onRecipe );
-		CraftingEvent.create( ModelBaseEvent.RESULT_RANGE, Network.userId, null );
+		CraftingEvent.addListener( ModelBaseEvent.RESULT_RANGE, onRecipe );
+        CraftingEvent.addListener( ModelBaseEvent.RESULT, onRecipe );
+		CraftingEvent.create( ModelBaseEvent.REQUEST_TYPE, Network.userId, null );
 	}
 	
 	private function onResized(e:UIOEvent):void 

@@ -41,7 +41,7 @@ public class PopupModelInfo extends VVPopup
 
     public function PopupModelInfo($mi:ModelInfo )
     {
-        super( "Model Metadata and Info" );
+        super( "Item_Info" );
         autoSize = false;
         autoHeight = true;
         width = WIDTH + 10;
@@ -68,9 +68,9 @@ public class PopupModelInfo extends VVPopup
     private function addMetadata():void {
         //addElement( new ComponentSpacer( WIDTH, 25 ) );
 
-        addElement( new ComponentTextInput( "Model Name "
+        addElement( new ComponentTextInput( "Item Name "
                 , function ($e:TextEvent):void { _mi.name = $e.target.text; setChanged(); }
-                , _mi.name ? _mi.name : "Unnamed Model"
+                , _mi.name ? _mi.name : "Unnamed Item"
                 , WIDTH ) );
 
         addElement( new ComponentTextArea( "Description "
@@ -90,10 +90,10 @@ public class PopupModelInfo extends VVPopup
         addPhoto();
         addMetadata();
         if ( Globals.isDebug )
-            addElement( new ComponentLabel( "Model GUID",  _mi.guid, WIDTH ) );
+            addElement( new ComponentLabel( "Item GUID",  _mi.guid, WIDTH ) );
         var panel:Container = new Container(width, 30);
         panel.addElement( new ComponentLabel( "Grain Size",  "Grain: " + String(_mi.grainSize) + " - " + Math.pow( 2, _mi.grainSize )/32 + " meters", (WIDTH/2-2) ) );
-        panel.addElement( new ComponentLabel( "Model Class",  _mi.modelClass, (WIDTH/2-2) ) );
+        panel.addElement( new ComponentLabel( "Item Class",  _mi.modelClass, (WIDTH/2-2) ) );
         addElement( panel );
         addAdvanced();
         addPermissions();
@@ -168,7 +168,6 @@ public class PopupModelInfo extends VVPopup
     }
 
     private function setChanged():void {
-		_mi.changed = true;
 		_mi.changed = true;
     }
 
