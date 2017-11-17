@@ -550,6 +550,7 @@ public class ModelInfo extends PersistenceObject
 
 	private function brandChild( $mi:ModelInfo ):void {
         $mi.childOfGuid = guid;
+        $mi.childOf = name;
         $mi.brandChildren();
 	}
 

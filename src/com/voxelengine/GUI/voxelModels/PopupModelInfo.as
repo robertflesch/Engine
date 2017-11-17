@@ -39,9 +39,25 @@ public class PopupModelInfo extends VVPopup
 
     private var _mi:ModelInfo = null;
 
+    private static const item_info:String = "item_info";
+    private static const item_name:String = "item_name";
+    private static const unnamed_item:String = "unnamed_item";
+    private static const description:String = "description";
+    private static const no_description:String = "no_description";
+    private static const hashtags:String = "hashtags";
+    private static const item_guid:String = "item_guid";
+    private static const grain_size:String = "grain_size";
+    private static const item_class:String = "item_class";
+    private static const grain:String = "grain";
+    private static const meters:String = "meters";
+    private static const permissions:String = "permissions";
+    private static const advanced:String = "advanced";
+    private static const take_new_picture:String = "take_new_picture";
+    private var LM:Function = LanguageManager.localizedStringGet;
+
     public function PopupModelInfo($mi:ModelInfo )
     {
-        super( "Item_Info" );
+        super( LanguageManager.localizedStringGet( item_info ) );
         autoSize = false;
         autoHeight = true;
         width = WIDTH + 10;
@@ -54,7 +70,7 @@ public class PopupModelInfo extends VVPopup
 
         _mi = $mi;
 
-        ModelInfoEvent.addListener( ModelBaseEvent.RESULT, modelInfoRetreived );
+        ModelInfoEvent.addListener( ModelBaseEvent.RESULT, modelInfoRetrieved );
         ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, _mi.guid, null );
 
         onCloseFunction = closeFunction;
@@ -68,17 +84,17 @@ public class PopupModelInfo extends VVPopup
     private function addMetadata():void {
         //addElement( new ComponentSpacer( WIDTH, 25 ) );
 
-        addElement( new ComponentTextInput( "Item Name "
+        addElement( new ComponentTextInput( LM( item_name )
                 , function ($e:TextEvent):void { _mi.name = $e.target.text; setChanged(); }
-                , _mi.name ? _mi.name : "Unnamed Item"
+                , _mi.name ? _mi.name : unnamed_item
                 , WIDTH ) );
 
-        addElement( new ComponentTextArea( "Description "
+        addElement( new ComponentTextArea( LM( description ) + ' '
                 , function ($e:TextEvent):void { _mi.description = $e.target.text; setChanged(); }
-                , _mi.description ? _mi.description : "No Description"
+                , _mi.description ? _mi.description : LM( no_description )
                 , WIDTH ) );
 
-        addElement( new ComponentTextInput( "HashTags"
+        addElement( new ComponentTextInput( LM( hashtags )
                 , function ($e:TextEvent):void { _mi.hashTags = $e.target.text; setChanged(); }
                 , _mi.hashTags
                 , WIDTH ) );
@@ -90,10 +106,10 @@ public class PopupModelInfo extends VVPopup
         addPhoto();
         addMetadata();
         if ( Globals.isDebug )
-            addElement( new ComponentLabel( "Item GUID",  _mi.guid, WIDTH ) );
+            addElement( new ComponentLabel(  LM(item_guid),  _mi.guid, WIDTH ) );
         var panel:Container = new Container(width, 30);
-        panel.addElement( new ComponentLabel( "Grain Size",  "Grain: " + String(_mi.grainSize) + " - " + Math.pow( 2, _mi.grainSize )/32 + " meters", (WIDTH/2-2) ) );
-        panel.addElement( new ComponentLabel( "Item Class",  _mi.modelClass, (WIDTH/2-2) ) );
+        panel.addElement( new ComponentLabel( LM(grain_size),  LM(grain) +': ' + String(_mi.grainSize) + " - " + Math.pow( 2, _mi.grainSize )/32 + ' ' +  LM(meters), (WIDTH/2-2) ) );
+        panel.addElement( new ComponentLabel( LM(item_class),  _mi.modelClass, (WIDTH/2-2) ) );
         addElement( panel );
         addAdvanced();
         addPermissions();
@@ -101,9 +117,9 @@ public class PopupModelInfo extends VVPopup
 //            var scriptsPanel:PanelModelScripts = new PanelModelScripts( this, width, 20, 200);
     }
 
-    private function modelInfoRetreived( $mie:ModelInfoEvent ):void {
+    private function modelInfoRetrieved( $mie:ModelInfoEvent ):void {
         if ( $mie.modelGuid == _mi.guid ) {
-            ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, modelInfoRetreived);
+            ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, modelInfoRetrieved);
             _mi = $mie.modelInfo;
             addModelInfo();
         }
@@ -112,7 +128,7 @@ public class PopupModelInfo extends VVPopup
     private function addPermissions():void {
         var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
         ebco.rootObject = _mi.permissions;
-        ebco.title = " permissions ";
+        ebco.title = ' ' + LM(permissions) + ' ';
         ebco.paddingTop = 7;
         ebco.width = WIDTH;
         addElement( new PanelPermissionModel( null, ebco ) );
@@ -121,7 +137,7 @@ public class PopupModelInfo extends VVPopup
     private function addAdvanced():void {
         var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
         ebco.rootObject = _mi;
-        ebco.title = " advanced ";
+        ebco.title = ' ' + LM(advanced) + ' ';
         ebco.paddingTop = 7;
         ebco.width = WIDTH;
         addElement( new PanelAdvancedModel( null, ebco ) );
@@ -161,7 +177,7 @@ public class PopupModelInfo extends VVPopup
         var pic:Image = new Image( new Bitmap( bmd ), PHOTO_WIDTH, PHOTO_HEIGHT );
         _photoContainer.addElement( pic );
         _photoContainer.addElement( new ComponentSpacer( WIDTH ) );
-        var btn:Button = new Button( "Take New Picture", WIDTH , 24 );
+        var btn:Button = new Button( LM(take_new_picture), WIDTH , 24 );
         $evtColl.addEvent( btn, UIMouseEvent.CLICK, newPhoto );
         _photoContainer.addElement(btn);
         addElement( new ComponentSpacer( WIDTH, 10 ) );
