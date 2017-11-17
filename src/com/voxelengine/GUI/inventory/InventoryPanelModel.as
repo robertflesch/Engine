@@ -9,7 +9,9 @@ package com.voxelengine.GUI.inventory {
 
 
 import com.voxelengine.GUI.inventory.BoxInventory;
+import com.voxelengine.GUI.panels.PanelModels;
 import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.worldmodel.models.AssignModelAndChildrenToPublicOwnership;
 
 import flash.display.DisplayObject;
 import flash.events.Event;
@@ -81,6 +83,7 @@ public class InventoryPanelModel extends VVContainer
 	private var _currentRow:Container;
     private var _source:String;
 	private var _category:String = MODEL_CAT_ALL;
+
     private var _currentSeries:int;
     private function get currentSeries():int { return _currentSeries; }
     private function set currentSeries( $val:int ):void { _currentSeries = $val; }
@@ -179,15 +182,15 @@ public class InventoryPanelModel extends VVContainer
 			}
 			_barLeft.selectedIndex = -1;
 			_currentRow = null;
-			displaySelectedCategory(_category);
+            _itemContainer.removeElements();
+            displaySelectedSource();
 		}
 	}
-	
-	// TODO I see problem here when language is different then what is in TypeInfo RSF - 11.16.14
+
+    // TODO I see problem here when language is different then what is in TypeInfo RSF - 11.16.14
 	// That is if I use the target "Name"
 	private function displaySelectedSource():void {
-		//Log.out( "InventoryPanelModels.displaySelectedCategory - Not implemented", Log.WARN );
-		// The series makes it so that I dont see results from other objects requests
+		// The series makes it so that I don't see results from other objects requests
 		// This grabs the current series counter which will be used on the REQUEST_TYPE call
 		if ( WindowInventoryNew.INVENTORY_OWNED == _source ) {
 			addTools();
@@ -202,15 +205,6 @@ public class InventoryPanelModel extends VVContainer
 		else
             ModelInfoEvent.create( ModelBaseEvent.REQUEST_TYPE, currentSeries, Network.storeId, null );
 	}
-
-    // TODO I see problem here when language is different then what is in TypeInfo RSF - 11.16.14
-    // That is if I use the target "Name"
-    private function displaySelectedCategory( $category:String ):void {
-		// does this make me leak? do I need to reassign boxes to empty?
-        _itemContainer.removeElements();
-        _category = $category;
-        displaySelectedSource();
-    }
 
     private function reassignPublicModelInfoEvent($mie:ModelInfoEvent):void {
 		// For this to happen I have to be on the backpack page!
@@ -262,27 +256,46 @@ public class InventoryPanelModel extends VVContainer
 		//// Add the filled bar to the container and create a new container
 		if ( ObjectInfo.OBJECTINFO_MODEL == $oi.objectType ) {
 			var om:ObjectModel = $oi as ObjectModel;
-			// dont show child models
-			//if ( !WindowInventoryNew._s_hackShowChildren )
-			if ( WindowInventoryNew.parentModel ) {
-				var bound:int = WindowInventoryNew.parentModel.modelInfo.oxelPersistence.bound;
-				if ( null != om.modelInfo.childOf && "" != om.modelInfo.childOf ) {
-					if ( WindowInventoryNew.parentModel.modelInfo.name != om.modelInfo.childOf ) {
-						Log.out( "InventoryPanelModel.qualifyAndPlaceModel - child model of wrong parent: " + om.modelInfo.name, Log.INFO );
-						return null;
-					}
-				} else {
-					if ( om.modelInfo.bound >= bound ) {
-						Log.out("InventoryPanelModel.qualifyAndPlaceModel - NOT child model of: " + om.modelInfo.name + " AND is larger", Log.WARN);
-						return null;
-					}
-				}
-			} else {
-				if ( null != om.modelInfo.childOf && "" != om.modelInfo.childOf ) {
-					//Log.out( "InventoryPanelModel.qualifyAndPlaceModel - NOT adding child model of: " + om.vmm.name, Log.INFO );
-					return null;
-				}
-			}
+			// don't show CURRENT child models
+            var pm:VoxelModel = PanelModels.getLastSelectedModel();
+			if ( pm ){
+                var bound:int = pm.modelInfo.oxelPersistence.bound;
+                if ( null != om.modelInfo.childOf && "" != om.modelInfo.childOf ) {
+                    if ( pm.modelInfo.name != om.modelInfo.childOf ) {
+                        //Log.out( "InventoryPanelModel.qualifyAndPlaceModel - child model of wrong parent: " + om.modelInfo.name, Log.INFO );
+                        return null;
+                    }
+                } else {
+                    if ( om.modelInfo.bound > bound ) {
+                        //Log.out("InventoryPanelModel.qualifyAndPlaceModel - NOT child model of: " + om.modelInfo.name + " AND is larger", Log.WARN);
+                        return null;
+                    }
+                }
+            } else {
+                if ( null != om.modelInfo.childOf && "" != om.modelInfo.childOf ) {
+                    //Log.out( "InventoryPanelModel.qualifyAndPlaceModel - NOT adding child model of: " + om.vmm.name, Log.INFO );
+                    return null;
+                }
+            }
+//			if ( WindowInventoryNew.parentModel ) {
+//				var bound:int = WindowInventoryNew.parentModel.modelInfo.oxelPersistence.bound;
+//				if ( null != om.modelInfo.childOf && "" != om.modelInfo.childOf ) {
+//					if ( WindowInventoryNew.parentModel.modelInfo.name != om.modelInfo.childOf ) {
+//						Log.out( "InventoryPanelModel.qualifyAndPlaceModel - child model of wrong parent: " + om.modelInfo.name, Log.INFO );
+//						return null;
+//					}
+//				} else {
+//					if ( om.modelInfo.bound > bound ) {
+//						Log.out("InventoryPanelModel.qualifyAndPlaceModel - NOT child model of: " + om.modelInfo.name + " AND is larger", Log.WARN);
+//						return null;
+//					}
+//				}
+//			} else {
+//				if ( null != om.modelInfo.childOf && "" != om.modelInfo.childOf ) {
+//					//Log.out( "InventoryPanelModel.qualifyAndPlaceModel - NOT adding child model of: " + om.vmm.name, Log.INFO );
+//					return null;
+//				}
+//			}
 		}
 				
 		var box:BoxInventory = findFirstEmpty();	
@@ -321,6 +334,7 @@ public class InventoryPanelModel extends VVContainer
 			if ( WindowInventoryNew.parentModel ) {
                 ii.controllingModel = WindowInventoryNew.parentModel;
                 new ModelMakerClone( ii, om.modelInfo );
+                om.modelInfo.changed = true;
             }
 			else {
 				// Only do this for top level models.
@@ -522,10 +536,14 @@ public class InventoryPanelModel extends VVContainer
 			if ( $mi.modelGuid == droppedItem.modelGuid ) {
                 ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, checkModelInfoPermissions);
                 var role:Role = Player.player.role;
-                if ($mi.modelInfo.owner == Network.PUBLIC && role.modelPublicDelete)
-                    new WindowModelDeleteChildrenQuery(droppedItem.modelGuid, removeModel);
-                else if ($mi.modelInfo.owner == Network.userId && role.modelPrivateDelete)
-                    new WindowModelDeleteChildrenQuery(droppedItem.modelGuid, removeModel);
+                if ($mi.modelInfo.owner == Network.PUBLIC && role.modelPublicDelete) {
+                    new AssignModelAndChildrenToPublicOwnership( droppedItem.modelGuid, true );
+                    //new WindowModelDeleteChildrenQuery(droppedItem.modelGuid, removeModel);
+                }
+                else if ($mi.modelInfo.owner == Network.userId && role.modelPrivateDelete) {
+                    new AssignModelAndChildrenToPublicOwnership( droppedItem.modelGuid, true );
+                    //new WindowModelDeleteChildrenQuery(droppedItem.modelGuid, removeModel);
+                }
                 else {
                     (new Alert("You (" + Network.userId + " as a " + role.name + " do not have required permissions to delete this object owned by " + $mi.modelInfo.owner).display(600));
                 }

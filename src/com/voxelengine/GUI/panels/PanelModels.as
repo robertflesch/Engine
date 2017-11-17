@@ -8,7 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.panels
 {
-
+import com.voxelengine.GUI.LanguageManager;
 import com.voxelengine.events.InstanceInfoEvent;
 import com.voxelengine.worldmodel.models.types.Avatar;
 
@@ -25,7 +25,6 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.UIRegionModelEvent;
-import com.voxelengine.GUI.*;
 import com.voxelengine.GUI.inventory.WindowInventoryNew;
 import com.voxelengine.GUI.voxelModels.PopupInstanceDetail;
 import com.voxelengine.worldmodel.Region;
@@ -36,7 +35,27 @@ import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 // all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
 public class PanelModels extends PanelBase
 {
+    private static const add_an_item_to_region:String = "add_an_item_to_region";
+    private static const add_a_child_to_parent:String = "add_a_child_to_parent";
+    private static const add_a_child_to_item:String = "add_a_child_to_item";
+    private static const item_remove_from_region:String = "item_remove_from_region";
+    private static const item_remove_from_parent:String = "item_remove_from_parent";
+
+    private static const item_create_copy_of:String = "item_create_copy_of";
+    private static const item_details:String = "item_details";
+    private static const nothing_selected:String = "nothing_selected";
+    private static const do_you_really_want_to_delete_the_model:String = "do_you_really_want_to_delete_the_model";
+    private static const yes:String = "yes";
+    private static const no:String = "no";
+    private static const all_items:String = "all_items";
+    private static const showing_possible_children_of:String = "showing_possible_children_of";
+    private static const no_model_selected:String = "no_model_selected";
+
 	private var _parentModel:VoxelModel;
+    private static var _s_lastSelectedModel:VoxelModel;
+    public static function setLastSelectedModel( $val:VoxelModel ):void { _s_lastSelectedModel = $val; }
+    public static function getLastSelectedModel():VoxelModel { return _s_lastSelectedModel; }
+
 	private var _listModels:ListBox;
 	private var _dictionarySource:Function;
 	private var _level:int;
@@ -45,6 +64,7 @@ public class PanelModels extends PanelBase
 	private var _dupButton:Button;
 	private var _detailButton:Button;
 	private var _deleteButton:Button;
+    private var _addButton:Button;
 
 	private function get myParent():ContainerModelDetails { return (_parent as ContainerModelDetails); }
 	
@@ -57,7 +77,7 @@ public class PanelModels extends PanelBase
 		autoHeight = false;
 		layout = new AbsoluteLayout();
 
-		//Log.out( "PanelModels - list box width: width: " + width + "  padding: " + pbPadding, Log.WARN );
+		//Log.out( 'PanelModels - list box width: width: ' + width + '  padding: ' + pbPadding, Log.WARN );
 		_listModels = new ListBox( width - 10, $elementHeight, $heightParam );
 		_listModels.x = 5;
 //		_listModels.dragEnabled = true;
@@ -84,11 +104,11 @@ public class PanelModels extends PanelBase
 		//_listModels.eventCollector.addEvent( this, ListEvent.ITEM_PRESSED, doDrag);
 		//addListeners();
 		
-		//_listModels.eventCollector.addEvent( _listModels, ListEvent.LIST_CHANGED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - LIST_CHANGED $le: " + $le ) } )		
-		//_listModels.eventCollector.addEvent( _listModels, ListEvent.EDITED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - EDITED $le: " + $le ) } )		
-		//_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_CLICKED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - ITEM_CLICKED $le: " + $le ) } )		
-		//_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_PRESSED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - ITEM_PRESSED $le: " + $le ) } )		
-		//_listModels.eventCollector.addEvent( _listModels, ListEvent.DATA_PROVIDER_CHANGED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - DATA_PROVIDER_CHANGED $le: " + $le ) } )		
+		//_listModels.eventCollector.addEvent( _listModels, ListEvent.LIST_CHANGED, function( $le:ListEvent ):void { Log.out( 'PanelModel.listModelEvent - LIST_CHANGED $le: ' + $le ) } )
+		//_listModels.eventCollector.addEvent( _listModels, ListEvent.EDITED, function( $le:ListEvent ):void { Log.out( 'PanelModel.listModelEvent - EDITED $le: ' + $le ) } )
+		//_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_CLICKED, function( $le:ListEvent ):void { Log.out( 'PanelModel.listModelEvent - ITEM_CLICKED $le: ' + $le ) } )
+		//_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_PRESSED, function( $le:ListEvent ):void { Log.out( 'PanelModel.listModelEvent - ITEM_PRESSED $le: ' + $le ) } )
+		//_listModels.eventCollector.addEvent( _listModels, ListEvent.DATA_PROVIDER_CHANGED, function( $le:ListEvent ):void { Log.out( 'PanelModel.listModelEvent - DATA_PROVIDER_CHANGED $le: ' + $le ) } )
 	}
 
     private function metadataChanged( $mme:ModelInfoEvent ):void {
@@ -154,7 +174,7 @@ public class PanelModels extends PanelBase
 	}
 	
 	public function populateModels( $source:Function, $parentModel:VoxelModel ):int	{
-		//Log.out( "PanelModels.populateModels - parentModel:" + $parentModel, Log.WARN )
+		//Log.out( 'PanelModels.populateModels - parentModel:' + $parentModel, Log.WARN )
 		_dictionarySource = $source;
 		_parentModel = $parentModel;
 		if ( _listModels )
@@ -179,6 +199,11 @@ public class PanelModels extends PanelBase
             levelSelectedModel = null;
         setSelectedModel( levelSelectedModel );
 
+		if ( null == _parentModel ){
+			_addButton.enabled = true;
+			_addButton.active = true;
+		}
+
 		return countAdded;
 	}
 
@@ -199,10 +224,10 @@ public class PanelModels extends PanelBase
             _listModels.selectedIndex = i;
         }
         else
-            _selectedText.text = "Nothing Selected";
+            _selectedText.text = LanguageManager.localizedStringGet( nothing_selected );
 
 	}
-	private function determineObjectName( $vm:VoxelModel ):String {
+	static private function determineObjectName( $vm:VoxelModel ):String {
         var itemName:String = "";
         if ( $vm.instanceInfo.name )
             itemName = $vm.instanceInfo.name;
@@ -215,7 +240,7 @@ public class PanelModels extends PanelBase
 	}
 
 	private function addItem( $vm:VoxelModel ):void {
-		_listModels.addItem( determineObjectName( $vm ), { "instanceGuid" : $vm.instanceInfo.instanceGuid, "modelGuid" : $vm.modelInfo.guid } );
+		_listModels.addItem( determineObjectName( $vm ), { 'instanceGuid' : $vm.instanceInfo.instanceGuid, 'modelGuid' : $vm.modelInfo.guid } );
 	}
 
 	private function getItemData( $index:int ):Object {
@@ -223,17 +248,17 @@ public class PanelModels extends PanelBase
 		if ( listItem )
 			return listItem.data as Object;
 		else
-			return { "instanceGuid" : "", "modelGuid" : "" };
+			return { 'instanceGuid' : "", 'modelGuid' : "" };
 	}
 
-	//// FIXME This would be much better with drag and drop
+    //// FIXME This would be much better with drag and drop
 	// meaning removing the buttons completely
 	private function buttonsCreate():int {
 		
 		const btnWidth:int = width - 10;
 		var container:Container;
 
-		//Log.out( "PanelModels.buttonsCreate" );
+		//Log.out( 'PanelModels.buttonsCreate' );
 		container = new Container( width, 10 );
 		//container.layout.orientation = LayoutOrientation.VERTICAL;
 		container.layout = new AbsoluteLayout();
@@ -248,19 +273,19 @@ public class PanelModels extends PanelBase
 		container.addElement( _selectedText );
 		_selectedText.y = currentY;
 		_selectedText.x = 5;
-        _selectedText.text = "-------";
+        _selectedText.text = '-------';
 
-		var addButton:Button = new Button( LanguageManager.localizedStringGet( "InstanceAdd" )  );
+        _addButton = new Button( LanguageManager.localizedStringGet( add_an_item_to_region )  );
 		//addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowModelList(); } );
-		addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, addModel );
+        _addButton.eventCollector.addEvent( _addButton, UIMouseEvent.CLICK, addModelToRegionHandler );
+
+        _addButton.y = currentY = currentY + BUTTON_DISTANCE;
+        _addButton.x = 5;
+        _addButton.width = btnWidth;
+		container.addElement( _addButton );
+		container.height += _addButton.height + pbPadding;
 		
-		addButton.y = currentY = currentY + BUTTON_DISTANCE;
-		addButton.x = 5;
-		addButton.width = btnWidth;
-		container.addElement( addButton );
-		container.height += addButton.height + pbPadding;
-		
-		_deleteButton = new Button( LanguageManager.localizedStringGet( "InstanceDelete" ) );
+		_deleteButton = new Button( LanguageManager.localizedStringGet( item_remove_from_region ) );
 		_deleteButton.y = currentY = currentY + BUTTON_DISTANCE;
 		_deleteButton.x = 5;
 		_deleteButton.width = btnWidth;
@@ -270,16 +295,16 @@ public class PanelModels extends PanelBase
 		container.addElement( _deleteButton );
 		container.height += _deleteButton.height + pbPadding;
 		
-		_detailButton = new Button( LanguageManager.localizedStringGet( "instanceDetails" ) );
+		_detailButton = new Button( LanguageManager.localizedStringGet( item_details ) );
 		_detailButton.y = currentY = currentY + BUTTON_DISTANCE;
 		_detailButton.x = 5;
 		_detailButton.width = btnWidth;
 		_detailButton.enabled = false;
-		_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, function ($e:UIMouseEvent):void { new PopupInstanceDetail( VoxelModel.selectedModel ); } );
+		_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, function ($e:UIMouseEvent):void { new PopupInstanceDetail( PanelModels.getLastSelectedModel() ); } );
 		container.addElement( _detailButton );
 
 		if ( Globals.isDebug ) {
-			_dupButton = new Button( LanguageManager.localizedStringGet( "instanceClone" ) );
+			_dupButton = new Button( LanguageManager.localizedStringGet( item_create_copy_of ) );
 			_dupButton.y = currentY = currentY + BUTTON_DISTANCE;
 			_dupButton.x = 5;
 			_dupButton.width = btnWidth;
@@ -305,8 +330,8 @@ public class PanelModels extends PanelBase
 				noModelSelected();
 			
 			function deleteModelCheck():void {
-				var alert:Alert = new Alert( "Do you really want to delete the model '" + VoxelModel.selectedModel.modelInfo.name + "'?", 400 );
-				alert.setLabels( "Yes", "No" );
+				var alert:Alert = new Alert( LanguageManager.localizedStringGet( nothing_selected ) + " '" + VoxelModel.selectedModel.modelInfo.name + "'?", 400 );
+				alert.setLabels( LanguageManager.localizedStringGet( yes ) , LanguageManager.localizedStringGet( no ) );
 				alert.alertMode = AlertMode.CHOICE;
 				$evtColl.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
 				alert.display();
@@ -322,7 +347,7 @@ public class PanelModels extends PanelBase
 			}
 			
 			function deleteElement():void {
-				Log.out( "PanelModels.deleteModel - " + VoxelModel.selectedModel.toString(), Log.WARN );
+				Log.out( 'PanelModels.deleteModel - ' + VoxelModel.selectedModel.toString(), Log.WARN );
 				ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved );
 				if ( VoxelModel.selectedModel.instanceInfo.associatedGrain && VoxelModel.selectedModel.instanceInfo.controllingModel ) {
 					VoxelModel.selectedModel.instanceInfo.controllingModel.write( VoxelModel.selectedModel.instanceInfo.associatedGrain, TypeInfo.AIR );
@@ -335,16 +360,18 @@ public class PanelModels extends PanelBase
 			}
 		}
 		
-		function addModel(event:UIMouseEvent):void {
-			if ( myParent.selectedModel && null != myParent.selectedModel.instanceInfo.controllingModel )
-				WindowInventoryNew._s_hackShowChildren = true;
-			else
-				WindowInventoryNew._s_hackShowChildren = false;
+		function addModelToRegionHandler(event:UIMouseEvent):void {
+			WindowInventoryNew._s_hackShowChildren = (myParent.selectedModel && null != myParent.selectedModel.instanceInfo.controllingModel);
+//            if ( myParent.selectedModel && null != myParent.selectedModel.instanceInfo.controllingModel )
+//                WindowInventoryNew._s_hackShowChildren = true;
+//            else
+//                WindowInventoryNew._s_hackShowChildren = false;
+
 			WindowInventoryNew._s_hackSupportClick = true;
 			var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );
-			var title:String = "All items";
+			var title:String = LanguageManager.localizedStringGet( all_items );
             if ( myParent.selectedModel )
-                title = "Showing possible children of " + myParent.selectedModel.modelInfo.name;
+                title = LanguageManager.localizedStringGet( showing_possible_children_of ) + myParent.selectedModel.modelInfo.name;
 			WindowInventoryNew.toggle( startingTab, title, myParent.selectedModel );
 		}
 	}
@@ -369,17 +396,29 @@ public class PanelModels extends PanelBase
 //	}
 
 	private function selectModel(event:ListEvent):void {
-		Log.out("PanelModels.selectModel");
 		if (event.target.data) {
 			var instanceGuid:String = event.target.data.instanceGuid;
-			Log.out("PanelModels.selectModel has TARGET DATA: " + event.target.data as String);
+			Log.out('PanelModels.selectModel has TARGET DATA: ' + event.target.data as String);
 			displayModelData( instanceGuid );
+			_addButton.label = LanguageManager.localizedStringGet( add_a_child_to_item );
 		}
+        else if ( _parentModel ) {
+            Log.out('PanelModels.selectModel has NO target data');
+            buttonsDisable();
+            setSelectedModel( null );
+            UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, null, _level);
+            _addButton.label = LanguageManager.localizedStringGet( add_a_child_to_parent );
+        }
 		else {
-			Log.out("PanelModels.selectModel has NO target data");
+			Log.out('PanelModels.selectModel has NO target data');
 			buttonsDisable();
 			setSelectedModel( null );
 			UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, null, _level);
+            _addButton.label = LanguageManager.localizedStringGet( add_an_item_to_region );
+			if ( null == _parentModel ) {
+                _addButton.enabled = true;
+				_addButton.active = true;
+			}
 		}
 	}
 
@@ -390,7 +429,9 @@ public class PanelModels extends PanelBase
 			vm = Region.currentRegion.modelCache.instanceGet( $instanceGuid );
 		else
 			vm = _parentModel.childFindInstanceGuid( $instanceGuid );
-		Log.out("PanelModels.selectModel vm: " + vm );
+		if ( vm )
+			setLastSelectedModel( vm );
+		Log.out('PanelModels.selectModel vm: ' + vm );
 		if ( vm ) {
 			setSelectedModel( vm );
 			UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, vm, _parentModel, _level);
@@ -399,6 +440,8 @@ public class PanelModels extends PanelBase
 	}
 	
 	private function buttonsDisable():void {
+        _addButton.enabled = false;
+        _addButton.active = false;
 		_detailButton.enabled = false;
 		_detailButton.active = false;
 		_deleteButton.enabled = false;
@@ -410,8 +453,14 @@ public class PanelModels extends PanelBase
 	}
 	
 	private function buttonsEnable():void {
-		_detailButton.enabled = true;
+        _addButton.enabled = true;
+        _addButton.active = true;
+        _detailButton.enabled = true;
 		_detailButton.active = true;
+		if ( null == _parentModel )
+            _deleteButton.label = LanguageManager.localizedStringGet( item_remove_from_region );
+		else
+            _deleteButton.label = LanguageManager.localizedStringGet( item_remove_from_parent );
 		_deleteButton.enabled = true;
 		_deleteButton.active = true;
 		if ( _dupButton ) {
@@ -421,14 +470,14 @@ public class PanelModels extends PanelBase
 	}
 	
 	static private function noModelSelected():void	{
-		(new Alert( LanguageManager.localizedStringGet( "No_Model_Selected" ) )).display();
+		(new Alert( LanguageManager.localizedStringGet( no_model_selected ) )).display();
 	}
 
 	private function childModelAdded( $me:ModelEvent ):void {
 		if ( 0 == _level )
 				return;
 		var pig:String = $me.parentInstanceGuid;
-		var ig:String = $me.instanceGuid;
+		//var ig:String = $me.instanceGuid;
 		var vm:VoxelModel = $me.vm;
 		if ( vm && _parentModel && pig == _parentModel.instanceInfo.instanceGuid )
 			addItem( vm );
@@ -437,45 +486,11 @@ public class PanelModels extends PanelBase
 	private function parentModelAdded( $me:ModelEvent ):void {
 		if ( 0 <= _level )
 			return;
-		var ig:String = $me.instanceGuid;
+		//var ig:String = $me.instanceGuid;
 		var vm:VoxelModel = $me.vm;
 		if ( vm )
 			addItem( vm );
 
 	}
-	//private function rollOverHandler(e:UIMouseEvent):void
-	//{
-		//Log.out( "PanelModels.UIMouseEvent.ROLL_OVER: " + e.toString() );
-		//if ( null == _buttonContainer ) {
-			//removeListeners();
-			//buttonsCreate();
-			//addListeners();
-		//}
-	//}
-	//
-	//private function rollOutHandler(e:UIMouseEvent):void 
-	//{
-		//Log.out( "PanelModels.UIMouseEvent.ROLL_OUT: " + e.toString() );
-		//if ( null != _buttonContainer ) {
-			//_buttonContainer.remove();
-			//_buttonContainer = null;
-			//removeListeners();
-			//addListeners();
-		//}
-	//}
-	//
-	//private function addListeners():void {
-		//Log.out( "PanelModels.addListeners" );
-		//addEventListener( UIMouseEvent.ROLL_OVER, rollOverHandler );
-		//addEventListener( UIMouseEvent.ROLL_OUT, rollOutHandler );
-	//}
-	//
-	//private function removeListeners():void {
-		//Log.out( "PanelModels.removeListeners" );
-		//removeEventListener( UIMouseEvent.ROLL_OVER, rollOverHandler );
-		//removeEventListener( UIMouseEvent.ROLL_OUT, rollOutHandler );
-	//}
-	//
-	
 }
 }

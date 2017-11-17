@@ -259,7 +259,7 @@ public class VoxelVerse extends Sprite
 	}
 
 	private static function dispatchSaves():void {
-		//Log.out( "VoxelVerse.dispatchSaves", Log.WARN )
+		Log.out( "VoxelVerse.dispatchSaves", Log.WARN );
 		if ( Region.currentRegion )
 			RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid );
 		AnimationEvent.create( ModelBaseEvent.SAVE, 0, null, null, null );
@@ -267,8 +267,8 @@ public class VoxelVerse extends Sprite
 		if ( null != vm && vm.instanceInfo ) {
 			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, vm.instanceInfo.instanceGuid , null ) );
 		}
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.SAVE, 0, "", null ) );
-		OxelDataEvent.create( ModelBaseEvent.SAVE, 0, "", null );
+		//ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.SAVE, 0, "", null ) );
+		//OxelDataEvent.create( ModelBaseEvent.SAVE, 0, "", null );
 	}
 
 	private static function uncaughtErrorHandler(event:UncaughtErrorEvent):void {

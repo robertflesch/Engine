@@ -65,8 +65,11 @@ import org.flashapi.swing.*
 		static public var _s_instance:WindowInventoryNew;
 		
 		static public function toggle( $startingTab:String, $label:String, $parentModel:VoxelModel ):void {
-			if ( null == _s_instance )
-				_s_instance = new WindowInventoryNew( $startingTab, $label, $parentModel );
+			if ( null == _s_instance ) {
+				if ( $parentModel )
+						Log.out( "WindowInventoryNew.toggle opening window with parent model: " + $parentModel, Log.WARN );
+                _s_instance = new WindowInventoryNew($startingTab, $label, $parentModel);
+            }
 			else {
 				_s_instance.remove();
 				_s_instance = null

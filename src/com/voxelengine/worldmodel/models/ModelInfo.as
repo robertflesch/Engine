@@ -543,11 +543,15 @@ public class ModelInfo extends PersistenceObject
 
 	public function brandChildren():void {
 		for each ( var child:VoxelModel in childVoxelModels ) {
-			child.modelInfo.childOfGuid = guid;
-			child.modelInfo.brandChildren();
+			if ( child && child.modelInfo )
+				brandChild( child.modelInfo );
 		}
 	}
 
+	private function brandChild( $mi:ModelInfo ):void {
+        $mi.childOfGuid = guid;
+        $mi.brandChildren();
+	}
 
 	public function childRemoveByGC( $gc:GrainCursor ):Boolean {
 		
@@ -608,6 +612,9 @@ public class ModelInfo extends PersistenceObject
 		// templates would like to add the child for each instance, that is a no no..
 		if ( !childExists( $child ) ) {
 			childVoxelModels.push($child);
+			if ( childrenLoaded ) {
+				brandChild( $child.modelInfo );
+            }
 			// this is the wrong place to do this. I should set it in the GUI rather than here.
 			//if ( !$child.instanceInfo.dynamicObject && Globals.isGuid( $child.modelInfo.guid) )
 			//	changed = true;
@@ -739,7 +746,7 @@ public class ModelInfo extends PersistenceObject
             oxelPersistence.save();
         }
 
-        Log.out("ModelInfo.save -     guid: " + guid, Log.WARN);
+        Log.out("ModelInfo.save -     guid: " + guid, Log.DEBUG);
 		if ( !super.save( $validateGuid ) )
 			return false;
 
