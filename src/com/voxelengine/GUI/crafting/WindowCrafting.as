@@ -78,7 +78,7 @@ public class WindowCrafting extends VVPopup
 	
 	private function onRecipe(e:CraftingEvent):void
 	{
-		_recipeList.addItem( e.name, e.recipe );
+		_recipeList.addItem( e.recipe.name, e.recipe );
 	}
 	
 	override protected function onRemoved( event:UIOEvent ):void

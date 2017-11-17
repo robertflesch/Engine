@@ -132,7 +132,7 @@ public class PanelRecipe extends PanelBase
             _instanceGuid 			= ii.instanceGuid		= Globals.getUID();
             ii.name					= _recipe.name;
             OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, templateComplete );
-            ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
+            //ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
             ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, modelInfoFailed );
 
             new ModelMakerClone( ii, mi );
@@ -142,27 +142,27 @@ public class PanelRecipe extends PanelBase
     private function modelInfoFailed( $mie:ModelInfoEvent ):void {
 		if ( _recipe.templateId == $mie.modelInfo.guid ){
 			(new Alert("An error has occurred, please try again later")).display();
-            OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, templateComplete);
-            ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete);
+            //ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete);
             ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, modelInfoFailed );
 			_parent.remove();
 		}
 	}
 
-    private function modelLoadComplete( $mle:ModelLoadingEvent ): void {
-        if ( $mle.data.modelGuid == _recipe.templateId ) {
-            OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, templateComplete);
-            ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete);
-            ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, modelInfoFailed );
+//    private function modelLoadComplete( $mle:ModelLoadingEvent ): void {
+//        if ( $mle.data.modelGuid == _recipe.templateId ) {
+//            OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, templateComplete);
+//            //ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete);
+//            ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, modelInfoFailed );
+//
+//	}
 
-            var ms:ModelStatisics = $mle.vm.modelInfo.oxelPersistence.statistics;
-            var stats:Array = ms.stats;
-            for ( var key:* in stats ) {
-                if ( !isNaN( key ) ) {
-                    var ti:TypeInfo = TypeInfo.typeInfo[key];
-                    if ( ti )
-                        Log.out( "Contains " + stats[key]/(16*16*16) + " cubic meters of " + ti.name);
-                }
+	private function printStats( $ms:ModelStatisics ):void {
+        var stats:Array = $ms.stats;
+        for ( var key:* in stats ) {
+            if ( !isNaN( key ) ) {
+                var ti:TypeInfo = TypeInfo.typeInfo[key];
+                if ( ti )
+                    Log.out( "Contains " + stats[key]/(16*16*16) + " cubic meters of " + ti.name);
             }
         }
 	}
@@ -172,22 +172,14 @@ public class PanelRecipe extends PanelBase
 	private function templateComplete(  $ode:OxelDataEvent ): void {
 		if ( $ode.modelGuid == _recipe.templateId ){
             OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, templateComplete );
-            ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
+            //ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
 
             var oxel:Oxel = $ode.oxelPersistence.oxel;
 			// I have the ToType, where do I get the from type?
 			// could I use the oxel statistics?
 			// should be able to find category from there, and the id
             var vm:VoxelModel =  Region.currentRegion.modelCache.instanceOfModelWithInstanceGuid( $ode.modelGuid, _instanceGuid );
-            var ms:ModelStatisics = vm.modelInfo.oxelPersistence.statistics;
-			var stats:Array = ms.stats;
-            for ( var key:* in stats ) {
-                if ( !isNaN( key ) ) {
-                    var ti:TypeInfo = TypeInfo.typeInfo[key]
-                    if ( ti )
-                        Log.out( "Contains " + stats[key]/16*16*16 + " cubic meters of " + ti.name);
-                }
-            }
+            printStats( vm.modelInfo.oxelPersistence.statistics );
 
 //            oxel.changeTypeFromTo( fromType, toType );
 //            _vm.modelInfo.oxelPersistence.changed = true;

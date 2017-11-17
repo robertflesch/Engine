@@ -350,13 +350,10 @@ public class ModelInfo extends PersistenceObject
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	protected 	var		_animationsLoaded:Boolean = true;
 	public 	function get animationsLoaded():Boolean 				{ return _animationsLoaded; }
-	public 	function set animationsLoaded(value:Boolean):void		{
-		Log.out( "ModelInfo.animationsLoaded: " + value );
-		_animationsLoaded = value;
-	}
+	public 	function set animationsLoaded(value:Boolean):void		{ _animationsLoaded = value; }
     private 	var 	_animsRemainingToLoad:int;
 
-	// Dont load the animations until the model is instaniated
+	// Don't load the animations until the model is instantiated
 	public function animationsLoad( $buildState:String ):void {
 		_series = 0;
 		animationsLoaded = true;
@@ -454,12 +451,10 @@ public class ModelInfo extends PersistenceObject
 	public		function get childVoxelModels():Vector.<VoxelModel>			{ return _childVoxelModels; }
 	public		function 	 childVoxelModelsGet():Vector.<VoxelModel>		{ return _childVoxelModels; } // This is so the function can be passed as parameter
 
+    // This is set to true by default, since the ModelInfo will not save unless it considers the children and animations to be loaded
 	private 	var			_childrenLoaded:Boolean = true;
 	public		function get childrenLoaded():Boolean 				{ return _childrenLoaded; }
-	public		function set childrenLoaded(value:Boolean):void  	{
-        Log.out( "ModelInfo.childrenLoaded: " + value );
-		_childrenLoaded = value;
-	}
+	public		function set childrenLoaded(value:Boolean):void  	{ _childrenLoaded = value; }
 	/////////////////////
 	public		function 	 unloadedChildCount():int		{
 		var count:int = 0;
@@ -469,7 +464,8 @@ public class ModelInfo extends PersistenceObject
 	}
 
 	public function childrenLoad( $vm:VoxelModel, $buildState:String ):void {
-		childrenLoaded	= true;
+		// See definition
+		// childrenLoaded	= true;
 		if ( !dbo || !dbo.children )
 			return;
 		
@@ -841,6 +837,9 @@ public class ModelInfo extends PersistenceObject
 	override public function clone( $guid:String ):* {
 		var newModelInfo:ModelInfo = new ModelInfo( $guid, null, dbo );
         newModelInfo.init();
+        newModelInfo.owner = Network.userId;
+        newModelInfo.hashTags = this.hashTags + "#cloned";
+		// TODO should probably do the same for children, to make sure I get any recent additions
 		for each ( var ani:Animation in _animations ) {
 			var newAni:Animation = ani.clone( guid );
 			newModelInfo._animations.push(newAni);
@@ -848,21 +847,21 @@ public class ModelInfo extends PersistenceObject
 		// these will be rebuilt when it is saved
 		delete newModelInfo.dbo.animations;
 		newModelInfo.animationsLoaded = true;
-		newModelInfo.oxelPersistence = oxelPersistence.cloneNew( $guid );
 
-
-/////////////////////////
-//        var oldObj:String = JSON.stringify( dbo );
-//        var newData:Object = JSON.parse( oldObj );
-//
-//        newData.owner = Network.userId;
-//        newData.hashTags = this.hashTags + "#cloned";
-//        newData.name = this.name;
-//        //newData.createdDate = new Date().toUTCString();
-//        var newModelMetadata:ModelMetadata = new ModelMetadata( $guid, null, newData );
-
-////////////////////////
+		// I want to clone this at the OxelData level not the oxelPersistence level
+		// since oxelPersistence is not assigned until it is complete drawn
+        OxelDataEvent.addListener( ModelBaseEvent.RESULT, oxelDataCheck );
+        // Since the model represented by the modelInfo may never added to the region, it doesn't get completely built
+        OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, guid, null );
 		return newModelInfo;
+
+        function oxelDataCheck( $ode:OxelDataEvent ):void {
+            if (guid == $ode.modelGuid) {
+                // Now we have the data.
+                OxelDataEvent.removeListener(ModelBaseEvent.RESULT, oxelDataCheck);
+                newModelInfo.oxelPersistence = $ode.oxelPersistence.cloneNew(guid)
+            }
+        }
 	}
 
     public function toString():String {

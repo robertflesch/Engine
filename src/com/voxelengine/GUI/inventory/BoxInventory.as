@@ -46,9 +46,10 @@ public class BoxInventory extends VVBox
 		dragEnabled = true;
 		_count = new Label( "", $widthParam );
 		_count.fontColor = 0xffffff;
+        _count.fontSize = 16;
 		_count.textAlign = TextAlign.CENTER;
 		//_count.x = 16;
-		_count.y = 5;
+		_count.y = 3;
 
 		_name = new Label( "", $widthParam );
 		_name.fontColor = 0xffffff;

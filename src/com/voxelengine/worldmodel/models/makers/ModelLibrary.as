@@ -9,6 +9,7 @@
 package com.voxelengine.worldmodel.models.makers
 {
 import com.voxelengine.worldmodel.crafting.items.Pick;
+import com.voxelengine.worldmodel.crafting.items.Shovel;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 
 import flash.utils.getDefinitionByName;
@@ -29,6 +30,8 @@ import flash.utils.getDefinitionByName;
 			{
                 //noinspection BadExpressionStatementJS
                 Pick;
+                //noinspection BadExpressionStatementJS
+                Shovel;
 				//noinspection BadExpressionStatementJS
 				Projectile;
 				//noinspection BadExpressionStatementJS
@@ -63,20 +66,14 @@ import flash.utils.getDefinitionByName;
 				EditCursor;
 			}
 			//
+			// it gets this by default
 			var asset:Class = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.models.types.VoxelModel" ) );
-			try 
-			{
-				asset = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.models.types." + assetLinkageID ) );
-			}
-			catch ( error:Error )
-			{
-				try
-				{
-					asset = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.weapons." + assetLinkageID ) );
-				}
-				catch ( error:Error )
-				{
-					Log.out( "ModelLibrary.getAsset - ERROR - ERROR - ERROR: " + error, Log.ERROR );
+			try { asset = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.models.types." + assetLinkageID ) );
+			} catch ( error:Error ) {
+				try { asset = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.weapons." + assetLinkageID ) );
+				} catch ( error:Error ) {
+                    try {  asset = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.crafting.items." + assetLinkageID ) );
+					} catch ( error:Error ) { Log.out("ModelLibrary.getAsset - ERROR - ERROR - ERROR: " + error, Log.ERROR); }
 				}
 			}
 			

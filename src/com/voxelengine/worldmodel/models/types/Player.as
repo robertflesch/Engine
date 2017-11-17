@@ -43,6 +43,10 @@ public class Player extends PersistenceObject
     static private const REFERENCE_AVATAR:String = "FAFC84B1-B3A2-726D-E016-0A6C8A80ABC1";
     static public const BIGDB_TABLE_PLAYER_OBJECTS:String = "PlayerObjects";
 
+    private var _playerInfo:PlayerInfo;
+    public function get playerInfo():PlayerInfo 			{ return _playerInfo; }
+    public function set playerInfo( $val:PlayerInfo):void 	{ _playerInfo = $val; }
+
     public function get role():Role 				{ return RoleCache.roleGet( dbo ? dbo.role : null ) }
     public function get instanceGuid():String 		{ return dbo ? dbo.instanceGuid: DEFAULT_PLAYER; }
 
@@ -86,7 +90,6 @@ public class Player extends PersistenceObject
 				// Assign the Avatar the default avatar
 				dbo.modelGuid = REFERENCE_AVATAR;
                 dbo.instanceGuid = Globals.getUID();
-
 //				var userName:String = dbo.key.substring( 6 );
 //				var firstChar:String = userName.substr(0, 1);
 //				var restOfString:String = userName.substr(1, userName.length);
@@ -95,14 +98,14 @@ public class Player extends PersistenceObject
 				dbo.description = "New Player Avatar";
 				dbo.modifiedDate = new Date().toUTCString();
 				dbo.createdDate = new Date().toUTCString();
-Log.out( "onPlayerLoadedAction - HACK TO NOT SAVE NEW PLAYER DATA", Log.WARN );
-//				dbo.role = Role.USER;
+				dbo.role = Role.USER;
 				dbo.save();
 			}
 			// Don't modify the modelGuid, change it in the DB if needed
-			var pi:PlayerInfo = new PlayerInfo( instanceGuid, null );
-			pi.modelGuid = dbo.modelGuid;
-			PlayerInfoEvent.create( ModelBaseEvent.SAVE, instanceGuid, pi );
+            playerInfo = new PlayerInfo( instanceGuid, null );
+            playerInfo.modelGuid = dbo.modelGuid;
+			// Need to use event so that the old record is purged first
+			PlayerInfoEvent.create( ModelBaseEvent.SAVE, instanceGuid, playerInfo );
 			createPlayer( dbo.modelGuid, instanceGuid );
 
             InventoryEvent.addListener( InventoryEvent.SAVE_REQUEST, savePlayerObject );
@@ -249,7 +252,7 @@ Log.out( "onPlayerLoadedAction - HACK TO NOT SAVE NEW PLAYER DATA", Log.WARN );
 		VoxelModel.controlledModel.usesGravity = Region.currentRegion.gravity;
 	}
 
-    static private function onRegionLoad( $re:RegionEvent ):void {
+    private function onRegionLoad( $re:RegionEvent ):void {
         if ( VoxelModel.controlledModel ) {
             if ( null == Region.currentRegion.modelCache.instanceGet( VoxelModel.controlledModel.instanceInfo.instanceGuid ) )
                 RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, VoxelModel.controlledModel );
@@ -276,6 +279,9 @@ Log.out( "onPlayerLoadedAction - HACK TO NOT SAVE NEW PLAYER DATA", Log.WARN );
                 avatar.instanceInfo.rotationSet = new Vector3D( 0, 0, 0 );
 
             avatar.usesGravity = region.gravity;
+
+			playerInfo.regionGuid = region.guid;
+            playerInfo.save();
             WindowSplashEvent.create(WindowSplashEvent.ANNIHILATE);
         }
     }

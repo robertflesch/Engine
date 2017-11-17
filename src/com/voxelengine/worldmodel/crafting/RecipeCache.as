@@ -59,9 +59,13 @@ public class RecipeCache
 	static private function loadRecipes(e:CraftingEvent):void 
 	{
 		if ( !_initialized ) {
-            PersistenceEvent.create(PersistenceEvent.LOAD_REQUEST, 0, Recipe.RECIPE_EXT, "basicPick");
-            PersistenceEvent.create(PersistenceEvent.LOAD_REQUEST, 0, Recipe.RECIPE_EXT, "pick");
-            PersistenceEvent.create(PersistenceEvent.LOAD_REQUEST, 0, Recipe.RECIPE_EXT, "shovel");
+            PersistenceEvent.create(PersistenceEvent.LOAD_REQUEST, 0, Recipe.BIGDB_TABLE_RECIPE, "0934572D-3ED8-D37D-CF38-54A6EBCA7E4F");
+            PersistenceEvent.create(PersistenceEvent.LOAD_REQUEST, 0, Recipe.BIGDB_TABLE_RECIPE, "A6F315F1-50B0-F7F4-DEA6-89C28E8F6563");
+            PersistenceEvent.create(PersistenceEvent.LOAD_REQUEST, 0, Recipe.BIGDB_TABLE_RECIPE, "68D3BB23-DB1E-05E7-998B-85945FC05DDE");
+
+//            PersistenceEvent.create(PersistenceEvent.LOAD_REQUEST, 0, Recipe.RECIPE_EXT, "basicPick");
+//            PersistenceEvent.create(PersistenceEvent.LOAD_REQUEST, 0, Recipe.RECIPE_EXT, "pick");
+//            PersistenceEvent.create(PersistenceEvent.LOAD_REQUEST, 0, Recipe.RECIPE_EXT, "shovel");
 		}
 		else {
 			for each ( var recipe:Recipe in _recipes ) {
@@ -95,6 +99,7 @@ public class RecipeCache
                 return;
             } else {
                 rec = new Recipe( $pe.guid, null, newObjData );
+				rec.guid = Globals.getUID();
             }
             rec.save();
             add( rec );

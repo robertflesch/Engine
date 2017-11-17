@@ -6,24 +6,13 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.crafting.items {
-	import com.voxelengine.events.CraftingItemEvent;
-	import com.voxelengine.Log;
-	import com.voxelengine.Globals;
-	import com.voxelengine.worldmodel.crafting.Material;
-	import com.voxelengine.worldmodel.crafting.Recipe;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
-/**
-	 * ...
-	 * @author Bob
-	 */
-	public class Pick extends VoxelModel
-	{
-		public function Pick() {
-			var ii:InstanceInfo = new InstanceInfo();
-
-			super(ii);
-		}
-	}
+	public class Pick extends VoxelModel {
+        public function Pick($ii:InstanceInfo) {
+            super($ii);
+        }
+        static public function getAnimationClass():String { return null; }
+    }
 }

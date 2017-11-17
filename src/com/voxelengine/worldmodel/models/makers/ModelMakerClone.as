@@ -8,6 +8,9 @@
 package com.voxelengine.worldmodel.models.makers
 {
 
+import com.voxelengine.events.RegionEvent;
+import com.voxelengine.worldmodel.Region;
+
 import flash.display.BitmapData;
 import flash.geom.Matrix;
 
@@ -28,10 +31,11 @@ import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelInfo;
 
+import org.flashapi.swing.Alert;
+
 public class ModelMakerClone extends ModelMakerBase {
 
     private var _waitForChildren:Boolean;
-    private var _newModelGuid:String;
     private var _oldModelInfo:ModelInfo;
 
     public function ModelMakerClone( $instanceInfo:InstanceInfo, $mi:ModelInfo = null ) {
@@ -39,11 +43,10 @@ public class ModelMakerClone extends ModelMakerBase {
 
         Log.out("ModelMakerClone - clone model with modelGuid: " + $instanceInfo.modelGuid + "  instanceGuid: " + $instanceInfo.instanceGuid );
 
-        _newModelGuid = Globals.getUID();
         _oldModelInfo = $mi;
 
         if ( _oldModelInfo )
-            processModelInfo();
+            gatherOxelData();
         else {
             requestModelInfo();
         }
@@ -53,36 +56,41 @@ public class ModelMakerClone extends ModelMakerBase {
         if ( ii.modelGuid == $mie.modelGuid ) {
             removeMIEListeners();
             _oldModelInfo = $mie.modelInfo;
-            processModelInfo();
+            gatherOxelData();
         }
     }
 
-    private function processModelInfo():void {
-        // If the OLD modelInfo is completely build, move on to requesting the metadata, otherwise wait for it.
-        if ( _oldModelInfo.oxelPersistence && ( 0 < _oldModelInfo.oxelPersistence.oxelCount ) ) {
-            _modelInfo = _oldModelInfo.clone(_newModelGuid);
-            Log.out( "ModelMakerClone.processModelInfo CLONED Model has a build Oxel _oldModelInfo.guid: " + _oldModelInfo.guid );
+    private function gatherOxelData():void {
+        OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, oxelDataFailed );
+        OxelDataEvent.addListener( ModelBaseEvent.RESULT, oxelDataReceived );
+        // Since this model is never added to the region, it doesn't get completely built
+        OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, _oldModelInfo.guid, null );
+    }
+
+    private function oxelDataReceived( $ode:OxelDataEvent ):void {
+        if ( _oldModelInfo.guid == $ode.modelGuid ) {
+            // Now we have the modelInfo data and oxel data.
+            OxelDataEvent.removeListener( ModelBaseEvent.RESULT, oxelDataReceived );
+            OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, oxelDataFailed );
+
+             _modelInfo = _oldModelInfo.clone( Globals.getUID() );
+            Log.out( "ModelMakerClone.gatherOxelData CLONED Model has a build Oxel _oldModelInfo.guid: " + _oldModelInfo.guid );
             if ( !parentModelGuid ) {
                 var modelClass:String = _oldModelInfo.modelClass;
                 modelInfo.animationClass = AnimationCache.requestAnimationClass(modelClass);
             }
             completeMake();
-        } else {  // wait on OLD modelInfo's oxel to finish!
-            Log.out( "ModelMakerClone.processModelInfo CLONED Models OXEL NOT READY wait for _oldModelInfo.guid: " + _oldModelInfo.guid );
-            OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_COMPLETE, onBaseModelOxelBuildComplete );
         }
     }
 
-     private function onBaseModelOxelBuildComplete( $ode:OxelDataEvent ):void {
-         // oxel s loaded, we can go!
-         if ( $ode.modelGuid == _oldModelInfo.guid ) {
-             Log.out("ModelMakerClone.onOxelBuildComplete OLD Models oxel is now ready ode.modelGuid: " + $ode.modelGuid + "  _oldModelInfo.guid: " + _oldModelInfo.guid );
-             OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, onBaseModelOxelBuildComplete);
-             // go back and try again
-             processModelInfo();
-         }
-     }
-
+    private function oxelDataFailed( $ode:OxelDataEvent ):void {
+        if ( _oldModelInfo.guid == $ode.modelGuid ) {
+            // Now we have the modelInfo data and oxel data.
+            OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, oxelDataFailed );
+            OxelDataEvent.removeListener( ModelBaseEvent.RESULT, oxelDataFailed );
+            (new Alert("Error cloning object").display());
+        }
+    }
 
     private function completeMake():void {
         //Log.out("ModelMakerClone.completeMake: " + ii.toString());
@@ -92,11 +100,11 @@ public class ModelMakerClone extends ModelMakerBase {
             if ( _vm ) {
                 _vm.stateLock( true, 10000 ); // Lock state so that it has time to load animations
                 addODEListeners();
-                PersistenceEvent.create( PersistenceEvent.CLONE_SUCCEED, 0, Globals.IVM_EXT, modelInfo.guid, null, modelInfo.oxelPersistence.ba, null, String( modelInfo.bound  ) );
                 if ( false == modelInfo.childrenLoaded ) { // its true if they are loaded or the model has no children.
                     _waitForChildren = true;
                     ModelLoadingEvent.addListener(ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady);
                 }
+                PersistenceEvent.create( PersistenceEvent.CLONE_SUCCEED, 0, Globals.IVM_EXT, modelInfo.guid, null, modelInfo.oxelPersistence.ba, null, String( modelInfo.bound  ) );
             } else {
                 markComplete(false);
             }
@@ -139,10 +147,9 @@ public class ModelMakerClone extends ModelMakerBase {
     override protected function markComplete( $success:Boolean ):void {
         if ( true == $success ) {
             modelInfo.brandChildren();
-            Log.out("ModelMakerClone.completeMake - waiting on quad build: " + modelInfo.description );
+            Log.out("ModelMakerClone.completeMake - waiting on quad build: " + modelInfo.description + "  oldModelInfo: " + _oldModelInfo.guid + "  newGuid: " + modelInfo.guid );
 
-            ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
-
+            ModelInfoEvent.create( ModelBaseEvent.GENERATION, 0, _modelInfo.guid, _modelInfo );
 
             _vm.complete = true;
 

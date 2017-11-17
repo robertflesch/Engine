@@ -11,8 +11,8 @@ import com.voxelengine.worldmodel.models.OxelPersistence;
 
 import flash.utils.ByteArray;
 
-public class OxelCloner {
-    public function OxelCloner( $op:OxelPersistence ) {
+public class OxelLevelOfDetailGenerator {
+    public function OxelLevelOfDetailGenerator($op:OxelPersistence ) {
 
         // this adds the version header, need for the persistanceEvent
         //var ba:ByteArray = OxelPersistence.toByteArray( $op.oxel );

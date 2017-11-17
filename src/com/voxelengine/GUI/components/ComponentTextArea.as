@@ -8,13 +8,17 @@
 
 package com.voxelengine.GUI.components {
 import org.flashapi.swing.Box;
+import org.flashapi.swing.LabelTextArea;
+import org.flashapi.swing.LabelTextArea;
 import org.flashapi.swing.TextArea;
+import org.flashapi.swing.TextInput;
 import org.flashapi.swing.event.TextEvent;
 import org.flashapi.swing.constants.BorderStyle;
 import org.flashapi.swing.plaf.spas.VVUI;
 
 public class ComponentTextArea extends Box
 {
+    private var _li:VVTextArea;
 	public function ComponentTextArea( $label:String, $changeHandler:Function, $initialValue:String, $width:int, $height:int = 70, $padding:int = 5 )
 	{
 		super( $width, $height );
@@ -23,13 +27,15 @@ public class ComponentTextArea extends Box
 		backgroundColor = VVUI.DEFAULT_COLOR;
 		title = $label;
 		borderStyle = BorderStyle.GROOVE;
-		
-		var li:TextArea = new TextArea();
-		li.appendText( $initialValue );
-		li.width = $width - 20;
-		li.addEventListener( TextEvent.EDITED, $changeHandler );
-			
-		addElement( li );
-	}
+
+		_li = new VVTextArea( $width, $height );
+        _li.text = $initialValue;
+        _li.addEventListener( TextEvent.EDITED, $changeHandler );
+        addElement( _li );
+    }
+
+    public function text():String {
+        return _li.text;
+    }
 }
 }

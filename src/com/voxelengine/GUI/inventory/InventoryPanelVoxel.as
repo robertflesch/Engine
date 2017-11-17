@@ -92,6 +92,8 @@ public class InventoryPanelVoxel extends VVContainer
 		_barLower.addItem( LanguageManager.localizedStringGet( Voxels.VOXEL_CAT_AVATAR ), Voxels.VOXEL_CAT_AVATAR );
 		_barLower.addItem( LanguageManager.localizedStringGet( Voxels.VOXEL_CAT_LIGHT ), Voxels.VOXEL_CAT_LIGHT );
 		_barLower.addItem( LanguageManager.localizedStringGet( Voxels.VOXEL_CAT_CRAFTING ), Voxels.VOXEL_CAT_CRAFTING );
+        _barLower.addItem( LanguageManager.localizedStringGet( Voxels.VOXEL_CAT_BEAST ), Voxels.VOXEL_CAT_BEAST );
+
 		_barLower.setButtonsWidth( 96, 32 );
 		eventCollector.addEvent( _barLower, ListEvent.ITEM_CLICKED, selectCategory );
 		addGraphicElements( _barLower );

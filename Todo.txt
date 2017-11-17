@@ -1,12 +1,14 @@
 
 VoxelVerse todo
 
+Recipes.. do I copy them to users inventory? or just give him reference?
 Copy of Avatar when starting
 Promotion system
 FB integration?
 Payvault integration?
 
 Lower
+Avatar is saving every time, what has set changed to true
 need to display ammo for gun models in voxel model panel - Or just allow infinity ammo
 HashTag not set in import
 SoundRange not set on import?
@@ -31,7 +33,7 @@ what happens to vines when sub oxels are created?
 DONE - make sure model inventory gets reset
 DONE - make sure duplicated model gets added to inventory window
 DONE - make sure permissions are correct on duplicated model.
-Do modify check on model
+DONE - Do modify check on model
 
 
 

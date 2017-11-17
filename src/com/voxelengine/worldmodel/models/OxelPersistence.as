@@ -29,7 +29,7 @@ import com.voxelengine.worldmodel.oxel.OxelBitfields;
 import com.voxelengine.worldmodel.oxel.Lighting;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.models.makers.OxelCloner;
+import com.voxelengine.worldmodel.models.makers.OxelLevelOfDetailGenerator;
 
 /**
  * ...
@@ -316,7 +316,7 @@ public class OxelPersistence extends PersistenceObject
 		// ... continue until max - 2?
 
 		LevelOfDetailEvent.addListener( LevelOfDetailEvent.MODEL_CLONE_COMPLETE, lodCloneCompleteEvent );
-		new OxelCloner( $vm.modelInfo.oxelPersistence );
+		new OxelLevelOfDetailGenerator( $vm.modelInfo.oxelPersistence );
 	}
 
 	private function lodCloneCompleteEvent(event:LevelOfDetailEvent):void {
@@ -327,7 +327,7 @@ public class OxelPersistence extends PersistenceObject
 		Log.out( "OxelPersistence.lodCloneCompleteEvent smallest on new oxel: " + size );
 		if ( _oxels[0] && _oxels[0].gc.grain > 4 && size < _oxels[0].gc.grain - 2) {
 			LevelOfDetailEvent.addListener( LevelOfDetailEvent.MODEL_CLONE_COMPLETE, lodCloneCompleteEvent );
-			new OxelCloner( this );
+			new OxelLevelOfDetailGenerator( this );
 		}
 	}
 
@@ -345,10 +345,11 @@ public class OxelPersistence extends PersistenceObject
 	 */
 
 	public function cloneNew( $guid:String ):OxelPersistence {
-		//toObject();
-		//var newOP:OxelPersistence = new OxelPersistence( $guid, null, dbo.ba, Lighting.defaultBaseLightIllumination );
-//		newOP.dbo.ba.uncompress();
-		var newOP:OxelPersistence = new OxelPersistence( $guid, null, oxel.toByteArray(), Lighting.defaultBaseLightIllumination );
+        if ( !ba )
+        	toObject();
+
+        // This data is like generated data with out headers
+		var newOP:OxelPersistence = new OxelPersistence( $guid, null, ba, true );
 		newOP.bound = bound;
 		newOP.changed = true;
 		return newOP;
