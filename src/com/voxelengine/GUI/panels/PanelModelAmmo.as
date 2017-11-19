@@ -86,8 +86,8 @@ public class PanelModelAmmo extends PanelBase
         recalc( width, height );
     }
 
-    override public function close():void {
-        super.close();
+    override public function remove():void {
+        super.remove();
         _listAmmo = null;
         _selectedAmmo = null;
         _selectedModel = null;

@@ -40,7 +40,7 @@ public class PanelPreview extends PanelBase
 		}
 	}
 
-	override public function close():void
+	override public function remove():void
 	{
 		CraftingItemEvent.removeListener( CraftingItemEvent.STATS_UPDATED, onStatsUpdated );
 	}

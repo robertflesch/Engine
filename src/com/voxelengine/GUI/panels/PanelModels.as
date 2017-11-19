@@ -50,6 +50,7 @@ public class PanelModels extends PanelBase
     private static const all_items:String = "all_items";
     private static const showing_possible_children_of:String = "showing_possible_children_of";
     private static const no_model_selected:String = "no_model_selected";
+    private var LM:Function = LanguageManager.localizedStringGet;
 
 	private var _parentModel:VoxelModel;
     private static var _s_lastSelectedModel:VoxelModel;
@@ -136,7 +137,7 @@ public class PanelModels extends PanelBase
     }
 
 
-	// This model is being removed from the library of models, remove all instances of it.
+	// This item is being removed from the region
 	private function modelDeletedGlobally( e:ModelInfoEvent ): void {
 		var modelFound:Boolean = true;
 		for ( var i:int = 0; i < _listModels.length; i++ ) {
@@ -156,8 +157,8 @@ public class PanelModels extends PanelBase
 */
 	}
 	
-	override public function close():void {
-		super.close();
+	override public function remove():void {
+		super.remove();
 		//_listModels.removeEventListener( ListEvent.LIST_CHANGED, selectModel );
 		//ModelMetadataEvent.removeListener( ModelBaseEvent.IMPORT_COMPLETE, metadataImported );
 
@@ -224,7 +225,7 @@ public class PanelModels extends PanelBase
             _listModels.selectedIndex = i;
         }
         else
-            _selectedText.text = LanguageManager.localizedStringGet( nothing_selected );
+            _selectedText.text = LM( nothing_selected );
 
 	}
 	static private function determineObjectName( $vm:VoxelModel ):String {
@@ -275,7 +276,7 @@ public class PanelModels extends PanelBase
 		_selectedText.x = 5;
         _selectedText.text = '-------';
 
-        _addButton = new Button( LanguageManager.localizedStringGet( add_an_item_to_region )  );
+        _addButton = new Button( LM( add_an_item_to_region )  );
 		//addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowModelList(); } );
         _addButton.eventCollector.addEvent( _addButton, UIMouseEvent.CLICK, addModelToRegionHandler );
 
@@ -285,7 +286,7 @@ public class PanelModels extends PanelBase
 		container.addElement( _addButton );
 		container.height += _addButton.height + pbPadding;
 		
-		_deleteButton = new Button( LanguageManager.localizedStringGet( item_remove_from_region ) );
+		_deleteButton = new Button( LM( item_remove_from_region ) );
 		_deleteButton.y = currentY = currentY + BUTTON_DISTANCE;
 		_deleteButton.x = 5;
 		_deleteButton.width = btnWidth;
@@ -295,7 +296,7 @@ public class PanelModels extends PanelBase
 		container.addElement( _deleteButton );
 		container.height += _deleteButton.height + pbPadding;
 		
-		_detailButton = new Button( LanguageManager.localizedStringGet( item_details ) );
+		_detailButton = new Button( LM( item_details ) );
 		_detailButton.y = currentY = currentY + BUTTON_DISTANCE;
 		_detailButton.x = 5;
 		_detailButton.width = btnWidth;
@@ -304,7 +305,7 @@ public class PanelModels extends PanelBase
 		container.addElement( _detailButton );
 
 		if ( Globals.isDebug ) {
-			_dupButton = new Button( LanguageManager.localizedStringGet( item_create_copy_of ) );
+			_dupButton = new Button( LM( item_create_copy_of ) );
 			_dupButton.y = currentY = currentY + BUTTON_DISTANCE;
 			_dupButton.x = 5;
 			_dupButton.width = btnWidth;
@@ -328,24 +329,24 @@ public class PanelModels extends PanelBase
 				deleteModelCheck();
 			else
 				noModelSelected();
-			
+
 			function deleteModelCheck():void {
-				var alert:Alert = new Alert( LanguageManager.localizedStringGet( nothing_selected ) + " '" + VoxelModel.selectedModel.modelInfo.name + "'?", 400 );
-				alert.setLabels( LanguageManager.localizedStringGet( yes ) , LanguageManager.localizedStringGet( no ) );
+				var alert:Alert = new Alert( LM( nothing_selected ) + " '" + VoxelModel.selectedModel.modelInfo.name + "'?", 400 );
+				alert.setLabels( LM( yes ) , LM( no ) );
 				alert.alertMode = AlertMode.CHOICE;
 				$evtColl.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
 				alert.display();
-				
+
 				function alertAction( $ae:AlertEvent ):void {
 					if ( AlertEvent.ACTION == $ae.action )
 						deleteElement();
 					else if ( AlertEvent.CHOICE == $ae.action )
 						doNotDelete();
 				}
-				
+
 				function doNotDelete():void { /* do nothing */ }
 			}
-			
+
 			function deleteElement():void {
 				Log.out( 'PanelModels.deleteModel - ' + VoxelModel.selectedModel.toString(), Log.WARN );
 				ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved );
@@ -369,9 +370,9 @@ public class PanelModels extends PanelBase
 
 			WindowInventoryNew._s_hackSupportClick = true;
 			var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );
-			var title:String = LanguageManager.localizedStringGet( all_items );
+			var title:String = LM( all_items );
             if ( myParent.selectedModel )
-                title = LanguageManager.localizedStringGet( showing_possible_children_of ) + myParent.selectedModel.modelInfo.name;
+                title = LM( showing_possible_children_of ) + myParent.selectedModel.modelInfo.name;
 			WindowInventoryNew.toggle( startingTab, title, myParent.selectedModel );
 		}
 	}
@@ -398,23 +399,23 @@ public class PanelModels extends PanelBase
 	private function selectModel(event:ListEvent):void {
 		if (event.target.data) {
 			var instanceGuid:String = event.target.data.instanceGuid;
-			Log.out('PanelModels.selectModel has TARGET DATA: ' + event.target.data as String);
+			Log.out('PanelModels.selectModel instanceGuid: ' + instanceGuid + '  modelGuid: ' + event.target.data.modelGuid );
 			displayModelData( instanceGuid );
-			_addButton.label = LanguageManager.localizedStringGet( add_a_child_to_item );
+			_addButton.label = LM( add_a_child_to_item );
 		}
         else if ( _parentModel ) {
             Log.out('PanelModels.selectModel has NO target data');
             buttonsDisable();
             setSelectedModel( null );
             UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, null, _level);
-            _addButton.label = LanguageManager.localizedStringGet( add_a_child_to_parent );
+            _addButton.label = LM( add_a_child_to_parent );
         }
 		else {
 			Log.out('PanelModels.selectModel has NO target data');
 			buttonsDisable();
 			setSelectedModel( null );
 			UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, null, _level);
-            _addButton.label = LanguageManager.localizedStringGet( add_an_item_to_region );
+            _addButton.label = LM( add_an_item_to_region );
 			if ( null == _parentModel ) {
                 _addButton.enabled = true;
 				_addButton.active = true;
@@ -431,7 +432,7 @@ public class PanelModels extends PanelBase
 			vm = _parentModel.childFindInstanceGuid( $instanceGuid );
 		if ( vm )
 			setLastSelectedModel( vm );
-		Log.out('PanelModels.selectModel vm: ' + vm );
+		Log.out('PanelModels.displayModelData vm: ' + vm );
 		if ( vm ) {
 			setSelectedModel( vm );
 			UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, vm, _parentModel, _level);
@@ -458,9 +459,9 @@ public class PanelModels extends PanelBase
         _detailButton.enabled = true;
 		_detailButton.active = true;
 		if ( null == _parentModel )
-            _deleteButton.label = LanguageManager.localizedStringGet( item_remove_from_region );
+            _deleteButton.label = LM( item_remove_from_region );
 		else
-            _deleteButton.label = LanguageManager.localizedStringGet( item_remove_from_parent );
+            _deleteButton.label = LM( item_remove_from_parent );
 		_deleteButton.enabled = true;
 		_deleteButton.active = true;
 		if ( _dupButton ) {
@@ -469,8 +470,8 @@ public class PanelModels extends PanelBase
 		}
 	}
 	
-	static private function noModelSelected():void	{
-		(new Alert( LanguageManager.localizedStringGet( no_model_selected ) )).display();
+	private function noModelSelected():void	{
+		(new Alert( LM( no_model_selected ) )).display();
 	}
 
 	private function childModelAdded( $me:ModelEvent ):void {

@@ -24,7 +24,7 @@ package com.voxelengine.GUI.crafting {
 	// all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
 	public class PanelMaterials extends PanelBase
 	{
-		private var _dragOp:DnDOperation = new DnDOperation();
+        private var boxArray:Array = [];
 		private const BOX_SIZE:int = 64;
 		public function PanelMaterials( $parent:PanelBase, $widthParam:Number, $heightParam:Number, $recipe:Recipe )
 		{
@@ -45,7 +45,18 @@ package com.voxelengine.GUI.crafting {
 				if ( optionals )
 					addElement( new Label( "*=" + LanguageManager.localizedStringGet( "optional") ) );
 			}
-		}
+            CraftingItemEvent.addListener( CraftingItemEvent.MATERIAL_DROPPED, onMaterialDropped );
+            CraftingItemEvent.addListener( CraftingItemEvent.MATERIAL_REMOVED, onMaterialRemoved );
+        }
+
+        private function onMaterialDropped(e:CraftingItemEvent):void {
+			(_parent as PanelRecipe).recipe.materialAdd( e.typeInfo );
+        }
+
+        private function onMaterialRemoved(e:CraftingItemEvent):void {
+            (_parent as PanelRecipe).recipe.materialRemove( e.typeInfo );
+        }
+
 		
 		private function doDrag(e:UIMouseEvent):void 
 		{
@@ -66,7 +77,19 @@ package com.voxelengine.GUI.crafting {
 			var mb:Box = new BoxCraftingBase( BOX_SIZE, category );
 			mb.addEventListener( DnDEvent.DND_DROP, onDrop );
 			eventCollector.addEvent( mb, UIMouseEvent.PRESS, doDrag);
+            boxArray.push( mb );
 			return mb;
 		}
+
+        override public function remove():void {
+            super.remove();
+            CraftingItemEvent.removeListener( CraftingItemEvent.MATERIAL_DROPPED, onMaterialDropped );
+            CraftingItemEvent.removeListener( CraftingItemEvent.MATERIAL_REMOVED, onMaterialRemoved );
+			for each ( var mb:BoxCraftingBase in boxArray ){
+				mb.remove();
+			}
+            boxArray.push( mb );
+        }
+
 	}
 }

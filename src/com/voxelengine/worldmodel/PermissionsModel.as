@@ -29,7 +29,7 @@ import playerio.DatabaseObject;
 
 public class PermissionsModel extends PermissionsBase
 {
-    static public const COPY_COUNT:int			= -1;
+    static public const COPY_COUNT:int			= 1;
 
     // All the binds need to be tested
     static public const BIND_NONE:String 		= "BIND_NONE";

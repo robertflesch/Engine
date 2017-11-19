@@ -44,7 +44,8 @@ public class PanelRecipe extends PanelBase
     private var _craftButton:Button;
 
 	private var _recipe:Recipe;
-	
+    public function get recipe():Recipe { return _recipe; }
+
 	public function PanelRecipe( $parent:PanelBase, $widthParam:Number, $heightParam:Number, $recipe:Recipe )
 	{
 		super( $parent, $widthParam, $heightParam );
@@ -98,20 +99,14 @@ public class PanelRecipe extends PanelBase
 
 	override public function remove():void {
 		super.remove();
+        _recipe = null;
+        _panelForumla.remove();
+        _panelBonuses.remove();
+        _panelMaterials.remove();
+        _panelPreview.remove();
+        _panelButtons.remove();
 	}
 	
-	override public function close():void 
-	{
-		//super.onRemoved(e);
-		_recipe = null;
-		_panelForumla.remove();
-		_panelBonuses.remove();
-		_panelMaterials.remove();
-		_panelPreview.remove();
-		_panelButtons.remove();
-		
-	}
-
     private var _instanceGuid:String;
 	private function craft( e:UIMouseEvent ):void {
 		// create model using templateID and replace the components with materials
@@ -186,11 +181,6 @@ public class PanelRecipe extends PanelBase
 //            _vm.modelInfo.oxelPersistence.save()
 
 		}
-	}
-	
-	public function get recipe():Recipe
-	{
-		return _recipe;
 	}
 }
 }

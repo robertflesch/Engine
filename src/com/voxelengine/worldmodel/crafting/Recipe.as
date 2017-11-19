@@ -48,9 +48,6 @@ public class Recipe extends PersistenceObject
 
 		init();
 
-        CraftingItemEvent.addListener( CraftingItemEvent.MATERIAL_DROPPED, onMaterialDropped );
-        CraftingItemEvent.addListener( CraftingItemEvent.MATERIAL_REMOVED, onMaterialRemoved );
-
         CraftingItemEvent.addListener( CraftingItemEvent.BONUS_DROPPED, onBonusDropped );
         CraftingItemEvent.addListener( CraftingItemEvent.BONUS_REMOVED, onBonusRemoved );
 	}
@@ -228,14 +225,6 @@ public class Recipe extends PersistenceObject
         }
 
         Log.out( "Recipe.bonusRemove - bonus: " + $typeInfo.category + " NOT FOUND" );
-    }
-
-    private function onMaterialDropped(e:CraftingItemEvent):void {
-        materialAdd( e.typeInfo );
-    }
-
-    private function onMaterialRemoved(e:CraftingItemEvent):void {
-        materialRemove( e.typeInfo );
     }
 
     private function onBonusDropped(e:CraftingItemEvent):void {

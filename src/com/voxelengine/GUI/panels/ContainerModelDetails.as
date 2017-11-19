@@ -65,7 +65,7 @@ public class ContainerModelDetails extends PanelBase
 		UIRegionModelEvent.addListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
 	}
 	
-	override public function close():void {
+	override public function remove():void {
 		UIRegionModelEvent.removeListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
 
 		childPanelRemove();
@@ -74,7 +74,7 @@ public class ContainerModelDetails extends PanelBase
 		_parentModel = null;
 		_selectedModel = null;
 
-		super.close();
+		super.remove();
 	}
 	
 	private function selectedModelChanged(e:UIRegionModelEvent):void {
@@ -136,7 +136,7 @@ public class ContainerModelDetails extends PanelBase
 	
 	private function modelPanelRemove():void {
 		if (_listModels)
-			_listModels.close();
+			_listModels.remove();
 		_listModels = null;
 	}
 
@@ -151,7 +151,6 @@ public class ContainerModelDetails extends PanelBase
 
 	public function childPanelRemove():void {
 		if ( null != _childPanel ) {
-			_childPanel.close();
 			_childPanel.remove(); // removes from display list
 			_childPanel = null;
 		}
@@ -171,7 +170,7 @@ public class ContainerModelDetails extends PanelBase
 
 	public function animationPanelRemove():void {
 		if ( null != _listAnimations ) {
-			_listAnimations.close();
+			_listAnimations.remove();
 			removeElement(_listAnimations);
 			_listAnimations = null;
 		}
@@ -210,7 +209,7 @@ public class ContainerModelDetails extends PanelBase
 
 	public function scriptPanelRemove():void {
 		if (null != _listScripts) {
-			_listScripts.close();
+			_listScripts.remove();
 			removeElement(_listScripts);
 			_listScripts = null;
 		}

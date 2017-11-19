@@ -3057,6 +3057,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			changeCandidate.applyNewLightInfo( $instanceGuid, $newType );
 			changeCandidate.applyFlowInfo( $instanceGuid, $newType )
 		}
+
 		changeCandidate.writeInternal( $instanceGuid, $newType, $onlyChangeType );
 		return changeCandidate;
 	}

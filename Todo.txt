@@ -1,3 +1,5 @@
+textAlign
+textFormat
 
 VoxelVerse todo
 
@@ -8,6 +10,7 @@ FB integration?
 Payvault integration?
 
 Lower
+Region Models - If a child model fails to load for a parent, there is no way to remove the broken link
 Avatar is saving every time, what has set changed to true
 need to display ammo for gun models in voxel model panel - Or just allow infinity ammo
 HashTag not set in import

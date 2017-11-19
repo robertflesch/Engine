@@ -59,7 +59,7 @@ public class WindowRegionModels extends VVPopup
 		ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelAdded );
 		RegionEvent.create( ModelBaseEvent.SAVE, 0, null );
 
-		_modelPanel.close();
+		_modelPanel.remove();
 
 		_s_instance = null
 	}

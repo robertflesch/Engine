@@ -9,6 +9,9 @@
 package com.voxelengine.GUI.inventory {
 
 
+import com.voxelengine.Globals;
+import com.voxelengine.events.InventoryVoxelEvent;
+
 import org.flashapi.swing.*;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.event.*;
@@ -30,9 +33,8 @@ import com.voxelengine.worldmodel.models.types.Player;
 
 public class BoxInventory extends VVBox
 {
-	private var _count:Label;
-	private var _name:Label;
-	private var _bpValue:Image;
+	protected var _countLabel:Label;
+    protected var _nameLabel:Label;
 	private var _editData:Image;
 	private var _objectInfo:ObjectInfo;
 	public function get objectInfo():ObjectInfo { return _objectInfo; }
@@ -44,21 +46,21 @@ public class BoxInventory extends VVBox
 		padding = 0;
 		autoSize = false;
 		dragEnabled = true;
-		_count = new Label( "", $widthParam );
-		_count.fontColor = 0xffffff;
-        _count.fontSize = 16;
-		_count.textAlign = TextAlign.CENTER;
-		//_count.x = 16;
-		_count.y = 3;
+		_countLabel = new Label( "", $widthParam );
+		_countLabel.fontColor = 0xffffff;
+        _countLabel.fontSize = 14;
+		_countLabel.textAlign = TextAlign.CENTER;
+		//_countLabel.x = 16;
+		_countLabel.y = 3;
 
-		_name = new Label( "", $widthParam );
-		_name.fontColor = 0xffffff;
-        _name.fontSize = _name.fontSize + 1;
-		_name.textAlign = TextAlign.CENTER;
-		//_count.x = 16;
-		_name.y = 105;
-		addElement(_count);
-		addElement(_name);
+		_nameLabel = new Label( "", $widthParam );
+		_nameLabel.fontColor = 0xffffff;
+        _nameLabel.fontSize = _nameLabel.fontSize + 1;
+		_nameLabel.textAlign = TextAlign.CENTER;
+		//_countLabel.x = 16;
+		_nameLabel.y = 105;
+		addElement(_countLabel);
+		addElement(_nameLabel);
 	}
 	
 	private function thumbnailLoaded( $mme:ModelInfoEvent ):void {
@@ -86,15 +88,15 @@ public class BoxInventory extends VVBox
             // listen for changes to this object
             ModelInfoEvent.addListener( ModelBaseEvent.UPDATE, metadataChanged );
 
-            _name.text = $mi.name;
+            _nameLabel.text = $mi.name;
             var permissions:PermissionsModel = $mi.permissions;
             var modelsOfThisGuid:int = permissions.copyCount;
             if ( 99999 < modelsOfThisGuid )
-                _count.text = "lots";
+                _countLabel.text = "lots";
             else if ( -1 == modelsOfThisGuid )
-                _count.text = "∞";
+                _countLabel.text = "∞";
             else
-                _count.text = String( modelsOfThisGuid );
+                _countLabel.text = String( modelsOfThisGuid );
 
             setHelp( "guid: " + $mi.guid );
 
@@ -117,99 +119,104 @@ public class BoxInventory extends VVBox
                 new PopupModelInfo( modelInfo );
         }
 	}
-
+	protected var _type:int; // Used when it is a voxel
+	public function get count():String { return _countLabel.text; }
 	public function updateObjectInfo( $item:ObjectInfo, $displayAddons:Boolean = true ):void {
         // this may or may not have this event registered, but we need to make sure its not in more than one.
 		ModelInfoEvent.removeListener( ModelBaseEvent.UPDATE, metadataChanged );
+        InventoryVoxelEvent.removeListener(InventoryVoxelEvent.COUNT_RESULT, receiveVoxelCount);
 		if ( null == $item )
 			return;
 			
 		_objectInfo = $item;
 		data = $item;
-		_name.text = "";
-
-        //if ( role.modelNominate && role.modelPromote ) {
+		_nameLabel.text = "";
+        _type = 0;
 
         switch ( $item.objectType ) {
-		case ObjectInfo.OBJECTINFO_EMPTY:
-			reset();
-            backgroundTexture = $item.backgroundTexture(width);
-            break;
-		case ObjectInfo.OBJECTINFO_MODEL:
-            var om:ObjectModel = _objectInfo as ObjectModel;
-            updateModelInfo( om.modelInfo, $displayAddons );
-			break;
-			
-		case ObjectInfo.OBJECTINFO_ACTION:
-			var oa:ObjectAction = $item as ObjectAction;
-			backgroundTexture = $item.backgroundTexture( width );
-			setHelp( oa.name );
-			_count.text = "";
-			break;
-			
-		case ObjectInfo.OBJECTINFO_TOOL:
-			var ot:ObjectTool = $item as ObjectTool;
-			backgroundTexture = $item.backgroundTexture( width );
-			setHelp( ot.name );			
-			_count.text = "";
-            if ( _editData ) {
-                removeElement(_editData);
-                _editData = null;
-            }
-            else if (_bpValue) {
-                removeElement(_bpValue);
-                _bpValue = null
-            }
+			case ObjectInfo.OBJECTINFO_EMPTY:
+				reset();
+				backgroundTexture = $item.backgroundTexture(width);
+				break;
+			case ObjectInfo.OBJECTINFO_MODEL:
+				var om:ObjectModel = _objectInfo as ObjectModel;
+				updateModelInfo( om.modelInfo, $displayAddons );
+				break;
 
-			_name.text = "";
-			break;
-			
-		case ObjectInfo.OBJECTINFO_VOXEL:
-		default:
-			var ov:ObjectVoxel = $item as ObjectVoxel;
-			var typeId:int = ov.type;
-			
-			var typeInfo:TypeInfo = TypeInfo.typeInfo[typeId];
-			if ( typeInfo ) {
+			case ObjectInfo.OBJECTINFO_ACTION:
+				var oa:ObjectAction = $item as ObjectAction;
 				backgroundTexture = $item.backgroundTexture( width );
-				setHelp( typeInfo.name );			
-			}
-			else {
-				throw new Error( "BoxInventory.updateObjectInfo typeInfo not found for typeId: " + typeId, Log.ERROR );
-			}
+				setHelp( oa.name );
+				_countLabel.text = "";
+				break;
 
-			var totalOxelsOfThisTypeCount:Number = ov.count / 4096;
-			var totalOxelsOfThisType:String = String( totalOxelsOfThisTypeCount.toFixed(0) );
-			_count.fontColor = typeInfo.countColor;
-			if ( totalOxelsOfThisTypeCount < 1 )
-				_count.text = "< 1";
-			else if ( -1 == totalOxelsOfThisTypeCount )
-				_count.text = "∞";
-			else if ( 8 < totalOxelsOfThisType.length ) {
-				_count.text = "lots";
-			}
-			else
-				_count.text = totalOxelsOfThisType;
-				
-			break;
-		}
+			case ObjectInfo.OBJECTINFO_TOOL:
+				var ot:ObjectTool = $item as ObjectTool;
+				backgroundTexture = $item.backgroundTexture( width );
+				setHelp( ot.name );
+				_countLabel.text = "";
+				if ( _editData ) {
+					removeElement(_editData);
+					_editData = null;
+				}
 
+				_nameLabel.text = "";
+				break;
+
+			case ObjectInfo.OBJECTINFO_VOXEL:
+			default:
+				updateVoxelInfo( $item as ObjectVoxel );
+				break;
+        }
+	}
+
+	private function updateVoxelInfo( ov:ObjectVoxel ):void {
+       _type = ov.type;
+
+        var typeInfo:TypeInfo = TypeInfo.typeInfo[_type];
+        if ( typeInfo ) {
+            backgroundTexture = ov.backgroundTexture( width );
+            setHelp( typeInfo.name );
+        }
+        else {
+            throw new Error( "BoxInventory.updateObjectInfo typeInfo not found for typeId: " + _type, Log.ERROR );
+        }
+
+        _countLabel.fontColor = typeInfo.countColor;
+        formatOxelCountLabel( ov.count );
+
+        InventoryVoxelEvent.addListener(InventoryVoxelEvent.COUNT_RESULT, receiveVoxelCount);
+	}
+
+    private function receiveVoxelCount( $ie:InventoryVoxelEvent):void {
+        if ( _type == $ie.typeId ) {
+            var count:int = ($ie.result as int);
+            formatOxelCountLabel( count );
+        }
+    }
+
+	private static const PerSquareMeter:int = 4096;
+	private function formatOxelCountLabel( $count:int ):void {
+        var count:Number = $count / PerSquareMeter;
+		if ( 10 < count )
+        	_countLabel.text = count.toFixed(0);
+		else if ( 1 < count )
+            _countLabel.text = count.toFixed(2);
+		else
+            _countLabel.text = count.toFixed(4);
 	}
 
 	override protected function onRemoved( event:UIOEvent ):void {
 		super.onRemoved( event );
+        reset();
 		// while it is active we want to monitor the count of oxels as they change
 	}
 	
 	public function reset():void {
 		setHelp( "Empty" );
-		_count.text = "";
+		_countLabel.text = "";
 		backgroundTexture = TextureBank.BLANK_IMAGE;
 		data = null;
-		if ( _bpValue ) {
-			removeElement( _bpValue );
-			_bpValue = null
-		}
 		if ( _editData ) {
 			removeElement( _editData );
 			_editData = null

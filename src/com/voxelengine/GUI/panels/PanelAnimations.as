@@ -107,8 +107,8 @@ public class PanelAnimations extends PanelBase
 //			populateAnimations( e.voxelModel);
 //	}
 
-	override public function close():void {
-		super.close();
+	override public function remove():void {
+		super.remove();
 //		UIRegionModelEvent.removeListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
 		_listAnimations = null;
 		_selectedAnimation = null;

@@ -7,21 +7,64 @@
  ==============================================================================*/
 package com.voxelengine.GUI.crafting {
 import com.voxelengine.GUI.VVBox;
+import com.voxelengine.GUI.inventory.BoxInventory;
+import com.voxelengine.events.CraftingItemEvent;
+import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.events.InventoryVoxelEvent;
+import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.inventory.InventoryManager;
+import com.voxelengine.worldmodel.models.PlayerInfoCache;
+import com.voxelengine.worldmodel.models.types.Player;
+
 import org.flashapi.swing.constants.BorderStyle;
 import org.flashapi.swing.dnd.DnDFormat;
+import org.flashapi.swing.event.UIOEvent;
 
-public class BoxCraftingBase extends VVBox {
+public class BoxCraftingBase extends BoxInventory {
 
+    private var _acceptsCategory:String;
+    private var _acceptsSubCat:String;
+    private var _dndFmt:DnDFormat;
     public function BoxCraftingBase( $size:Number, $acceptsCategory:String, $acceptsSubCat:String = "", $borderStyle:String = BorderStyle.INSET ) {
         super($size, $size, borderStyle);
-        var _acceptsCategory:String = $acceptsCategory;
-        var _acceptsSubCat:String = $acceptsSubCat;
+        _acceptsCategory = $acceptsCategory;
+        _acceptsSubCat = $acceptsSubCat;
 
         dropEnabled = true;
         dragEnabled = true;
         borderStyle = $borderStyle;
-        var dndFmt:DnDFormat = new DnDFormat( _acceptsCategory, _acceptsSubCat );
-        addDropFormat( dndFmt );
+        _dndFmt = new DnDFormat( _acceptsCategory, _acceptsSubCat );
+        addDropFormat( _dndFmt );
+
+        CraftingItemEvent.addListener( CraftingItemEvent.MATERIAL_DROPPED, onMaterialDropped );
+        CraftingItemEvent.addListener( CraftingItemEvent.MATERIAL_REMOVED, onMaterialRemoved );
+        _countLabel.text = "";
+    }
+
+    private function onMaterialRemoved(e:CraftingItemEvent):void {
+        trace( "BoxCraftingBase.onMaterialDropped" + e.typeInfo.category + " " + _acceptsCategory + " " + e.typeInfo.subCat + " " + _acceptsSubCat);
+        if ( _acceptsCategory == e.typeInfo.category && ( _acceptsSubCat == e.typeInfo.subCat || _acceptsSubCat == "" ) ) {
+            _type = 0;
+            _countLabel.text = "";
+            trace("BoxCraftingBase.onMaterialRemoved" + e.typeInfo);
+        }
+    }
+
+    private function onMaterialDropped(e:CraftingItemEvent):void {
+        trace( "BoxCraftingBase.onMaterialDropped" + e.typeInfo.category + " " + _acceptsCategory + " " + e.typeInfo.subCat + " " + _acceptsSubCat);
+        if ( _acceptsCategory == e.typeInfo.category && ( _acceptsSubCat == e.typeInfo.subCat || _acceptsSubCat == "" ) ) {
+            var bi:BoxInventory = e.data as BoxInventory;
+            _type = e.typeInfo.type;
+            InventoryVoxelEvent.create(InventoryVoxelEvent.COUNT_REQUEST, Network.userId, e.typeInfo.type, null);
+            _countLabel.text = bi.count;
+        }
+        //backgroundTexture = bi.backgroundTexture;
+    }
+
+    override public function remove():void {
+        super.remove();
+        _type = 0;
+        removeDropFormat( _dndFmt );
     }
 }
 }

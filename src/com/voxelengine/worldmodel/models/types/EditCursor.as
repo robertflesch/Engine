@@ -98,7 +98,7 @@ public class EditCursor extends VoxelModel
 
 
 	override public function set dead(val:Boolean):void {
-		Log.out( "EditCursor.dead - THIS MODEL IS IMMORTAL", Log.WARN );
+		Log.out( "EditCursor.dead - THIS MODEL IS IMMORTAL", Log.DEBUG );
 		// Do nothing for this object, since you dont want to have to recreate each time you change regions.
 	}
 

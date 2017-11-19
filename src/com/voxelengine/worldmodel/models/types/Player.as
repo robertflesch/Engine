@@ -222,7 +222,7 @@ public class Player extends PersistenceObject
 	}
 
     static private function savePlayerObject ( $e:InventoryEvent ): void {
-		Log.out( "Player.savePlayerObject name: " + Network.userId, Log.DEBUG );
+		//Log.out( "Player.savePlayerObject name: " + Network.userId, Log.DEBUG );
 		Player.player.save( false );
 	}
 

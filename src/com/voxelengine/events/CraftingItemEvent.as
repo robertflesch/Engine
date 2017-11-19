@@ -7,14 +7,11 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.events
 {
-import com.voxelengine.worldmodel.TypeInfo;
 import flash.events.Event;
-import flash.geom.Vector3D;
 import flash.events.EventDispatcher;
-/**
- * ...
- * @author Robert Flesch - RSF 
- */
+
+import com.voxelengine.worldmodel.TypeInfo;
+
 public class CraftingItemEvent extends Event
 {
 	static public const BONUS_DROPPED:String				= "BONUS_DROPPED";
@@ -24,32 +21,22 @@ public class CraftingItemEvent extends Event
 	static public const STATS_UPDATED:String				= "STATS_UPDATED";
     static public const REQUIREMENTS_MET:String				= "REQUIREMENTS_MET";
 
-	
 	private var _typeInfo:TypeInfo;
-	
-	public function CraftingItemEvent( $type:String, $typeInfo:TypeInfo, $bubbles:Boolean = true, $cancellable:Boolean = false )
-	{
-		super( $type, $bubbles, $cancellable );
-		_typeInfo = $typeInfo
-	}
-	
-	public override function clone():Event
-	{
-		return new CraftingItemEvent(type, _typeInfo, bubbles, cancelable);
-	}
-   
-	public override function toString():String
-	{
-		return formatToString("CraftingMaterialEvent", "bubbles", "cancelable") + " _typeInfo: " + _typeInfo.toString();
-	}
-	
-	public function get typeInfo():TypeInfo 
-	{
-		return _typeInfo;
-	}
-///////////////// Event handler interface /////////////////////////////
+    public function get typeInfo():TypeInfo { return _typeInfo; }
+    private var _data:*;
+    public function get data():* { return _data; }
 
-	// Used to distribue all persistance messages
+	public function CraftingItemEvent( $type:String, $typeInfo:TypeInfo, $data:* ) {
+		super( $type );
+		_typeInfo = $typeInfo;
+		_data = $data;
+	}
+	
+	public override function clone():Event { return new CraftingItemEvent(type, _typeInfo, _data); }
+	public override function toString():String { return formatToString("CraftingMaterialEvent", "typeInfo", "data" ); }
+	
+	///////////////// Event handler interface /////////////////////////////
+	// Used to distribute all persistence messages
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 
 	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
@@ -60,8 +47,8 @@ public class CraftingItemEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function create( $type:String, $typeInfo:TypeInfo ) : Boolean {
-		return _eventDispatcher.dispatchEvent( new CraftingItemEvent( $type, $typeInfo ) );
+	static public function create( $type:String, $typeInfo:TypeInfo, $data:* = null ) : Boolean {
+		return _eventDispatcher.dispatchEvent( new CraftingItemEvent( $type, $typeInfo, $data ) );
 	}
 	///////////////// Event handler interface /////////////////////////////
 }

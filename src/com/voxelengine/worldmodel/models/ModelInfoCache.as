@@ -46,8 +46,6 @@ public class ModelInfoCache
         ModelInfoEvent.addListener( ModelInfoEvent.REASSIGN_STORE, 		reassignToStore );
         ModelInfoEvent.addListener( ModelInfoEvent.REASSIGN_PUBLIC,		reassignToPublic );
 
-
-
         // These are the events at the persistence layer
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed );
@@ -84,13 +82,10 @@ public class ModelInfoCache
                 ModelInfoEvent.create( ModelBaseEvent.RESULT_RANGE, $mme.series, mi.guid, mi );
             }
             else {
-                if ( mi ) {
-                    //Log.out("ModelInfoCache.requestType REJECTING  " + mi.owner + " !=" + $mme.modelGuid + "  guid: " + mi.guid + "  desc: " + mi.description, Log.INFO);
-					continue;
-                } else {
+                if ( !mi )
                     Log.out("ModelInfoCache.requestType REJECTING null object: ", Log.WARN);
-                    continue;
-                }
+                //else
+                    //Log.out("ModelInfoCache.requestType REJECTING  " + mi.owner + " !=" + $mme.modelGuid + "  guid: " + mi.guid + "  desc: " + mi.description, Log.INFO);
             }
         }
     }
@@ -100,7 +95,7 @@ public class ModelInfoCache
 			Log.out( "ModelInfoCache.request requested event or guid is NULL: ", Log.ERROR );
 			ModelInfoEvent.create( ModelBaseEvent.EXISTS_ERROR, ( $mie ? $mie.series: -1 ), "MISSING", null );
 		} else {
-			//Log.out( "ModelInfoCache.modelInfoRequest guid: " + $mie.modelGuid, Log.INFO );
+			Log.out( "ModelInfoCache.modelInfoRequest guid: " + $mie.modelGuid, Log.INFO );
 			var mi:ModelInfo = _modelInfo[$mie.modelGuid];
 			if (null == mi) {
 				if (_block.has($mie.modelGuid))
@@ -118,41 +113,6 @@ public class ModelInfoCache
 				else
 					Log.out("ModelInfoCache.request ModelInfoEvent is NULL: ", Log.WARN);
 			}
-		}
-	}
-
-    static private function reassignToStore( $mie:ModelInfoEvent ):void {
-        var mi:ModelInfo = _modelInfo[$mie.modelGuid];
-        if ( mi ) {
-            mi.owner = Network.storeId;
-            mi.save();
-        }
-    }
-
-    static private function reassignToPublic( $mie:ModelInfoEvent ):void {
-        var mi:ModelInfo = _modelInfo[$mie.modelGuid];
-        if ( mi ) {
-            mi.owner = Network.PUBLIC;
-            mi.save();
-        }
-    }
-
-	static private function save(e:ModelInfoEvent):void {
-		for each ( var modelInfo:ModelInfo in _modelInfo )
-			if ( modelInfo && modelInfo.changed )
-				modelInfo.save();
-	}
-
-	static private function checkIfExists( $mie:ModelInfoEvent ):void {
-		if ( null == $mie || null == $mie.modelGuid ) { // Validator
-			Log.out( "ModelInfoCache.checkIfExists requested event or guid is NULL: ", Log.ERROR );
-			ModelInfoEvent.create( ModelBaseEvent.EXISTS_ERROR, ( $mie ? $mie.series: -1 ), "MISSING", null );
-		} else {
-			var mi:ModelInfo = _modelInfo[$mie.modelGuid];
-			if (null != mi)
-				ModelInfoEvent.create( ModelBaseEvent.EXISTS, $mie.series, $mie.modelGuid, mi);
-			else
-				ModelInfoEvent.create( ModelBaseEvent.EXISTS_FAILED, $mie.series, $mie.modelGuid, null);
 		}
 	}
 
@@ -221,7 +181,43 @@ public class ModelInfoCache
 		}
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////////
+    static private function reassignToStore( $mie:ModelInfoEvent ):void {
+        var mi:ModelInfo = _modelInfo[$mie.modelGuid];
+        if ( mi ) {
+            mi.owner = Network.storeId;
+            mi.save();
+        }
+    }
+
+    static private function reassignToPublic( $mie:ModelInfoEvent ):void {
+        var mi:ModelInfo = _modelInfo[$mie.modelGuid];
+        if ( mi ) {
+            mi.owner = Network.PUBLIC;
+            mi.save();
+        }
+    }
+
+    static private function save(e:ModelInfoEvent):void {
+        for each ( var modelInfo:ModelInfo in _modelInfo )
+            if ( modelInfo && modelInfo.changed )
+                modelInfo.save();
+    }
+
+    static private function checkIfExists( $mie:ModelInfoEvent ):void {
+        if ( null == $mie || null == $mie.modelGuid ) { // Validator
+            Log.out( "ModelInfoCache.checkIfExists requested event or guid is NULL: ", Log.ERROR );
+            ModelInfoEvent.create( ModelBaseEvent.EXISTS_ERROR, ( $mie ? $mie.series: -1 ), "MISSING", null );
+        } else {
+            var mi:ModelInfo = _modelInfo[$mie.modelGuid];
+            if (null != mi)
+                ModelInfoEvent.create( ModelBaseEvent.EXISTS, $mie.series, $mie.modelGuid, mi);
+            else
+                ModelInfoEvent.create( ModelBaseEvent.EXISTS_FAILED, $mie.series, $mie.modelGuid, null);
+        }
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
 	//  ModelInfoEvent
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -230,12 +226,16 @@ public class ModelInfoCache
 	static private function add( $series:int, $mi:ModelInfo ):void {
 		// check to make sure is not already there
 		if ( null ==  _modelInfo[$mi.guid] ) {
-			//Log.out( "ModelInfoCache.add modelInfo: " + $mi.toString(), Log.DEBUG );
+			Log.out( "ModelInfoCache.add modelInfo: " + $mi.toString(), Log.DEBUG );
 			_modelInfo[$mi.guid] = $mi;
-			if ( $series == _currentSeries )
-                ModelInfoEvent.create( ModelBaseEvent.RESULT_RANGE, $series, $mi.guid, $mi );
-			else
-				ModelInfoEvent.create( ModelBaseEvent.RESULT, $series, $mi.guid, $mi );
+			if ( 0 < $series && $series == _currentSeries ) {
+                //Log.out( "ModelInfoCache.add - SERIES FOUND sending RESULT_RANGE", Log.DEBUG );
+				ModelInfoEvent.create(ModelBaseEvent.RESULT_RANGE, $series, $mi.guid, $mi);
+            }
+			else {
+                //Log.out( "ModelInfoCache.add - NO SERIES MATCH FOUND sending RESULT", Log.DEBUG );
+                ModelInfoEvent.create(ModelBaseEvent.RESULT, $series, $mi.guid, $mi);
+            }
 		} else {
             Log.out( "ModelInfoCache.add - ModelInfo already exists", Log.ERROR );
 		}

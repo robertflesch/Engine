@@ -11,6 +11,7 @@ import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.CharacterSlotEvent;
 import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.events.InventoryVoxelEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.worldmodel.Region;
@@ -36,6 +37,7 @@ public class InventoryManager
 		InventoryEvent.addListener( InventoryEvent.UNLOAD_REQUEST, unloadInventory );
 		InventoryEvent.addListener( InventoryEvent.REQUEST, requestInventory );
         InventoryEvent.addListener( InventoryEvent.REQUEST_NPC, requestInventoryNPC );
+
 //		InventoryEvent.addListener( InventoryEvent.SAVE_REQUEST, save );
 //		InventoryEvent.addListener( InventoryEvent.SAVE_FORCE, saveForce );
 		InventoryEvent.addListener( InventoryEvent.DELETE, deleteInventory );
@@ -96,6 +98,7 @@ public class InventoryManager
 			}
 		}
 	}
+
 
 //	static private function save( e:InventoryEvent ):void {
 //		if ( Globals.online ) {

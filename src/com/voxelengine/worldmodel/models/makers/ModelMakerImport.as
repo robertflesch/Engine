@@ -45,21 +45,12 @@ public class ModelMakerImport extends ModelMakerBase {
 		super( $ii, IMPORTING );
 		Log.out( "ModelMakerImport - ii: " + ii.toString(), Log.DEBUG );
 		// First request the modelInfo
-		requestModelInfo();
+		requestModelInfo( ModelBaseEvent.USE_FILE_SYSTEM );
 	}
 
-	// override default since this version uses the file system
-	override protected function requestModelInfo():void {
-		// use default handler in base to go to next step
-		// which is to attempt to build make the model.
-		addMIEListeners();
-		// Since this is the import, it uses the local file system rather then persistence
-		ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null, ModelBaseEvent.USE_FILE_SYSTEM );
-	}
-	
 	// next get or generate the metadata
 	override protected function attemptMake():void {
-		//Log.out( "ModelMakerImport - attemptMake: " + ii.toString() );
+		Log.out( "ModelMakerImport - attemptMake: " + ii.toString() );
         // for imports we have no metadata, so we go ahead and either generate it, or prompt the user for it.
 		if ( null != modelInfo ) {
 			// The new guid is generated in the Window or in the hidden metadata creation

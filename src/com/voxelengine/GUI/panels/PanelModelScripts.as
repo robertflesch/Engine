@@ -101,8 +101,8 @@ public class PanelModelScripts extends PanelBase
         recalc( width, height );
     }
 
-    override public function close():void {
-        super.close();
+    override public function remove():void {
+        super.remove();
         ScriptEvent.removeListener( ScriptEvent.SCRIPT_SELECTED, scriptSelected );
         _listScripts.removeAll();
         _listScripts = null;

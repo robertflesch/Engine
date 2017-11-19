@@ -333,8 +333,8 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private function onDeactivate( $ae:Event ):void {
-		Log.out( " UserInventory - onDeactivate - DISABLE EDIT CURSOR DISABLED", Log.WARN );
-		//processItemSelection( boxes[1], false )
+		//Log.out( "UserInventory - onDeactivate - DISABLE EDIT CURSOR DISABLED", Log.WARN );
+		processItemSelection( boxes[1], false )
 	}
 	
 	private function onCursorOperationNone(e:CursorOperationEvent):void { 

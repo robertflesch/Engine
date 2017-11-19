@@ -186,7 +186,7 @@ public class InventoryPanelVoxel extends VVContainer
 
 			
 			if ( e.dropTarget.target is PanelMaterials ) {
-				CraftingItemEvent.create( CraftingItemEvent.MATERIAL_DROPPED, ti );
+				CraftingItemEvent.create( CraftingItemEvent.MATERIAL_DROPPED, ti, e.dragOperation.initiator  );
 			}
 			else if ( e.dropTarget.target is PanelBonuses ) {
 				CraftingItemEvent.create( CraftingItemEvent.BONUS_DROPPED, ti );

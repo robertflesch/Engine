@@ -30,6 +30,12 @@ public class InventoryEvent extends Event
 	
 	static public const DELETE:String 			= "DELETE";
 
+
+    static public const VOXEL_COUNT:String 		= "VOXEL_COUNT";
+    static public const VOXEL_COUNT_CHANGED:String 	= "VOXEL_COUNT_CHANGED";
+    static public const VOXEL_COUNT_RESPONSE:String = "VOXEL_COUNT_RESPONSE";
+
+
 	private var _owner:String; // Guid of model which is implementing this action
 	private var _result:*;	
 	
