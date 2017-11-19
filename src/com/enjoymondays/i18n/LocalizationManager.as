@@ -38,9 +38,10 @@ package com.enjoymondays.i18n {
 	
 	import com.enjoymondays.data.TypedHashMap;
 	import com.enjoymondays.core.interfaces.IComparable;
-	
-	
-	import flash.events.Event;
+import com.voxelengine.Log;
+
+
+import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.utils.Dictionary;
 	
@@ -225,9 +226,18 @@ package com.enjoymondays.i18n {
 		/** @inheritDoc **/ 
 		public function setCurrentLocale( locale:ILocale ):String {
 			
-			if ( Locale.notValid( locale ) ) return LocalizationStatus.BAD_LOCALE_REQUEST;
-			if ( IComparable(locale ).equals( _locale ) ) return LocalizationStatus.SAME_LOCALE_REQUEST;
-			if ( ! isSupportedLocale( locale ) ) return LocalizationStatus.REQUEST_NOT_SUPPORTED;
+			if ( Locale.notValid( locale ) ) {
+				Log.out ( "LocalizationManager.setCurrentLocale ERROR: " + LocalizationStatus.BAD_LOCALE_REQUEST, Log.WARN );
+                return LocalizationStatus.BAD_LOCALE_REQUEST;
+            }
+			if ( IComparable(locale ).equals( _locale ) ) {
+                Log.out ( "LocalizationManager.setCurrentLocale ERROR: " + LocalizationStatus.SAME_LOCALE_REQUEST, Log.WARN );
+                return LocalizationStatus.SAME_LOCALE_REQUEST;
+			}
+			if ( ! isSupportedLocale( locale ) ) {
+                Log.out ( "LocalizationManager.setCurrentLocale ERROR: " + LocalizationStatus.REQUEST_NOT_SUPPORTED, Log.WARN );
+                return LocalizationStatus.REQUEST_NOT_SUPPORTED;
+			}
 			
 			_oldLocale 	= _locale;
 			_locale 	= locale;

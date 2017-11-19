@@ -51,7 +51,7 @@ package com.voxelengine.GUI
 			_localization.addEventListener( LocalizationEvent.UPDATE_AVAILABLE, _onComplete );
 			
 			function _getSupportedCodes( ):Array {
-				return [Locale.EN,Locale.ES];
+				return [Locale.EN,Locale.ES,Locale.CN,Locale.EP];
 			}
 			
 			function _getCurrentLocale():ILocale {

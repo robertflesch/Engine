@@ -139,7 +139,7 @@ public class PersistBigDB
 				
 		function loadTypeSucceed( dba:Array ):void {
             var temp:PersistenceEvent = $pe;
-			Log.out( "PersistBigDB.loadTypeSucceed - from table: " + $pe.table + "  loaded: " + dba.length, Log.DEBUG );
+			//Log.out( "PersistBigDB.loadTypeSucceed - from table: " + $pe.table + "  loaded: " + dba.length, Log.DEBUG );
 			// TODO - I will have to add handler here for when I have more than 99 items - RSF 11.14.2017
 			for each ( var $dbo:DatabaseObject in dba )
 			{

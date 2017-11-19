@@ -181,7 +181,7 @@ public class Player extends PersistenceObject
 
 	static private function playerModelLoaded( $mle:ModelLoadingEvent ):void {
 		if ( $mle.vm && ( $mle.vm.instanceInfo.instanceGuid == Player.player.instanceGuid || $mle.vm.instanceInfo.instanceGuid == Network.LOCAL ) ){
-			Log.out( "Player.playerModelLoaded");
+			//Log.out( "Player.playerModelLoaded");
 			ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 
 //            if ( Player.player.dbo ) {

@@ -91,15 +91,15 @@ public class ModelMakerBase {
 	// ModelInfo
 
 	protected function requestModelInfo( $fromTables:Boolean = true ):void {
-		Log.out( "ModelMakerBase.retrieveBaseInfo - _ii.modelGuid: " + _ii.modelGuid + " from tables?: " + $fromTables );
+		//Log.out( "ModelMakerBase.retrieveBaseInfo - _ii.modelGuid: " + _ii.modelGuid + " from tables?: " + $fromTables );
 		addMIEListeners();
 		ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null, $fromTables );
 	}
 	
 	protected function retrievedModelInfo($mie:ModelInfoEvent):void  {
-        Log.out( "ModelMakerBase.retrievedModelInfo - ii: " + _ii.modelGuid + " $mie.modelGuid: " + $mie.modelGuid, Log.DEBUG );
+        //Log.out( "ModelMakerBase.retrievedModelInfo - ii: " + _ii.modelGuid + " $mie.modelGuid: " + $mie.modelGuid, Log.DEBUG );
 		if (_ii.modelGuid == $mie.modelGuid ) {
-			Log.out( "ModelMakerBase.retrievedModelInfo - ii: " + _ii.toString(), Log.DEBUG )
+			//Log.out( "ModelMakerBase.retrievedModelInfo - ii: " + _ii.toString(), Log.DEBUG )
 			removeMIEListeners();
 			_modelInfo = $mie.modelInfo;
 			attemptMake();

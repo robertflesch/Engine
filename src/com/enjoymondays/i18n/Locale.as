@@ -62,9 +62,12 @@ package com.enjoymondays.i18n {
 		/** Dutch locale. */
         public static const NL					:Locale = new Locale( "nl", "Dutch", "Dutch" );
 		
-		/** French locale.  */
-        public static const FR					:Locale = new Locale( "fr", "French", "French" );
-		
+		/** Chinese locale.  */
+        public static const CN					:Locale = new Locale( "cn", "Chinese", "Simplified" );
+
+        /** Esparanto locale.  */
+        public static const EP					:Locale = new Locale( "ep", "Esparanto", "Esparanto" );
+
 		/** Unknow locale. */
         public static const XU					:Locale = new Locale( "xu", "Other/unknown" );
 		

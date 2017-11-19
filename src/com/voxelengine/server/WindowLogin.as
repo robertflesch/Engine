@@ -8,6 +8,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.server
 {
 
+import com.voxelengine.GUI.LanguageManager;
+
 import org.flashapi.swing.list.ListItem;
 
 import flash.display.Bitmap;
@@ -43,7 +45,7 @@ public class WindowLogin extends VVPopup
 	private var _savePW:CheckBox;
 	private var _loginButton:Button;
 
-	private var _topImage:Bitmap;
+
 	[Embed(source='../../../../embed/textures/loginImage.png')]
 	private var _topImageClass:Class;
 
@@ -76,8 +78,8 @@ public class WindowLogin extends VVPopup
 			showCloseButton = false;
 		}
 
-		_topImage = (new _topImageClass() as Bitmap);
-		var pic:Image = new Image( _topImage, width, 189 );
+        var topImage:Bitmap = (new _topImageClass() as Bitmap);
+		var pic:Image = new Image( topImage, width, 189 );
 		addElement(pic);
 
 		var infoPanel:Container = new Container( width, 80 );
@@ -169,32 +171,53 @@ public class WindowLogin extends VVPopup
 		addElement( buttonPanel );
 
 		var dropDownPanel:Container = new Container( width, buttonHeight );
+        var languages:Vector.<String> = new Vector.<String>();
+		languages.push( "English" );
+        languages.push( "Spanish" );
+        languages.push( "Chinese" );
+        languages.push( "Esparanto" );
+        var locales:Vector.<String> = new Vector.<String>();
+        locales.push( "en" );
+        locales.push( "es" );
+        locales.push( "cn" );
+        locales.push( "ep" );
+		dropDownPanel.addElement(new ComponentComboBoxWithLabel("Choose Language"
+								, changeLanguage
+								, languages[0]
+								, languages
+								, locales
+								, width));
+		addElement(dropDownPanel);
 
-		var servers:Vector.<String> = new Vector.<String>();
-		var configs:Vector.<ServerConfigObject> = ServerConfig.configListGet();
-		for each ( var obj:Object in configs ) {
-			servers.push( obj.name );
-		}
-		if ( Globals.isDebug ) {
-            dropDownPanel.addElement(new ComponentComboBoxWithLabel("Choose Server"
-                    , changeServer
-                    , servers[0]
-                    , servers
-                    , configs
-                    , width));
-            addElement(dropDownPanel);
-        }
-
+//		if ( Globals.isDebug ) {
+//        	  var dropDownPanel1:Container = new Container( width, buttonHeight );
+//            var servers:Vector.<String> = new Vector.<String>();
+//            var configs:Vector.<ServerConfigObject> = ServerConfig.configListGet();
+//            for each ( var obj:Object in configs ) {
+//                servers.push( obj.name );
+//            }
+//            dropDownPanel1.addElement(new ComponentComboBoxWithLabel("Choose Server"
+//									, changeServer
+//									, servers[0]
+//									, servers
+//									, configs
+//									, width));
+//            addElement(dropDownPanel1);
+//        }
 
 		display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
 
 		VVKeyboardEvent.addListener( KeyboardEvent.KEY_DOWN, onKeyPressed );
 	}
 
-	private function changeServer( $le:ListEvent ):void {
-		var li:ListItem = $le.target.getItemAt( $le.target.selectedIndex );
-		ServerConfig.configSetCurrent( li.data );
-	}
+    private function changeLanguage( $le:ListEvent ):void {
+        var li:ListItem = $le.target.getItemAt( $le.target.selectedIndex );
+        LanguageManager.selectLocale( li.data );
+    }
+//	private function changeServer( $le:ListEvent ):void {
+//		var li:ListItem = $le.target.getItemAt( $le.target.selectedIndex );
+//		ServerConfig.configSetCurrent( li.data );
+//	}
 	private function closeFunction():void {
 		// This forces the shutdown of the spalsh screen.
 		//WindowSplashEvent.create( WindowSplashEvent.ANNIHILATE );
