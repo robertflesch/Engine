@@ -7,14 +7,20 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.crafting 
 {
+import com.voxelengine.GUI.VVContainer;
+import com.voxelengine.GUI.inventory.InventoryPanelVoxel;
+import com.voxelengine.GUI.inventory.WindowInventoryNew;
 import com.voxelengine.events.CraftingItemEvent;
+import com.voxelengine.events.InventoryVoxelEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.crafting.RecipeCache;
+import com.voxelengine.worldmodel.inventory.Voxels;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.ModelStatisics;
@@ -22,6 +28,8 @@ import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.oxel.Oxel;
+
+import org.as3commons.collections.Set;
 
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
@@ -51,7 +59,7 @@ public class PanelRecipe extends PanelBase
 		super( $parent, $widthParam, $heightParam );
         _recipe = $recipe;
 		borderStyle = BorderStyle.NONE;
-		autoSize = true;
+		//autoSize = true;
 		padding = 0;
 		layout.orientation = LayoutOrientation.VERTICAL;
 		
@@ -59,7 +67,8 @@ public class PanelRecipe extends PanelBase
 		addElement( _recipeDesc );
 		if ( $recipe )
 			_recipeDesc.text = $recipe.desc;
-		
+
+		/// Formula //////////
 		_panelForumla = new PanelBase( this, $widthParam, $heightParam - 30 );
 		_panelForumla.layout.orientation = LayoutOrientation.HORIZONTAL;
 		addElement( _panelForumla );
@@ -75,7 +84,17 @@ public class PanelRecipe extends PanelBase
 		_panelPreview = new PanelPreview( this, $widthParam / 2, $height, $recipe );
 		_panelPreview.borderStyle = BorderStyle.NONE;
 		_panelForumla.addElement( _panelPreview );
-		
+
+        var cont:VVContainer = new VVContainer( null );
+        _panelForumla.addElement( cont );
+
+//        var ipv:InventoryPanelVoxel = new InventoryPanelVoxel( cont, "backpack" );
+//		cont.addElement( ipv );
+//        _panelForumla.addElement( cont );
+//        InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.userId, -1, Voxels.VOXEL_CAT_ALL );
+
+        /// Formula //////////
+
 		_panelButtons = new PanelBase( this, $width, 30 );
 		_panelButtons.layout.orientation = LayoutOrientation.HORIZONTAL;
 		_panelButtons.borderStyle = BorderStyle.NONE;
@@ -87,6 +106,13 @@ public class PanelRecipe extends PanelBase
 		eventCollector.addEvent( _craftButton, UIMouseEvent.CLICK, craft );
 		_panelButtons.addElement( _craftButton );
 		_panelButtons.addElement( new Label( "Drag Items from Inventory", 200 ) );
+	}
+
+	private function showVoxelInventory( $me:UIMouseEvent ):void {
+        var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_VOXELS );
+        var title:String = "Your Voxels";
+        WindowInventoryNew.toggle( startingTab, title, null, false );
+		_panelMaterials.askForFilter();
 	}
 
 	private function requirementTest( $cie:CraftingItemEvent ):void {

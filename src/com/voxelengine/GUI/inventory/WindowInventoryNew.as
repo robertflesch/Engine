@@ -64,11 +64,11 @@ import org.flashapi.swing.*
 		static public var _s_hackSupportClick:Boolean;
 		static public var _s_instance:WindowInventoryNew;
 		
-		static public function toggle( $startingTab:String, $label:String, $parentModel:VoxelModel ):void {
+		static public function toggle( $startingTab:String, $label:String, $parentModel:VoxelModel, $showTabs:Boolean = true ):void {
 			if ( null == _s_instance ) {
 				if ( $parentModel )
 						Log.out( "WindowInventoryNew.toggle opening window with parent model: " + $parentModel, Log.WARN );
-                _s_instance = new WindowInventoryNew($startingTab, $label, $parentModel);
+                _s_instance = new WindowInventoryNew($startingTab, $label, $parentModel, $showTabs );
             }
 			else {
 				_s_instance.remove();
@@ -78,18 +78,21 @@ import org.flashapi.swing.*
 		
 		static private var _parentModel:VoxelModel;
         static public function get parentModel():VoxelModel { return _parentModel; }
+    	static private var _showTabs:Boolean;
+	    static public function get showTabs():Boolean { return _showTabs; }
 
-		public function WindowInventoryNew( $startingTab:String, $label:String, $parentModel:VoxelModel )
+		public function WindowInventoryNew( $startingTab:String, $label:String, $parentModel:VoxelModel, $showTabs:Boolean = true )
 		{
 			if ( Globals.isDebug )
 					$label += " - " + Network.userId;
 			super( $label );
+			_showTabs = $showTabs;
             _parentModel = $parentModel;
 			autoSize = true;
 			layout.orientation = LayoutOrientation.VERTICAL;
 			
 			//ownedVsStoreRB();
-			ownedVsStoreTabsHorizontal( $startingTab );
+			ownedVsStoreTabsHorizontal( $startingTab, $showTabs );
 			
 			var count:int = width / 64;
 			width = count * 64;
@@ -102,54 +105,59 @@ import org.flashapi.swing.*
 		
 		private const TAB_BAR_HEIGHT:int = 36;
 		public function onResized(e:UIOEvent):void  {
-			_ownedVsStore.setButtonsWidth( width / _ownedVsStore.length, TAB_BAR_HEIGHT );
+			if ( _showTabs )
+				_ownedVsStore.setButtonsWidth( width / _ownedVsStore.length, TAB_BAR_HEIGHT );
 		}
 		
 		public function onResizedFromChild(e:UIOEvent):void	{
-			_ownedVsStore.setButtonsWidth( width / _ownedVsStore.length, TAB_BAR_HEIGHT );
+            if ( _showTabs && _ownedVsStore )
+				_ownedVsStore.setButtonsWidth( width / _ownedVsStore.length, TAB_BAR_HEIGHT );
 		}
 
 		static private var _s_lastSource:String = INVENTORY_OWNED;
-		private function ownedVsStoreTabsHorizontal( $tabTokens:String ):void {
+		private function ownedVsStoreTabsHorizontal( $tabTokens:String, $showTabs:Boolean ):void {
 			var index:int = $tabTokens.indexOf( ";" );
 			var startingTabName:String;
 			if ( -1 < index ) {
 				startingTabName = $tabTokens.substr( 0 , index );
 				$tabTokens = $tabTokens.substr( index + 1, $tabTokens.length );
 			}
-			_ownedVsStore = new TabBar();
-			_ownedVsStore.orientation = ButtonBarOrientation.HORIZONTAL;
-			_ownedVsStore.name = "ownedVsStore";
-            _ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_PUBLIC ), INVENTORY_PUBLIC );
-            _ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_OWNED ), INVENTORY_OWNED );
-			_ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_STORE ), INVENTORY_STORE );
-			_ownedVsStore.setButtonsWidth( 728.55 / _ownedVsStore.length, TAB_BAR_HEIGHT );
+			if( $showTabs ) {
+                _ownedVsStore = new TabBar();
+                _ownedVsStore.orientation = ButtonBarOrientation.HORIZONTAL;
+                _ownedVsStore.name = "ownedVsStore";
+                _ownedVsStore.addItem(LanguageManager.localizedStringGet(INVENTORY_PUBLIC), INVENTORY_PUBLIC);
+                _ownedVsStore.addItem(LanguageManager.localizedStringGet(INVENTORY_OWNED), INVENTORY_OWNED);
+                _ownedVsStore.addItem(LanguageManager.localizedStringGet(INVENTORY_STORE), INVENTORY_STORE);
+                _ownedVsStore.setButtonsWidth(728.55 / _ownedVsStore.length, TAB_BAR_HEIGHT);
 
-			if ( startingTabName == "last" )
-                startingTabName = _s_lastSource;
+                if (startingTabName == "last")
+                    startingTabName = _s_lastSource;
 
-			if ( startingTabName == INVENTORY_STORE )
-				_ownedVsStore.selectedIndex = 2;
-            else if ( startingTabName == INVENTORY_PUBLIC )
-                _ownedVsStore.selectedIndex = 0;
-			else
-				_ownedVsStore.selectedIndex = 1;
-			//_ownedVsStore.itemsCollection
-            eventCollector.addEvent( _ownedVsStore, ListEvent.ITEM_CLICKED, selectCategory );
-            addGraphicElements( _ownedVsStore );
-			
-			_underline = new Box( width, 5 );
-			_underline.backgroundColor = VVUI.DEFAULT_COLOR;
-			addGraphicElements( _underline );			
-			
-			displaySelectedContainer( startingTabName, $tabTokens );
+                if (startingTabName == INVENTORY_STORE)
+                    _ownedVsStore.selectedIndex = 2;
+                else if (startingTabName == INVENTORY_PUBLIC)
+                    _ownedVsStore.selectedIndex = 0;
+                else
+                    _ownedVsStore.selectedIndex = 1;
+                //_ownedVsStore.itemsCollection
+                eventCollector.addEvent(_ownedVsStore, ListEvent.ITEM_CLICKED, selectCategory);
+                addGraphicElements(_ownedVsStore);
+
+                _underline = new Box(width, 5);
+                _underline.backgroundColor = VVUI.DEFAULT_COLOR;
+                addGraphicElements(_underline);
+            }
+			displaySelectedContainer( startingTabName, $tabTokens, $showTabs );
 		}
 		
 		override protected function onRemoved( event:UIOEvent ):void {
 			
 			removeEventListener( UIOEvent.RESIZED, onResized );
-			_ownedVsStore.remove();
-			_ownedVsStore = null;
+            if ( _showTabs ) {
+                _ownedVsStore.remove();
+                _ownedVsStore = null;
+            }
 
 			if ( _panelContainer ) {
 				_panelContainer.remove();
@@ -164,10 +172,10 @@ import org.flashapi.swing.*
 		
 		private function selectCategory(e:ListEvent):void 
 		{			
-			displaySelectedContainer( e.target.data as String, INVENTORY_CAT_LAST + ";" );
+			displaySelectedContainer( e.target.data as String, INVENTORY_CAT_LAST + ";", _showTabs );
 		}
 		
-		private function displaySelectedContainer( $dataSource:String, $tabTokens:String ):void
+		private function displaySelectedContainer( $dataSource:String, $tabTokens:String, $showTabs:Boolean ):void
 		{	
 			if ( _panelContainer ) {
 				removeElement( _panelContainer );
@@ -175,7 +183,7 @@ import org.flashapi.swing.*
 			}
 
             _s_lastSource = $dataSource;
-			_panelContainer = new InventoryPanelOverview( this, $dataSource, $tabTokens );
+			_panelContainer = new InventoryPanelOverview( this, $dataSource, $tabTokens, $showTabs );
 			addElement( _panelContainer );
 		}
 	}

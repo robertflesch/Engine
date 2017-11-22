@@ -21,6 +21,7 @@ public class InventoryVoxelEvent extends Event
 	static public const COUNT_RESULT:String  	= "COUNT_RESULT";
 	static public const TYPES_REQUEST:String  	= "TYPES_REQUEST";
 	static public const TYPES_RESULT:String  	= "TYPES_RESULT";
+    static public const TYPES_FILTER:String  	= "TYPES_FILTER";
 //		static public const INVENTORY_PRIM_REMOVE:String  			= "REMOVE";
 	
 	private var _networkId:String; // Guid of model which is implementing this action
@@ -59,7 +60,7 @@ public class InventoryVoxelEvent extends Event
 
 	///////////////// Event handler interface /////////////////////////////
 
-	// Used to distribue all persistance messages
+	// Used to distribute all persistence messages
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 
 	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {

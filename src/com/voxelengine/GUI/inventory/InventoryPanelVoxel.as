@@ -9,6 +9,8 @@ package com.voxelengine.GUI.inventory {
 import com.voxelengine.worldmodel.inventory.Voxels;
 
 import flash.display.DisplayObject;
+
+import org.as3commons.collections.Set;
 import org.flashapi.swing.*
 import org.flashapi.swing.core.UIObject;
 import org.flashapi.swing.event.*;
@@ -40,21 +42,26 @@ public class InventoryPanelVoxel extends VVContainer
 	private var _barLower:TabBar;
 	private var _itemContainer:Container = new Container( VOXEL_IMAGE_WIDTH, VOXEL_IMAGE_HEIGHT);
     private var _voxelData:Vector.<SecureInt>;
-	
-	public function InventoryPanelVoxel( $parent:VVContainer, $dataSource:String )
+    private var _showTabs:Boolean;
+
+	public function InventoryPanelVoxel( $parent:VVContainer, $dataSource:String, $showTabs:Boolean )
 	{
 		// TODO I notice when I repeatedly open and close this window that more and more memory is allocated
 		super( $parent );
 		layout.orientation = LayoutOrientation.HORIZONTAL;
-		
-		upperTabsAdd();
+		_showTabs = $showTabs;
+		if ( _showTabs )
+			upperTabsAdd();
 
         addElement( _itemContainer );
         _itemContainer.autoSize = true;
         _itemContainer.layout.orientation = LayoutOrientation.VERTICAL;
 
-		lowerTabsAdd();
+        if ( _showTabs )
+			lowerTabsAdd();
         InventoryVoxelEvent.addListener( InventoryVoxelEvent.TYPES_RESULT, populateVoxels );
+        InventoryVoxelEvent.addListener( InventoryVoxelEvent.TYPES_FILTER, filterVoxels );
+
         displaySelectedSource( $dataSource );
 
 		// This forces the window into a multiple of 64 width
@@ -109,7 +116,10 @@ public class InventoryPanelVoxel extends VVContainer
 		else
 			_barLower.selectedIndex = -1;
 			
-		displaySelectedCategory( e.target.value );	
+		var set:Set = new Set();
+		set.add( (e.target.value as String).toUpperCase() );
+        displaySelectedCategory( set );
+	//	displaySelectedCategory( e.target.value );
 	}
 
     private function displaySelectedSource( $source:String ):void {
@@ -121,7 +131,7 @@ public class InventoryPanelVoxel extends VVContainer
             InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.storeId, -1, Voxels.VOXEL_CAT_ALL );
     }
 
-	private function displaySelectedCategory( $category:String ):void {
+	private function displaySelectedCategory( $category:Set ):void {
         while (1 <= _itemContainer.numElements)
             _itemContainer.removeElementAt(0);
         var count:int = 0;
@@ -135,8 +145,6 @@ public class InventoryPanelVoxel extends VVContainer
         for (var typeId:int=0; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
         {
             item = TypeInfo.typeInfo[typeId];
-            if ( 152 == typeId)
-                Log.out( "Voxels.populateVoxel type ID is VINE");
             if ( null == item )
                 continue;
             var voxelCount:int = _voxelData[typeId].val;
@@ -145,8 +153,9 @@ public class InventoryPanelVoxel extends VVContainer
 
 			var ti:TypeInfo = TypeInfo.typeInfo[typeId];
 			if ( ti ) {
-				var catData:String = ti.category;
-				if ( $category.toUpperCase() == catData.toUpperCase() || $category == Voxels.VOXEL_CAT_ALL ) {
+				var catData:String = ti.category.toUpperCase();
+				if ( $category.has( catData ) || $category.has( Voxels.VOXEL_CAT_ALL ) ) {
+				//if ( $category.toUpperCase() == catData || $category == Voxels.VOXEL_CAT_ALL ) {
 					if ( item.placeable && -1 < voxelCount ) {
 						// Add the filled bar to the container and create a new container
 						if ( countMax == count ) {
@@ -167,13 +176,23 @@ public class InventoryPanelVoxel extends VVContainer
 			}
         }
         _itemContainer.addElement( pc );
-	}
-	
+        dispatchUIOEvent(UIOEvent.RESIZED);
+		_parent.height = height = _itemContainer.numElements * 64;
+    }
+
+    private function filterVoxels( e:InventoryVoxelEvent ):void {
+
+        var filter:Set = e.result as Set;
+        displaySelectedCategory( filter );
+    }
+
 	private function populateVoxels( e:InventoryVoxelEvent ):void {
 
         _voxelData = e.result as Vector.<SecureInt>;
         InventoryVoxelEvent.removeListener(InventoryVoxelEvent.TYPES_RESULT, populateVoxels);
-        displaySelectedCategory(Voxels.VOXEL_CAT_ALL);
+        var set:Set = new Set();
+        set.add( Voxels.VOXEL_CAT_ALL );
+        displaySelectedCategory( set );
     }
 
 

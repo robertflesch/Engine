@@ -24,16 +24,19 @@ public class InventoryPanelOverview extends VVContainer
 	private var _sourceType:String;
 	private var _underline:Box;
 	private var _parentWindow:UIContainer;
+    private var _showTabs:Boolean;
 
-	public function InventoryPanelOverview( $windowInventoryNew:UIContainer, $source:String, $tabTokens:String ) {
+	public function InventoryPanelOverview( $windowInventoryNew:UIContainer, $source:String, $tabTokens:String, $showTabs:Boolean ) {
 		_parentWindow = $windowInventoryNew;
 		super( null );
 		_sourceType = $source;
+		_showTabs = $showTabs;
 		autoSize = true;
 		layout.orientation = LayoutOrientation.VERTICAL;
 
+
 		var index:int = $tabTokens.indexOf( ";" );
-		var startingTabName:String;
+		var startingTabName:String = WindowInventoryNew.INVENTORY_CAT_LAST;
 		if ( -1 < index )
 			startingTabName = $tabTokens.substr( 0 , index );
 
@@ -46,24 +49,32 @@ public class InventoryPanelOverview extends VVContainer
 			_s_lastType = startingTabName;
 		}
 
-		upperTabsAdd( startingTabName );
+		if ( $showTabs)
+			upperTabsAdd( startingTabName );
 		addEventListener( UIOEvent.RESIZED, onResized );
 		displaySelectedContainer( startingTabName, _sourceType );
 	}
 
 	override protected function onResized(e:UIOEvent):void
 	{
-		_barUpper.setButtonsWidth( width / _barUpper.length, 36 );
-		(_parentWindow as WindowInventoryNew).onResizedFromChild( e );
+		trace( "IPO - onResize");
+		if ( _showTabs )
+			_barUpper.setButtonsWidth( width / _barUpper.length, 36 );
+        if ( _parentWindow && _parentWindow is WindowInventoryNew )
+			(_parentWindow as WindowInventoryNew).onResizedFromChild( e );
 		//_underline.width = width;
 	}
 
 	override protected function onRemoved( event:UIOEvent ):void {
 
-		removeEventListener( UIOEvent.RESIZED, onResized );
+        trace( "IPO - onRemoved");
+		removeEventListener( UIOEvent.RESIZED, onRemoved );
 
-		_barUpper.remove();
-		_barUpper = null;
+        if ( _showTabs ) {
+            _barUpper.remove();
+            _barUpper = null;
+        }
+        _showTabs = false;
 
 		if ( _panelContainer ) {
 			_panelContainer.remove();
@@ -124,7 +135,7 @@ public class InventoryPanelOverview extends VVContainer
 		}
 
 		if ( WindowInventoryNew.INVENTORY_CAT_VOXELS == $category )
-			_panelContainer = new InventoryPanelVoxel( this, $dataSource );
+			_panelContainer = new InventoryPanelVoxel( this, $dataSource, _showTabs );
 		else if ( WindowInventoryNew.INVENTORY_CAT_MODELS == $category )
 			_panelContainer = new InventoryPanelModel(this, $dataSource );
 		else if ( WindowInventoryNew.INVENTORY_CAT_REGIONS == $category )
