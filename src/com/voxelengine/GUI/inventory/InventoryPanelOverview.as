@@ -7,6 +7,11 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
 
+import com.voxelengine.events.InventoryVoxelEvent;
+import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.inventory.Voxels;
+
+import org.as3commons.collections.Set;
 import org.flashapi.swing.*
 import org.flashapi.swing.containers.UIContainer;
 import org.flashapi.swing.event.*;
@@ -134,8 +139,26 @@ public class InventoryPanelOverview extends VVContainer
 			_panelContainer.remove();
 		}
 
-		if ( WindowInventoryNew.INVENTORY_CAT_VOXELS == $category )
-			_panelContainer = new InventoryPanelVoxel( this, $dataSource, _showTabs );
+		if ( WindowInventoryNew.INVENTORY_CAT_VOXELS == $category ) {
+            _panelContainer = new InventoryPanelVoxel(this, $dataSource, _showTabs );
+            var filter:Set = new Set();
+            if ( $dataSource == WindowInventoryNew.INVENTORY_PUBLIC ) {
+                InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.PUBLIC, -1, Voxels.VOXEL_CAT_ALL );
+                filter.add( Voxels.VOXEL_CAT_EARTH.toUpperCase() );
+                InventoryVoxelEvent.create(InventoryVoxelEvent.TYPES_FILTER, "", 0, filter );
+            }
+            else if ( $dataSource == WindowInventoryNew.INVENTORY_OWNED ) {
+                InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.userId, -1, Voxels.VOXEL_CAT_ALL );
+                filter.add( Voxels.VOXEL_CAT_ALL.toUpperCase() );
+                InventoryVoxelEvent.create(InventoryVoxelEvent.TYPES_FILTER, "", 0, filter );
+            }
+            else {
+                InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.storeId, -1, Voxels.VOXEL_CAT_ALL );
+                filter.add( Voxels.VOXEL_CAT_METAL.toUpperCase() );
+                InventoryVoxelEvent.create(InventoryVoxelEvent.TYPES_FILTER, "", 0, filter );
+
+			}
+        }
 		else if ( WindowInventoryNew.INVENTORY_CAT_MODELS == $category )
 			_panelContainer = new InventoryPanelModel(this, $dataSource );
 		else if ( WindowInventoryNew.INVENTORY_CAT_REGIONS == $category )
@@ -146,6 +169,9 @@ public class InventoryPanelOverview extends VVContainer
 			_panelContainer = new InventoryPanelRecipes(this, $dataSource );
 
 		addElement( _panelContainer );
-	}
+
+
+
+    }
 }
 }

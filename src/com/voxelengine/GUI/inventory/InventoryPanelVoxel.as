@@ -43,6 +43,7 @@ public class InventoryPanelVoxel extends VVContainer
 	private var _itemContainer:Container = new Container( VOXEL_IMAGE_WIDTH, VOXEL_IMAGE_HEIGHT);
     private var _voxelData:Vector.<SecureInt>;
     private var _showTabs:Boolean;
+    private var _filter:Set;
 
 	public function InventoryPanelVoxel( $parent:VVContainer, $dataSource:String, $showTabs:Boolean )
 	{
@@ -50,6 +51,7 @@ public class InventoryPanelVoxel extends VVContainer
 		super( $parent );
 		layout.orientation = LayoutOrientation.HORIZONTAL;
 		_showTabs = $showTabs;
+
 		if ( _showTabs )
 			upperTabsAdd();
 
@@ -59,10 +61,9 @@ public class InventoryPanelVoxel extends VVContainer
 
         if ( _showTabs )
 			lowerTabsAdd();
+
         InventoryVoxelEvent.addListener( InventoryVoxelEvent.TYPES_RESULT, populateVoxels );
         InventoryVoxelEvent.addListener( InventoryVoxelEvent.TYPES_FILTER, filterVoxels );
-
-        displaySelectedSource( $dataSource );
 
 		// This forces the window into a multiple of 64 width
 		var count:int = width / 64;
@@ -108,30 +109,18 @@ public class InventoryPanelVoxel extends VVContainer
 	
 	private function selectCategory(e:ListEvent):void {
 		//Log.out( "PanelVoxelInventory.selectCategory" );
-		while ( 1 <= _itemContainer.numElements )
-			_itemContainer.removeElementAt( 0 );
-		
 		if ( e.target.name == "lower" )
 			_barUpper.selectedIndex = -1;
 		else
 			_barLower.selectedIndex = -1;
-			
-		var set:Set = new Set();
-		set.add( (e.target.value as String).toUpperCase() );
-        displaySelectedCategory( set );
-	//	displaySelectedCategory( e.target.value );
+
+        _filter = null;
+		_filter = new Set();
+        _filter.add( (e.target.value as String).toUpperCase() );
+        displaySelectedCategory();
 	}
 
-    private function displaySelectedSource( $source:String ):void {
-        if ( $source == WindowInventoryNew.INVENTORY_PUBLIC )
-            InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.PUBLIC, -1, Voxels.VOXEL_CAT_ALL );
-        else if ( $source == WindowInventoryNew.INVENTORY_OWNED )
-            InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.userId, -1, Voxels.VOXEL_CAT_ALL );
-        else
-            InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.storeId, -1, Voxels.VOXEL_CAT_ALL );
-    }
-
-	private function displaySelectedCategory( $category:Set ):void {
+	private function displaySelectedCategory():void {
         while (1 <= _itemContainer.numElements)
             _itemContainer.removeElementAt(0);
         var count:int = 0;
@@ -141,6 +130,9 @@ public class InventoryPanelVoxel extends VVContainer
         var countMax:int = VOXEL_CONTAINER_WIDTH / VOXEL_IMAGE_HEIGHT;
         var box:BoxInventory;
         var item:TypeInfo;
+
+        if ( 0 == _filter.size )
+			return;
 
         for (var typeId:int=0; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
         {
@@ -154,7 +146,7 @@ public class InventoryPanelVoxel extends VVContainer
 			var ti:TypeInfo = TypeInfo.typeInfo[typeId];
 			if ( ti ) {
 				var catData:String = ti.category.toUpperCase();
-				if ( $category.has( catData ) || $category.has( Voxels.VOXEL_CAT_ALL ) ) {
+				if ( _filter.has( catData ) || _filter.has( Voxels.VOXEL_CAT_ALL.toUpperCase() ) ) {
 				//if ( $category.toUpperCase() == catData || $category == Voxels.VOXEL_CAT_ALL ) {
 					if ( item.placeable && -1 < voxelCount ) {
 						// Add the filled bar to the container and create a new container
@@ -177,22 +169,20 @@ public class InventoryPanelVoxel extends VVContainer
         }
         _itemContainer.addElement( pc );
         dispatchUIOEvent(UIOEvent.RESIZED);
-		_parent.height = height = _itemContainer.numElements * 64;
+		height = _itemContainer.numElements * 64;
+		if ( _parent )
+            _parent.height = height
     }
 
     private function filterVoxels( e:InventoryVoxelEvent ):void {
 
-        var filter:Set = e.result as Set;
-        displaySelectedCategory( filter );
+        _filter = e.result as Set;
+        displaySelectedCategory();
     }
 
 	private function populateVoxels( e:InventoryVoxelEvent ):void {
-
         _voxelData = e.result as Vector.<SecureInt>;
         InventoryVoxelEvent.removeListener(InventoryVoxelEvent.TYPES_RESULT, populateVoxels);
-        var set:Set = new Set();
-        set.add( Voxels.VOXEL_CAT_ALL );
-        displaySelectedCategory( set );
     }
 
 
@@ -203,7 +193,6 @@ public class InventoryPanelVoxel extends VVContainer
 			e.dropTarget.data = e.dragOperation.initiator.data;
 			var ti:TypeInfo = TypeInfo.typeInfo[e.dragOperation.initiator.data.type];
 
-			
 			if ( e.dropTarget.target is PanelMaterials ) {
 				CraftingItemEvent.create( CraftingItemEvent.MATERIAL_DROPPED, ti, e.dragOperation.initiator  );
 			}

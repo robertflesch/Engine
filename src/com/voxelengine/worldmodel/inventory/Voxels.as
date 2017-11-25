@@ -19,6 +19,8 @@ import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
 import com.voxelengine.worldmodel.models.SecureInt;
 
+import org.as3commons.collections.Set;
+
 public class Voxels
 {
     static public const VOXEL_CAT_ALL:String 		= "All";
@@ -60,26 +62,28 @@ public class Voxels
 	// This returns an Array which holds the typeId and the count of those voxels
 	public function types(e:InventoryVoxelEvent):void 
 	{
-		Log.out( "Voxels.types -- WARNING HACKING IN PUBLIC AND STORE INVENTORY", Log.WARN );
-		if ( e.networkId == _owner.ownerGuid || e.networkId == Network.storeId || e.networkId == Network.PUBLIC) {
-            var cat:String = (e.result as String);
-            if ( e.networkId == Network.storeId )
-				cat = VOXEL_CAT_METAL;
-            if ( e.networkId == Network.PUBLIC)
-                cat = VOXEL_CAT_EARTH;
-
-			if ( cat == VOXEL_CAT_ALL ) {
-				InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_RESULT, _owner.ownerGuid, -1, _items );
-				return;
+		if ( e.networkId == _owner.ownerGuid ) {
+            // Private returns all, and filter is applied on front end
+            InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_RESULT, _owner.ownerGuid, -1, _items );
+            return;
+		} else if ( e.networkId == Network.storeId || e.networkId == Network.PUBLIC ) {
+            var cat:Set = new Set();
+            if ( e.networkId == Network.storeId ) {
+				Log.out( "Voxels.types - FAKING STORE VOXELS", Log.WARN );
+                cat.add( VOXEL_CAT_METAL.toUpperCase() );
 			}
-				
+            else if ( e.networkId == Network.PUBLIC) {
+				Log.out( "Voxels.types - FAKING PUBLIC VOXELS", Log.WARN );
+                cat.add( VOXEL_CAT_EARTH.toUpperCase() );
+			}
+
 			var result:Vector.<SecureInt> = new Vector.<SecureInt>(TypeInfo.MAX_TYPE_INFO, true);
 			for ( var typeId:int = 0; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ ) {
 				result[typeId] = new SecureInt( 0 );
 				var ti:TypeInfo = TypeInfo.typeInfo[typeId];
-				if ( ti ) { 
+				if ( ti ) {
 					var catData:String = ti.category;
-					if ( cat.toUpperCase() == catData.toUpperCase() ) {
+					if ( cat.has( catData.toUpperCase() ) ) {
 						if ( 0 < _items[typeId].val )
 							result[typeId].val	= _items[typeId].val;
 						else
@@ -91,6 +95,8 @@ public class Voxels
 			}
 
 			InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_RESULT, e.networkId, -1, result );
+		} else {
+            Log.out( "Voxels.types - UNKNOWN owner request", Log.ERROR );
 		}
     }
 	

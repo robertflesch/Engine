@@ -6,21 +6,25 @@ authorship protected under United States Copyright Act.
 Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.crafting {
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.server.Network;
+
+import com.voxelengine.GUI.inventory.InventoryPanelOverview;
+import com.voxelengine.GUI.inventory.InventoryPanelVoxel;
+import com.voxelengine.GUI.inventory.WindowInventoryNew;
+import com.voxelengine.events.InventoryVoxelEvent;
+import com.voxelengine.worldmodel.inventory.Voxels;
+
+import org.as3commons.collections.Set;
 
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
-import org.flashapi.swing.list.ListItem;
-
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.GUI.VVPopup;
-import com.voxelengine.GUI.VoxelVerseGUI;
 import com.voxelengine.GUI.LanguageManager;
+import com.voxelengine.GUI.panels.PanelBase;
 import com.voxelengine.events.CraftingEvent;
-import com.voxelengine.worldmodel.crafting.RecipeCache;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.crafting.Recipe;
 
 
@@ -33,34 +37,49 @@ public class WindowCrafting extends VVPopup
 	private var _recipeList:ListBox;
 	private var _selectedRecipe:Recipe;
 	private var _panelRecipe:PanelRecipe;
-	
+    private var _panelUpper:PanelBase;
+    private var _panelLower:InventoryPanelVoxel;
+
 	public function WindowCrafting()
 	{
 		super( LanguageManager.localizedStringGet( "Crafting" ) );
 		width = 150;
-		height = 300;
-		layout.orientation = LayoutOrientation.HORIZONTAL;
-		addEventListener( UIOEvent.RESIZED, onResized );
-		
+		height = PANEL_HEIGHT;
+		layout.orientation = LayoutOrientation.VERTICAL;
+        _panelUpper = new PanelBase( null, width, height );
+        _panelUpper.layout.orientation = LayoutOrientation.HORIZONTAL;
+        addElement( _panelUpper );
+
+
 		_recipeList = new ListBox( width, 15, PANEL_HEIGHT );
-		_recipeList.addEventListener( ListEvent.LIST_CHANGED, selectRecipe );		
-		addElement( _recipeList );
-		
+		_recipeList.addEventListener( ListEvent.LIST_CHANGED, selectRecipe );
+        _panelUpper.addElement( _recipeList );
+
+        showVoxelInventory()
 		// This makes sure the crafting manager is running
 		display();
-		
+
+//        addEventListener( UIOEvent.RESIZED, onResized );
 		addEventListener(UIOEvent.REMOVED, onRemoved );
 		CraftingEvent.addListener( ModelBaseEvent.RESULT_RANGE, onRecipe );
         CraftingEvent.addListener( ModelBaseEvent.RESULT, onRecipe );
 		CraftingEvent.create( ModelBaseEvent.REQUEST_TYPE, Network.userId, null );
-	}
+
+    }
 	
-	private function onResized(e:UIOEvent):void 
-	{
-		_recipeList.height = height;
-	}
-	
-	private function selectRecipe(e:ListEvent):void 
+//	private function onResized(e:UIOEvent):void
+//	{
+//		_recipeList.height = height;
+//	}
+
+    private function showVoxelInventory():void {
+        _panelLower = new InventoryPanelVoxel( null, WindowInventoryNew.INVENTORY_OWNED, false );
+        addElement( _panelLower );
+        InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.userId, -1, null );
+    }
+
+
+    private function selectRecipe(e:ListEvent):void
 	{
 		autoSize = true;
 		_selectedRecipe = e.target.data;
@@ -70,10 +89,10 @@ public class WindowCrafting extends VVPopup
 			_panelRecipe.remove();
 			_panelRecipe = null;
 		}
-		_recipeList.height = 10; // by resizing it here, the list can be properly be resize when the onResize method is called.
-		_panelRecipe = new PanelRecipe( null, 200, 200, _selectedRecipe );
+		//_recipeList.height = 10; // by resizing it here, the list can be properly be resize when the onResize method is called.
+		_panelRecipe = new PanelRecipe( null, 300, 200, _selectedRecipe );
 		_panelRecipe.borderStyle = BorderStyle.DOUBLE;
-		addElement( _panelRecipe );
+        _panelUpper.addElement( _panelRecipe );
 	}
 	
 	private function onRecipe(e:CraftingEvent):void

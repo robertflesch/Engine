@@ -36,6 +36,7 @@ public class VVContainer extends Container
 	protected function onRemoved( event:UIOEvent ):void
 	{
 		eventCollector.removeEvent(this, UIOEvent.REMOVED, onRemoved );
+        eventCollector.removeEvent( this, UIOEvent.RESIZED, onResized );
 //		Globals.openWindowCount = Globals.openWindowCount - 1;
 	}
 	

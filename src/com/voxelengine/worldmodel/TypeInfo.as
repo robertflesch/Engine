@@ -265,6 +265,8 @@ public class TypeInfo
 	static private function loadTypeDataFromJSON( $data:String ):void {
 		//Log.out( "TypeInfo.loadTypeDataFromJSON - loading", Log.WARN );
 		var timer:int = getTimer();
+
+		// TODO RSF why add a ZERO type?
 		var ti:TypeInfo = new TypeInfo( 0 );
 		ti._typeId = 0;
 		ti._category = "INVALID";

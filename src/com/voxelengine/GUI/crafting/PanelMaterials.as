@@ -76,8 +76,10 @@ public class PanelMaterials extends PanelBase
 		// reset the material
 		var mb:Box = e.target as Box;
 		mb.backgroundTexture = null;
-		var ti:TypeInfo = TypeInfo.typeInfo[ mb.data.type ];
-		CraftingItemEvent.create( CraftingItemEvent.MATERIAL_REMOVED, ti );
+		if ( mb.data ) {
+            var ti:TypeInfo = TypeInfo.typeInfo[mb.data.type];
+            CraftingItemEvent.create(CraftingItemEvent.MATERIAL_REMOVED, ti);
+        }
 	}
 
 	private function onDrop(e:DnDEvent):void
