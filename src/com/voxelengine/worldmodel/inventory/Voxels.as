@@ -7,7 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 
-import com.voxelengine.GUI.inventory.InventoryPanelVoxel;
+import com.voxelengine.GUI.inventory.PanelVoxels;
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.server.Network;
 

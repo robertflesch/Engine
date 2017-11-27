@@ -197,7 +197,6 @@ public class InventoryPanelModel extends VVContainer
 		}
 
         currentSeries = ModelBaseEvent.seriesCounter;
-		trace( "IPM.displaySelectedSource series: " + currentSeries );
 		if ( _source == WindowInventoryNew.INVENTORY_PUBLIC )
             ModelInfoEvent.create( ModelBaseEvent.REQUEST_TYPE, currentSeries, Network.PUBLIC, null );
 		else if ( _source == WindowInventoryNew.INVENTORY_OWNED )

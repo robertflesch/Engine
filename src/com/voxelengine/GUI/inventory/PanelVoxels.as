@@ -19,7 +19,6 @@ import org.flashapi.swing.list.ListItem;
 import org.flashapi.swing.dnd.*;
 import org.flashapi.swing.layout.AbsoluteLayout;
 
-import com.voxelengine.Log;
 import com.voxelengine.events.CraftingItemEvent;
 import com.voxelengine.events.InventoryVoxelEvent;
 import com.voxelengine.events.InventorySlotEvent;
@@ -31,7 +30,9 @@ import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.SecureInt;
 import com.voxelengine.worldmodel.inventory.ObjectVoxel;
 
-public class InventoryPanelVoxel extends VVContainer
+import org.flashapi.swing.plaf.spas.VVUI;
+
+public class PanelVoxels extends VVContainer
 {
 	static private const VOXEL_CONTAINER_WIDTH:int = 512;
 	static private const VOXEL_IMAGE_WIDTH:int = 64;
@@ -42,25 +43,25 @@ public class InventoryPanelVoxel extends VVContainer
 	private var _barLower:TabBar;
 	private var _itemContainer:Container = new Container( VOXEL_IMAGE_WIDTH, VOXEL_IMAGE_HEIGHT);
     private var _voxelData:Vector.<SecureInt>;
-    private var _showTabs:Boolean;
     private var _filter:Set;
 
-	public function InventoryPanelVoxel( $parent:VVContainer, $dataSource:String, $showTabs:Boolean )
+	public function PanelVoxels($parent:VVContainer, $showTabs:Boolean )
 	{
 		// TODO I notice when I repeatedly open and close this window that more and more memory is allocated
 		super( $parent );
-		layout.orientation = LayoutOrientation.HORIZONTAL;
-		_showTabs = $showTabs;
-
-		if ( _showTabs )
-			upperTabsAdd();
-
-        addElement( _itemContainer );
         _itemContainer.autoSize = true;
         _itemContainer.layout.orientation = LayoutOrientation.VERTICAL;
-
-        if ( _showTabs )
-			lowerTabsAdd();
+		// If this is displayed in the crafting window, we need to show the source tabs
+        if ( !$showTabs ) {
+            layout.orientation = LayoutOrientation.VERTICAL;
+            showSourceTabs();
+            addElement( _itemContainer );
+        } else {
+            layout.orientation = LayoutOrientation.HORIZONTAL;
+            upperTabsAdd();
+            addElement( _itemContainer );
+            lowerTabsAdd();
+		}
 
         InventoryVoxelEvent.addListener( InventoryVoxelEvent.TYPES_RESULT, populateVoxels );
         InventoryVoxelEvent.addListener( InventoryVoxelEvent.TYPES_FILTER, filterVoxels );
@@ -71,7 +72,33 @@ public class InventoryPanelVoxel extends VVContainer
 
 		eventCollector.addEvent(_dragOp, DnDEvent.DND_DROP_ACCEPTED, dropMaterial );
 	}
-	
+
+	// This method is called when the panel is used in the crafting windows
+	private function showSourceTabs():void {
+        var _ownedVsStore:TabBar = new TabBar();
+        _ownedVsStore.orientation = ButtonBarOrientation.HORIZONTAL;
+        _ownedVsStore.name = "ownedVsStore";
+        _ownedVsStore.addItem(LanguageManager.localizedStringGet(WindowInventoryNew.INVENTORY_OWNED), WindowInventoryNew.INVENTORY_OWNED);
+        _ownedVsStore.addItem(LanguageManager.localizedStringGet(WindowInventoryNew.INVENTORY_STORE), WindowInventoryNew.INVENTORY_STORE);
+        const BUTTON_WIDTH:int = 500;
+        const TAB_BAR_HEIGHT:int = 36;
+        _ownedVsStore.setButtonsWidth( BUTTON_WIDTH / _ownedVsStore.length, TAB_BAR_HEIGHT);
+        _ownedVsStore.selectedIndex = 0;
+        eventCollector.addEvent(_ownedVsStore, ListEvent.ITEM_CLICKED, selectSource);
+        addGraphicElements(_ownedVsStore);
+
+        var _underline:Box = new Box( BUTTON_WIDTH, 5);
+        _underline.backgroundColor = VVUI.DEFAULT_COLOR;
+        addGraphicElements(_underline);
+
+        function selectSource(e:ListEvent):void {
+            if ( WindowInventoryNew.INVENTORY_OWNED == (e.target.data as String) )
+                InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.userId, -1, null );
+            else
+                InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.storeId, -1, null );
+        }
+    }
+
 	private function upperTabsAdd():void {
 		_barUpper = new TabBar();
 		_barUpper.orientation = ButtonBarOrientation.VERTICAL;
@@ -186,7 +213,7 @@ public class InventoryPanelVoxel extends VVContainer
     }
 
 
-	private function dropMaterial(e:DnDEvent):void 	{
+	static private function dropMaterial(e:DnDEvent):void 	{
 		if ( e.dragOperation.initiator.data is ObjectVoxel )
 		{
 			e.dropTarget.backgroundTexture = e.dragOperation.initiator.backgroundTexture;

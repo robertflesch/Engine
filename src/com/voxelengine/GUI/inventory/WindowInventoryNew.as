@@ -144,7 +144,7 @@ import org.flashapi.swing.*
                 eventCollector.addEvent(_ownedVsStore, ListEvent.ITEM_CLICKED, selectCategory);
                 addGraphicElements(_ownedVsStore);
 
-                _underline = new Box(width, 5);
+                _underline = new Box( width, 5);
                 _underline.backgroundColor = VVUI.DEFAULT_COLOR;
                 addGraphicElements(_underline);
             }

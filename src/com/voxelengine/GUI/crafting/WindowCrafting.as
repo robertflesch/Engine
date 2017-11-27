@@ -14,7 +14,7 @@ import com.voxelengine.Log;
 import com.voxelengine.GUI.VVPopup;
 import com.voxelengine.GUI.LanguageManager;
 import com.voxelengine.GUI.panels.PanelBase;
-import com.voxelengine.GUI.inventory.InventoryPanelVoxel;
+import com.voxelengine.GUI.inventory.PanelVoxels;
 import com.voxelengine.GUI.inventory.WindowInventoryNew;
 import com.voxelengine.events.InventoryVoxelEvent;
 import com.voxelengine.events.CraftingEvent;
@@ -32,7 +32,7 @@ public class WindowCrafting extends VVPopup {
 	private var _selectedRecipe:Recipe;
 	private var _panelRecipe:PanelRecipe;
     private var _panelUpper:PanelBase;
-    private var _panelLower:InventoryPanelVoxel;
+    private var _panelLower:PanelVoxels;
 
 	public function WindowCrafting() {
 		super( LanguageManager.localizedStringGet( "Crafting" ) );
@@ -66,7 +66,7 @@ public class WindowCrafting extends VVPopup {
 //	}
 
     private function showVoxelInventory():void {
-        _panelLower = new InventoryPanelVoxel( null, WindowInventoryNew.INVENTORY_OWNED, false );
+        _panelLower = new PanelVoxels( null, false );
         addElement( _panelLower );
         InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.userId, -1, null );
     }

@@ -60,9 +60,7 @@ public class InventoryPanelOverview extends VVContainer
 		displaySelectedContainer( startingTabName, _sourceType );
 	}
 
-	override protected function onResized(e:UIOEvent):void
-	{
-		trace( "IPO - onResize");
+	override protected function onResized(e:UIOEvent):void {
 		if ( _showTabs )
 			_barUpper.setButtonsWidth( width / _barUpper.length, 36 );
         if ( _parentWindow && _parentWindow is WindowInventoryNew )
@@ -71,8 +69,6 @@ public class InventoryPanelOverview extends VVContainer
 	}
 
 	override protected function onRemoved( event:UIOEvent ):void {
-
-        trace( "IPO - onRemoved");
 		removeEventListener( UIOEvent.RESIZED, onRemoved );
 
         if ( _showTabs ) {
@@ -140,7 +136,7 @@ public class InventoryPanelOverview extends VVContainer
 		}
 
 		if ( WindowInventoryNew.INVENTORY_CAT_VOXELS == $category ) {
-            _panelContainer = new InventoryPanelVoxel(this, $dataSource, _showTabs );
+            _panelContainer = new PanelVoxels(this, _showTabs );
             var filter:Set = new Set();
             if ( $dataSource == WindowInventoryNew.INVENTORY_PUBLIC ) {
                 InventoryVoxelEvent.create( InventoryVoxelEvent.TYPES_REQUEST, Network.PUBLIC, -1, Voxels.VOXEL_CAT_ALL );
