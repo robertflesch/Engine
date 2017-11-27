@@ -101,6 +101,7 @@ public class PanelRecipe extends PanelBase
     }
 
 	override public function remove():void {
+        CraftingItemEvent.removeListener( CraftingItemEvent.REQUIREMENTS_MET, requirementTest );
 		super.remove();
         _recipe = null;
         _panelForumla.remove();
@@ -121,7 +122,7 @@ public class PanelRecipe extends PanelBase
 
 	private function modelInfoReceived( $mie:ModelInfoEvent ):void {
 		if ( $mie.modelInfo.guid == _recipe.templateId ){
-            ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST, modelInfoReceived );
+            ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoReceived );
             var mi:ModelInfo = $mie.modelInfo;
 			mi.modelClass = _recipe.className;
 
@@ -130,7 +131,6 @@ public class PanelRecipe extends PanelBase
             _instanceGuid 			= ii.instanceGuid		= Globals.getUID();
             ii.name					= _recipe.name;
             OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, templateComplete );
-            //ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
             ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, modelInfoFailed );
 
             new ModelMakerClone( ii, mi );
@@ -141,6 +141,7 @@ public class PanelRecipe extends PanelBase
 		if ( _recipe.templateId == $mie.modelInfo.guid ){
 			(new Alert("An error has occurred, please try again later")).display();
             //ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete);
+            ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoReceived );
             ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, modelInfoFailed );
 			_parent.remove();
 		}
@@ -170,6 +171,7 @@ public class PanelRecipe extends PanelBase
 	private function templateComplete(  $ode:OxelDataEvent ): void {
 		if ( $ode.modelGuid == _recipe.templateId ){
             OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, templateComplete );
+            ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, modelInfoFailed );
             //ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
 
             var oxel:Oxel = $ode.oxelPersistence.oxel;
