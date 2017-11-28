@@ -27,8 +27,6 @@ public class RegionEvent extends ModelBaseEvent
 	
 	// These are the region specific events
 	// dispatched when a region is unloaded
-	static public const UNLOAD:String						= "UNLOAD";
-	// tells the region manager to load this region
 	static public const LOAD:String							= "LOAD";
 	// dispatched after jobs for all process have been added
 	static public const LOAD_BEGUN:String					= "LOAD_BEGUN";

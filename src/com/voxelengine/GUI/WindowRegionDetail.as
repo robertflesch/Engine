@@ -195,16 +195,16 @@ public class WindowRegionDetail extends VVPopup
 //			_region.release();
 			//
 			var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, RegionManager.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true );
-			RegionManager.instance.add( pe, _region );
+			RegionManager.add( pe, _region );
 			// This tell the region manager to add it to the region list
 			//PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true ) );
 			// This tell the region to save itself!
-			RegionEvent.create( ModelBaseEvent.SAVE, 0, _region.guid );
+			RegionEvent.create( ModelBaseEvent.SAVE, 0, _region.guid, _region );
 		}
 		else {
-			RegionEvent.create( ModelBaseEvent.CHANGED, 0, _region.guid );
+			RegionEvent.create( ModelBaseEvent.CHANGED, 0, _region.guid, _region );
 			// This is not the active region, so we have to save it.
-			RegionEvent.create( ModelBaseEvent.SAVE, 0, _region.guid );
+			RegionEvent.create( ModelBaseEvent.SAVE, 0, _region.guid, _region );
 		}
 			
 		closeFunction();

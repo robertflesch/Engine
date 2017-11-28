@@ -142,7 +142,7 @@ public class VoxelVerse extends Sprite
 
 		InventoryManager.init();
 		MouseKeyboardHandler.init();
-		RegionManager.instance;
+		RegionManager.init();
 		ConfigManager.instance;
 		LightAdd.init();
 		LightRemove.init();
@@ -212,7 +212,9 @@ public class VoxelVerse extends Sprite
 
 		Globals.taskController.next();
 
-		RegionManager.instance.update( interFrameTime );
+        if ( Region.currentRegion )
+            Region.currentRegion.update( interFrameTime );
+
 		Shader.animationOffsetsUpdate( interFrameTime );
 		//var _timeUpdate:int = getTimer() - _s_timeEntered;
 

@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+import com.voxelengine.GUI.panels.PanelModels;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.LoadingEvent;
@@ -16,44 +17,33 @@ import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.RoomEvent;
 import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.server.Room;
 import com.voxelengine.worldmodel.models.CollisionPoint;
 import com.voxelengine.worldmodel.models.types.Axes;
 import com.voxelengine.worldmodel.models.types.ControllableVoxelModel;
 import com.voxelengine.worldmodel.models.types.EditCursor;
-import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
-/**
- * ...
- * @author Bob
- */
-public class RegionManager 
+public class RegionManager
 {
     static public const BIGDB_TABLE_REGIONS_INDEX_OWNER:String = "owner";
     static public const BIGDB_TABLE_REGIONS:String = "regions";
     static public const REGION_EXT:String = ".rjson";
 
-    private var _regions:Vector.<Region> = null;
-	private var _requestPublic:Boolean;
-	private var _requestPrivate:Boolean;
-	private var _requestStore:Boolean;
-	
-	public function get size():int { return _regions.length; }
-	
-	public function get regions():Vector.<Region> { return _regions; }
-	
-	static private var _s_instance:RegionManager;
-	static public function get instance():RegionManager {
-		if ( null == _s_instance )
-			_s_instance = new RegionManager();		
-		return _s_instance	
-	}
-	
-	public function RegionManager():void {
+    static private var _regions:Vector.<Region> = null;
+    static private var _requestPublic:Boolean;
+    static private var _requestPrivate:Boolean;
+    static private var _requestStore:Boolean;
+
+    static public function get size():int { return _regions.length; }
+
+    static public function get regions():Vector.<Region> { return _regions; }
+
+	public function RegionManager():void {}
+
+    static public function init():void {
 		_regions = new Vector.<Region>;
 
 		RegionEvent.addListener( RegionEvent.JOIN, 				requestServerJoin ); 
@@ -62,8 +52,9 @@ public class RegionManager
 		RegionEvent.addListener( ModelBaseEvent.SAVE, 			save );
 		RegionEvent.addListener( ModelBaseEvent.DELETE,			deleteRegion );
 		RegionEvent.addListener( RegionEvent.ADD_MODEL, 		addModel );
+        RegionEvent.addListener( RegionEvent.LOAD, 				load );
 
-		RoomEvent.addListener( RoomEvent.ROOM_DISCONNECT, 		requestDefaultRegionLoad );
+        RoomEvent.addListener( RoomEvent.ROOM_DISCONNECT, 		requestDefaultRegionLoad );
 		RoomEvent.addListener( RoomEvent.ROOM_JOIN_SUCCESS, 	onJoinRoomEvent );
 		
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
@@ -86,7 +77,18 @@ public class RegionManager
 		//RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, 0, $re.guid ) );
 	//}
 
-	private function deleteRegion( $re:RegionEvent ):void {
+    static private function load( $re:RegionEvent ):void {
+		if ( Region.currentRegion ) {
+            Region.currentRegion.unload();
+            VoxelModel.selectedModel = null;
+            PanelModels.setLastSelectedModel( null );
+			// TODO Anything else?
+        }
+        var region:Region = regionGet( $re.guid );
+		region.load();
+    }
+
+    static private function deleteRegion( $re:RegionEvent ):void {
 		if ( null == $re.guid ) {
 			Log.out( "RegionManager.deleteRegion guid requested is NULL: ", Log.WARN );
 			return;
@@ -106,7 +108,7 @@ public class RegionManager
 	}
 
 
-	private function request( $re:RegionEvent):void {
+    static private function request( $re:RegionEvent):void {
 		
 		if ( null == $re.guid ) {
 			Log.out( "RegionManager.regionRequest guid requested is NULL: ", Log.WARN );
@@ -125,10 +127,10 @@ public class RegionManager
 			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $re.series, REGION_EXT, $re.guid, null, null ) );
 	}
 
-	private function regionTypeRequest(e:RegionEvent):void {
+    static private function regionTypeRequest(e:RegionEvent):void {
 		if ( Network.PUBLIC == e.guid && false == _requestPublic ) {
 			_requestPublic = true;
-				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, e.series, BIGDB_TABLE_REGIONS, Network.PUBLIC, null, BIGDB_TABLE_REGIONS_INDEX_OWNER ) );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, e.series, BIGDB_TABLE_REGIONS, Network.PUBLIC, null, BIGDB_TABLE_REGIONS_INDEX_OWNER ) );
 		}
 		if ( Network.userId == e.guid && false == _requestPrivate ) {
 			_requestPrivate = true;
@@ -145,24 +147,24 @@ public class RegionManager
 				RegionEvent.create( ModelBaseEvent.RESULT, 0, region.guid, region );
 		}
 	}
-	
-	private function loadFail( $pe:PersistenceEvent ):void {
+
+    static private function loadFail( $pe:PersistenceEvent ):void {
 		if ( BIGDB_TABLE_REGIONS != $pe.table && REGION_EXT != $pe.table )
 			return;
 			
 		Log.out( "RegionManager.loadFail - region: " + $pe.guid, Log.ERROR );
 		throw new Error( "RegionManager.loadFail - why did I fail to load region PersistenceEvent: " + $pe.toString(), Log.WARN );
 	}
-	
-	private function loadSucceed( $pe:PersistenceEvent ):void {
+
+    static private function loadSucceed( $pe:PersistenceEvent ):void {
 		if ( BIGDB_TABLE_REGIONS == $pe.table || REGION_EXT == $pe.table ) {
 			//Log.out( "RegionManager.loadSucceed - creating new region: " + $pe.guid, Log.DEBUG );
 			var newRegion:Region = new Region( $pe.guid, $pe.dbo, $pe.data );
 			add( $pe, newRegion );
 		}
 	}
-	
-	public function add($pe:PersistenceEvent, $region:Region ):void {
+
+    static public function add($pe:PersistenceEvent, $region:Region ):void {
 		//Log.out( "RegionManager.regionAdd - adding region: " + $region.guid, Log.DEBUG );
 		if ( false == regionHas( $region.guid ) ) {
 			_regions.push( $region );
@@ -174,8 +176,8 @@ public class RegionManager
 	
 	////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////
-	
-	public function configComplete( $e:LoadingEvent ):void {
+
+    static public function configComplete( $e:LoadingEvent ):void {
 		var startingRegion:Region = new Region( "Blank", null, {} );
 		add( null, startingRegion );
 		RegionEvent.create( RegionEvent.LOAD, 0, "Blank" );
@@ -191,7 +193,7 @@ public class RegionManager
 //		RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST, 0, $guid ) );
 	}
 
-	private function buildComplete( $mle:ModelLoadingEvent ):void {
+    static private function buildComplete( $mle:ModelLoadingEvent ):void {
 		var ohd:ObjectHierarchyData = $mle.data;
 		// Since the collision markers are needed for avatar, don't load avatar until it is complete.
 		if ( ControllableVoxelModel.COLLISION_MARKER == ohd.modelGuid) {
@@ -220,8 +222,8 @@ public class RegionManager
 		var defaultRegionID:String = defaultRegionJSON.config.region.startingRegion;
 		Room.createJoinRoom( defaultRegionID );	
 	}
-	
-	public function onJoinRoomEvent( e:RoomEvent ):void {
+
+    static public function onJoinRoomEvent( e:RoomEvent ):void {
 		//Log.out( "RegionManager.onJoinRoomEvent - guid: " + e.guid, Log.DEBUG );
 		RegionEvent.create( RegionEvent.LOAD, 0, e.guid );
 	}
@@ -229,14 +231,8 @@ public class RegionManager
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
 	
-	// this calls the region and its model manager to update
-	public function update( $elapsed:int ):void {
-		if ( Region.currentRegion )
-			Region.currentRegion.update( $elapsed );
-	}
-	
 	// Just assign the dbo from the create to the region
-	private function regionCreatedHandler( $pe:PersistenceEvent ):void {
+    static private function regionCreatedHandler( $pe:PersistenceEvent ):void {
 		if ( BIGDB_TABLE_REGIONS != $pe.table )
 			return;
 		
@@ -248,8 +244,8 @@ public class RegionManager
 		else	
 			Log.out( "RegionManager.regionCreatedHandler: ERROR region not found for returned guid: " + $pe.guid );
 	}
-	
-	private function regionGet( $guid:String ):Region {
+
+    static private function regionGet( $guid:String ):Region {
 		for each ( var region:Region in _regions ) {
 			if ( region && region.guid == $guid ) {
 				return region;
@@ -257,19 +253,19 @@ public class RegionManager
 		}
 		return null;
 	}
-	
-	public function regionHas( $guid:String ):Boolean {
+
+    static public function regionHas( $guid:String ):Boolean {
 		var region:Region = regionGet( $guid );
 		return (null != region);
 	}
 
-	private function save( $re:RegionEvent ):void {
+    static private function save( $re:RegionEvent ):void {
 		var region:Region = regionGet( $re.guid );
 		if ( region )
 			region.save();
 	}
 
-	private function addModel( $re:RegionEvent ):void {
+    static private function addModel( $re:RegionEvent ):void {
 		var region:Region = regionGet( $re.guid );
 		if ( region )
 			region.modelCache.add( $re.data );

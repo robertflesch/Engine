@@ -101,12 +101,11 @@ import com.voxelengine.worldmodel.models.ModelTransform;
 
 			display( Renderer.renderer.width/2 - (width + fudgeFactor)/2, Renderer.renderer.height - height - 128 );
             Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
-			RegionEvent.addListener( RegionEvent.UNLOAD, onRegionUnload );
+			RegionEvent.addListener( RegionEvent.LOAD, onRegionLoad );
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 		} 
 		
-		private function onRegionUnload( le:RegionEvent ):void
-		{
+		private function onRegionLoad( le:RegionEvent ):void {
 			loseControl( null );
 		}
 		

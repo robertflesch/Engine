@@ -54,6 +54,7 @@ public class PanelModels extends PanelBase
 
 	private var _parentModel:VoxelModel;
     private static var _s_lastSelectedModel:VoxelModel;
+    private static var _s_lastSelectedModelInitialized:Boolean;
     public static function setLastSelectedModel( $val:VoxelModel ):void { _s_lastSelectedModel = $val; }
     public static function getLastSelectedModel():VoxelModel { return _s_lastSelectedModel; }
 
@@ -68,9 +69,19 @@ public class PanelModels extends PanelBase
     private var _addButton:Button;
 
 	private function get myParent():ContainerModelDetails { return (_parent as ContainerModelDetails); }
-	
+
+    static private function checkLastSelectedForModelDeletion( $mie:ModelInfoEvent ):void {
+        var vm:VoxelModel = getLastSelectedModel()
+		if ( vm && vm.modelInfo && ( vm.modelInfo.guid  == $mie.modelGuid ) )
+			setLastSelectedModel( null );
+	}
+
 	public function PanelModels($parent:ContainerModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number, $level:int )	{
 		super( $parent, $widthParam, $heightParam );
+		if ( false == _s_lastSelectedModelInitialized ) {
+            _s_lastSelectedModelInitialized = true;
+            ModelInfoEvent.addListener(ModelBaseEvent.DELETE, checkLastSelectedForModelDeletion );
+        }
 		width = $widthParam;
 		height = $heightParam;
 		_parent = $parent;
@@ -430,9 +441,10 @@ public class PanelModels extends PanelBase
 			vm = Region.currentRegion.modelCache.instanceGet( $instanceGuid );
 		else
 			vm = _parentModel.childFindInstanceGuid( $instanceGuid );
-		if ( vm )
-			setLastSelectedModel( vm );
-		Log.out('PanelModels.displayModelData vm: ' + vm );
+		if ( vm ) {
+            setLastSelectedModel(vm);
+            Log.out('PanelModels.displayModelData vm: ' + vm);
+        }
 		if ( vm ) {
 			setSelectedModel( vm );
 			UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, vm, _parentModel, _level);

@@ -60,7 +60,7 @@ public class WindowBeastControlQuery extends VVCanvas
 		addElement( button );
 
 		Globals.g_app.stage.addEventListener(Event.RESIZE, onResize );
-		RegionEvent.addListener( RegionEvent.UNLOAD, onRegionUnload );
+		RegionEvent.addListener( RegionEvent.LOAD, onRegionLoad );
 		GUIEvent.addListener( GUIEvent.TOOLBAR_HIDE, guiEventHandler );
 		GUIEvent.addListener( GUIEvent.TOOLBAR_SHOW, guiEventHandler );
 		ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved );
@@ -79,7 +79,7 @@ public class WindowBeastControlQuery extends VVCanvas
 		move( Renderer.renderer.width / 2 - width / 2, Renderer.renderer.height - height - window_offset );
 	}
 
-	private function onRegionUnload ( le:RegionEvent ):void {
+	private function onRegionLoad ( le:RegionEvent ):void {
 		remove();
 	}
 
@@ -89,7 +89,7 @@ public class WindowBeastControlQuery extends VVCanvas
 		removeEventListener(UIOEvent.REMOVED, onRemoved );
 		Globals.g_app.stage.removeEventListener(Event.RESIZE, onResize );
 		VVKeyboardEvent.removeListener( KeyboardEvent.KEY_DOWN, takeControlKey );
-		RegionEvent.removeListener( RegionEvent.UNLOAD, onRegionUnload );
+		RegionEvent.removeListener( RegionEvent.LOAD, onRegionLoad );
 		GUIEvent.removeListener( GUIEvent.TOOLBAR_HIDE, guiEventHandler );
 		GUIEvent.removeListener( GUIEvent.TOOLBAR_SHOW, guiEventHandler );
 		ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved );
