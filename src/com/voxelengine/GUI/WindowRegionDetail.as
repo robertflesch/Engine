@@ -8,34 +8,27 @@
 
 package com.voxelengine.GUI 
 {
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.PersistenceEvent;
-import com.voxelengine.events.RegionEvent;
 import com.voxelengine.renderer.Renderer;
-import com.voxelengine.worldmodel.RegionManager;
-import com.voxelengine.worldmodel.models.Role;
-import com.voxelengine.worldmodel.models.types.Player;
 
 import flash.geom.Vector3D;
 import flash.events.Event;
-import flash.display.Bitmap;
-import playerio.DatabaseObject;
 
 import org.flashapi.swing.*
-import org.flashapi.swing.core.UIObject;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
-import org.flashapi.swing.list.ListItem;
-import org.flashapi.swing.constants.BorderStyle;
 import org.flashapi.swing.button.RadioButtonGroup;
-import org.flashapi.swing.databinding.DataProvider;
-import org.flashapi.swing.containers.*;
 
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
+import com.voxelengine.Globals;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.PersistenceEvent;
+import com.voxelengine.events.RegionEvent;
+import com.voxelengine.GUI.components.*;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.Region;
-import com.voxelengine.GUI.components.*;
+import com.voxelengine.worldmodel.RegionManager;
+import com.voxelengine.worldmodel.models.Role;
+import com.voxelengine.worldmodel.models.types.Player;
 
 public class WindowRegionDetail extends VVPopup
 {

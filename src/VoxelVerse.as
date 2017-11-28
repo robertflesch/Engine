@@ -271,8 +271,8 @@ public class VoxelVerse extends Sprite
 		if ( null != vm && vm.instanceInfo ) {
 			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, vm.instanceInfo.instanceGuid , null ) );
 		}
-		//ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.SAVE, 0, "", null ) );
-		//OxelDataEvent.create( ModelBaseEvent.SAVE, 0, "", null );
+		ModelInfoEvent.create( ModelBaseEvent.SAVE, 0, "", null );
+		OxelDataEvent.create( ModelBaseEvent.SAVE, 0, "", null );
 	}
 
 	private static function uncaughtErrorHandler(event:UncaughtErrorEvent):void {

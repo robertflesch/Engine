@@ -674,6 +674,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		// remove chunk before changing type, so it know what VBO its in.
 		quadsDeleteAll();
 		this.parentMarkAs();
+		childCount = 8;
 		if (lighting) {
 			LightingPool.poolReturn(lighting);
 			lighting = null;
