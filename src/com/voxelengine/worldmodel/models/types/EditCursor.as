@@ -288,7 +288,7 @@ public class EditCursor extends VoxelModel
 		// This is to adjust the size of the cursor if it goes over a model
 		// not fully function yet
 		if ( ! _gciData.oxel ) {
-			Log.out( "ModelCacheUtil.highLightEditableOxel - Why no oxel?")
+			Log.out( "" + "EditCursor.gciDataSet - Why no oxel?")
 		}
 		//_gci.point = editableModel.worldToModel( _gci.point );
 		// This is used to see if there is a model associated with that grain

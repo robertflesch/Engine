@@ -1117,7 +1117,7 @@ public class VoxelModel {
 			stateSet($state, $percentage);
 		}
 		else if (_anim.name != $state) { // changing anim
-			Log.out( "VoxelModel.updateAnimations - change to new anim: "  + $state + "  from old anim: " + _anim.name );
+			//Log.out( "VoxelModel.updateAnimations - change to new anim: "  + $state + "  from old anim: " + _anim.name );
 			stateSet($state, $percentage);
 		}
 		else if (_anim.name == $state) { // updating existing anim

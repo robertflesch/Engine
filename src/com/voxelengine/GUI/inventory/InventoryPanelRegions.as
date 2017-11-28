@@ -74,7 +74,7 @@ public class InventoryPanelRegions extends VVContainer
 			var item:ListItem = _listbox1.getItemAt( i );
 			if ( item.data == e.guid ) {
                 var region:Region = e.data as Region;
-                _listbox1.updateItemAt(i, region.name + "\t Desc: " + region.desc + "\t Gravity: " + (region.gravity?"Yes":"No") + "/t Sky Color: " + region.getSkyColor(), region.guid);
+                _listbox1.updateItemAt(i, region.name + "\t Desc: " + region.desc + "\t Gravity: " + (region.gravity?"Yes":"No") + "\t Sky Color: " + region.getSkyColor(), region.guid);
             }
 		}
 	}

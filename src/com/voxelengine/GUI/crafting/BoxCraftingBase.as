@@ -6,19 +6,15 @@
  Unauthorized reproduction, translation, or display is prohibited.
  ==============================================================================*/
 package com.voxelengine.GUI.crafting {
-import com.voxelengine.GUI.VVBox;
-import com.voxelengine.GUI.inventory.BoxInventory;
-import com.voxelengine.events.CraftingItemEvent;
-import com.voxelengine.events.InventoryEvent;
-import com.voxelengine.events.InventoryVoxelEvent;
-import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.inventory.InventoryManager;
-import com.voxelengine.worldmodel.models.PlayerInfoCache;
-import com.voxelengine.worldmodel.models.types.Player;
 
 import org.flashapi.swing.constants.BorderStyle;
 import org.flashapi.swing.dnd.DnDFormat;
-import org.flashapi.swing.event.UIOEvent;
+
+import com.voxelengine.GUI.inventory.BoxInventory;
+import com.voxelengine.events.CraftingItemEvent;
+import com.voxelengine.events.InventoryVoxelEvent;
+import com.voxelengine.server.Network;
+
 
 public class BoxCraftingBase extends BoxInventory {
 
@@ -51,7 +47,7 @@ public class BoxCraftingBase extends BoxInventory {
     }
 
     private function onMaterialDropped(e:CraftingItemEvent):void {
-        trace( "BoxCraftingBase.onMaterialDropped" + e.typeInfo.category + " " + _acceptsCategory + " " + e.typeInfo.subCat + " " + _acceptsSubCat);
+        trace( "BoxCraftingBase.onMaterialDropped category: " + e.typeInfo.category + " " + _acceptsCategory + "   subcat: " + e.typeInfo.subCat + " " + _acceptsSubCat);
         if ( _acceptsCategory == e.typeInfo.category && ( _acceptsSubCat == e.typeInfo.subCat || _acceptsSubCat == "" ) ) {
             var bi:BoxInventory = e.data as BoxInventory;
             _type = e.typeInfo.type;
