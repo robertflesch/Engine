@@ -79,6 +79,11 @@ public class PopupInstanceDetail extends VVPopup {
 		addElement(_photoContainer);
 		addPhoto();
 
+		if ( _vm.instanceInfo.controllingModel )
+            addElement( new Label( "relative_to_parent" ) );
+		else
+            addElement( new Label( "world_space" ) );
+
 		addElement( new ComponentVector3DToObject( setChanged, ii.setPositionInfo, "Position", "X: ", "Y: ", "Z: ",  ii.positionGet, WIDTH, updateVal ) );
 		addElement( new ComponentVector3DToObject( setChanged, ii.setRotationInfo, "Rotation", "X: ", "Y: ", "Z: ",  ii.rotationGet, WIDTH, updateVal ) );
 		addElement( new ComponentVector3DToObject( setChanged, ii.setScaleInfo, "Scale", "X: ", "Y: ", "Z: ",  ii.scale, WIDTH, updateScaleVal, 4 ) );
