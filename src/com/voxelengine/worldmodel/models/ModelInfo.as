@@ -443,9 +443,13 @@ public class ModelInfo extends PersistenceObject
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  Children functions
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	private 	var			 _childCount:uint;
-    private 	function	 get childCount():uint 							{ return _childCount; }
-    private 	function	 set childCount($val:uint):void 				{ _childCount = $val; }
+	private 	var			 _countOfChildrenToBeLoaded:uint;
+    private 	function	 get countOfChildrenToBeLoaded():uint 						{ return _countOfChildrenToBeLoaded; }
+    private 	function	 set countOfChildrenToBeLoaded($val:uint):void 				{ _countOfChildrenToBeLoaded = $val; }
+
+    private 	var			 _childCount:uint;
+    public 	function	 	get childCount():uint 						{ return _childCount; }
+    public 	function	 	set childCount($val:uint):void 				{ _childCount = $val; }
 
 	private 	var			 _childVoxelModels:Vector.<VoxelModel>			= new Vector.<VoxelModel>; 	// INSTANCE NOT EXPORTED
 	public		function get childVoxelModels():Vector.<VoxelModel>			{ return _childVoxelModels; }
@@ -491,8 +495,8 @@ public class ModelInfo extends PersistenceObject
 			// Since this is a child object, it automatically get added to the parent.
 			// So add to cache just adds it to parent instance.
 			//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
-			childCount = childCount + 1;
-			//Log.out( "VoxelModel.childrenLoad - the " + guid + " is loading child guid: " + ii.modelGuid + "  childCount: " + childCount );
+			countOfChildrenToBeLoaded = countOfChildrenToBeLoaded + 1;
+			//Log.out( "VoxelModel.childrenLoad - the " + guid + " is loading child guid: " + ii.modelGuid + "  countOfChildrenToBeLoaded: " + countOfChildrenToBeLoaded );
             if ( $buildState == ModelMakerBase.IMPORTING )
                 new ModelMakerImport( ii, false );
             if ( $buildState == ModelMakerBase.CLONING ) {
@@ -510,9 +514,10 @@ public class ModelInfo extends PersistenceObject
     protected function onChildAdded( $me:ModelEvent ):void {
 		// does the child's parent guid == this objects guid, if so its our child
 		if ( $me.vm && $me.vm.instanceInfo.controllingModel && $me.vm.instanceInfo.controllingModel.modelInfo.guid == guid ) {
-			childCount = childCount - 1;
-			//Log.out( "ModelInfo.onChildAdded - MY CHILD - parent guid: " + guid + "  childGuid: " + $me.vm.modelInfo.guid + "  children remaining: " + _childCount, Log.WARN );
-            checkChildCountForZero( $me.vm, $me.vm.modelInfo.guid );
+			countOfChildrenToBeLoaded = countOfChildrenToBeLoaded - 1;
+            childCount = childCount + 1;
+			Log.out( "ModelInfo.onChildAdded - MY CHILD - parent guid: " + guid + "  childGuid: " + $me.vm.modelInfo.guid + "  children remaining: " + _countOfChildrenToBeLoaded, Log.WARN );
+            checkChildLoadingCountForZero( $me.vm, $me.vm.modelInfo.guid );
 		}
 		//else {
             //Log.out( "ModelInfo.onChildAdded - NOT MY CHILD - parent guid: " + guid + "  childGuid: " + $me.vm.modelInfo.guid, Log.WARN );
@@ -521,12 +526,12 @@ public class ModelInfo extends PersistenceObject
 
     public function onChildAddFailure( $childGuid:String ):void {
         	Log.out( "ModelInfo.onChildAddFailure - this model: " + guid + "  childModel.modelGuid: " + $childGuid );
-        	childCount = childCount - 1;
-            checkChildCountForZero( null, $childGuid );
+        	countOfChildrenToBeLoaded = countOfChildrenToBeLoaded - 1;
+        	checkChildLoadingCountForZero( null, $childGuid );
     }
 
-	private function checkChildCountForZero( $vm:VoxelModel, $childModelGuid:String ):void {
-        if (0 == childCount) {
+	private function checkChildLoadingCountForZero( $vm:VoxelModel, $childModelGuid:String ):void {
+        if (0 == countOfChildrenToBeLoaded) {
 //			Log.out( "ModelInfo.checkChildCountForZero - modelInfo: " + guid + "  children COMPLETE", Log.WARN );
             ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded);
             childrenLoaded = true;
@@ -735,7 +740,7 @@ public class ModelInfo extends PersistenceObject
 	// These are temporary used for loading local objects
 	public function get biomes():Biomes 							{ return _biomes; }
 	public function set biomes(value:Biomes):void  					{ _biomes = value;  changed = true; }
-	
+
 	override public function save( $validateGuid:Boolean = true ):Boolean {
 
 		if ( false == animationsLoaded || false == childrenLoaded) {
