@@ -7,18 +7,15 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-import com.voxelengine.renderer.Renderer;
-
-import flash.display3D.Context3D;
-
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.utils.Dictionary;
-import flash.utils.getTimer;
+
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelEvent;
-import com.voxelengine.worldmodel.Region;
+import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.models.types.*;
 
 public class ModelCache 
@@ -48,8 +45,19 @@ public class ModelCache
 	public function get modelsDynamic():Vector.<VoxelModel> { return _instancesDynamic; }
 	
 	public function ModelCache() {
+        ModelInfoEvent.addListener( ModelInfoEvent.REASSIGN_PUBLIC, reassignPublicModelInfoEvent );
 	}
-	
+
+
+    private function reassignPublicModelInfoEvent($mie:ModelInfoEvent):void {
+        for ( var i:int = 0; i < _instances.length; i++ ) {
+            var vm:VoxelModel = _instances[i];
+            if ( vm )
+                if ( $mie.modelGuid == vm.modelInfo.guid )
+                    vm.dead = true;
+        }
+    }
+
 	public function requestModelInfoByModelGuid( $modelGuid:String ):ModelInfo {
 		for ( var i:int = 0; i < _instances.length; i++ ) {
 			var vm:VoxelModel = _instances[i];
@@ -70,9 +78,8 @@ public class ModelCache
 		return null
 	}
 	
-	// need to do a recurvsive search here
-	public function instanceGet( $instanceGuid:String ):VoxelModel
-	{ 
+	// need to do a recursive search here
+	public function instanceGet( $instanceGuid:String ):VoxelModel {
 		return _instanceByGuid[$instanceGuid];
 	}
 
@@ -81,7 +88,6 @@ public class ModelCache
         for each (var vm:VoxelModel in models) {
             if ($instanceGuid == vm.instanceInfo.instanceGuid) {
                 return vm;
-                break;
             }
         }
         return null;
@@ -112,7 +118,6 @@ public class ModelCache
 		var vm:VoxelModel;
 		for ( var i:int = 0; i < _instances.length; i++ ) {
 			vm = _instances[i];
-			var t:VoxelModel = VoxelModel.controlledModel;
 			if ( vm == VoxelModel.controlledModel )
 				continue;
 			vm.dead = true;	
@@ -122,6 +127,8 @@ public class ModelCache
 			vm = _instancesDynamic[i];
 			vm.dead = true;
 		}
+
+        ModelInfoEvent.removeListener( ModelInfoEvent.REASSIGN_PUBLIC, 	reassignPublicModelInfoEvent );
 	}
 
 	public function add( vm:VoxelModel ):void {

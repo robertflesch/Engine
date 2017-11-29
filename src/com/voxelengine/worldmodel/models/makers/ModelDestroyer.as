@@ -33,7 +33,7 @@ public class ModelDestroyer {
         for each (var vm:VoxelModel in modelOnScreen)
             vm.dead = true;
 
-        Log.out("ModelDestroyer - attempting to remove modelGuid: " + $modelGuid + ( $recursive ? " and children from" : " from" ) + " persistence");
+        Log.out("ModelDestroyer - attempting to remove modelGuid: " + $modelGuid + ( $recursive ? " and children from" : " from" ) + " persistence", Log.WARN);
 
         addListeners();
         ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, $modelGuid, null );
@@ -58,7 +58,7 @@ public class ModelDestroyer {
                     // TODO Inventory is by instance... but this is removing the model template.
                     // InventoryModelEvent.dispatch( new InventoryModelEvent( ModelBaseEvent.DELETE, "", vm.instanceInfo.instanceGuid, null ) )
                 }
-                Log.out("ModelDestroyer - SUCCESSFULLY removed modelGuid: " + $modelGuid + ( $recursive ? " and children from" : " from" ) + " persistence");
+                Log.out("ModelDestroyer - SUCCESSFULLY removed modelGuid: " + $modelGuid + ( $recursive ? " and children from" : " from" ) + " persistence", Log.WARN);
             }
         }
 

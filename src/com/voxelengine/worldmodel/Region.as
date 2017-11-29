@@ -7,7 +7,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-import com.voxelengine.worldmodel.models.makers.ModelMaker;
 
 import flash.geom.Vector3D;
 import playerio.DatabaseObject;
@@ -16,22 +15,15 @@ import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.RegionEvent;
-import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.events.ModelLoadingEvent;
-import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelCache;
 import com.voxelengine.worldmodel.models.PersistenceObject;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
-/**
- * ...
- * @author Bob
- */
 public class Region extends PersistenceObject {
 
 	static public var _s_currentRegion:Region;

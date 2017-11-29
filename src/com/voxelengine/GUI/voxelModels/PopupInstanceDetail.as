@@ -116,8 +116,10 @@ public class PopupInstanceDetail extends VVPopup {
 			// TODO add a drop down of available states
 			addElement( new ComponentLabel( "State", _vm.anim ? _vm.anim.name : "", WIDTH ) );
 
-		if ( ii.controllingModel )
-			addElement( new ComponentLabel( "Parent GUID",  ii.controllingModel ? ii.controllingModel.instanceInfo.instanceGuid : "", WIDTH ) );
+		if ( ii.controllingModel ) {
+            addElement(new ComponentLabel("Parent Model GUID", ii.controllingModel ? ii.controllingModel.modelInfo.guid : "", WIDTH));
+            addElement(new ComponentLabel("Parent Instance GUID", ii.controllingModel ? ii.controllingModel.instanceInfo.instanceGuid : "", WIDTH));
+        }
 
 		if ( Globals.isDebug )	{
 			var oxelUtils:Button = new Button( LanguageManager.localizedStringGet( "Oxel_Utils" ) );
@@ -171,7 +173,12 @@ public class PopupInstanceDetail extends VVPopup {
 	}
 
     private function setChanged():void {
-        _vm.instanceInfo.changed = true
+        if ( _vm.instanceInfo.controllingModel ) {
+            _vm.instanceInfo.controllingModel.instanceInfo.changed = true;
+            _vm.instanceInfo.controllingModel.modelInfo.changed = true;
+        }
+        _vm.instanceInfo.changed = true;
+        _vm.modelInfo.changed = true;
     }
 
 

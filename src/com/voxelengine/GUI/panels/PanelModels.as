@@ -242,11 +242,11 @@ public class PanelModels extends PanelBase
 	static private function determineObjectName( $vm:VoxelModel ):String {
         var itemName:String = "";
         if ( $vm.instanceInfo.name )
-            itemName = $vm.instanceInfo.name;
+            itemName = $vm.instanceInfo.name + "  ";
         else if ( $vm.modelInfo.name )
-            itemName = $vm.modelInfo.name;
+            itemName = $vm.modelInfo.name + "  ";
         else
-            itemName = $vm.modelInfo.guid;
+            itemName = $vm.modelInfo.guid + "  ";
 
 		return itemName;
 	}

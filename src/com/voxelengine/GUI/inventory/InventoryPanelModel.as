@@ -206,9 +206,9 @@ public class InventoryPanelModel extends VVContainer
 	}
 
     private function reassignPublicModelInfoEvent($mie:ModelInfoEvent):void {
-		// For this to happen I have to be on the backpack page!
+        // For this to happen I have to be on the backpack page!
         if ( _source == WindowInventoryNew.INVENTORY_OWNED )
-        	removeModel( $mie.modelGuid );
+            removeModel( $mie.modelGuid );
     }
 
     private function removeModelInfoEvent( $mie:ModelInfoEvent ):void {
@@ -334,6 +334,7 @@ public class InventoryPanelModel extends VVContainer
                 ii.controllingModel = WindowInventoryNew.parentModel;
                 new ModelMakerClone( ii, om.modelInfo );
                 om.modelInfo.changed = true;
+                WindowInventoryNew.parentModel.modelInfo.changed = true;
             }
 			else {
 				// Only do this for top level models.
@@ -357,6 +358,7 @@ public class InventoryPanelModel extends VVContainer
                 ii.positionSet = viewVector;
 				new ModelMaker( ii );
 			}
+
 
 		}
 	}

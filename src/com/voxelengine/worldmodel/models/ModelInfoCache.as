@@ -23,10 +23,13 @@ import com.voxelengine.utils.JSONUtil;
 import com.voxelengine.utils.StringUtils;
 import com.voxelengine.worldmodel.models.makers.ModelDestroyer;
 
+import org.as3commons.collections.Map;
+import org.as3commons.collections.iterators.FilterIterator;
+
 public class ModelInfoCache
 {
-	static private var _modelInfo:Dictionary = new Dictionary(false);
-	static private var _block:Block = new Block();
+    static private var _modelInfo:Map = new Map();
+    static private var _block:Block = new Block();
 	
 	// This is required to be public.
 	public function ModelInfoCache() {}
@@ -75,28 +78,46 @@ public class ModelInfoCache
             _initializedPrivate = true;
         }
 
-        // This will return models already loaded.
-        for each ( var mi:ModelInfo in _modelInfo ) {
-            if ( mi && mi.owner == $mme.modelGuid ) {
-                //Log.out( "ModelInfoCache.requestType RETURN  " +  mi.owner + " ==" + $mme.modelGuid + "  guid: " + mi.guid + "  desc: " + mi.description , Log.WARN );
+//        // This will return models already loaded.
+//        for each ( var mi:ModelInfo in _modelInfo ) {
+//            if ( mi && mi.owner == $mme.modelGuid ) {
+//                //Log.out( "ModelInfoCache.requestType RETURN  " +  mi.owner + " ==" + $mme.modelGuid + "  guid: " + mi.guid + "  desc: " + mi.description , Log.WARN );
+//                ModelInfoEvent.create( ModelBaseEvent.RESULT_RANGE, $mme.series, mi.guid, mi );
+//            }
+//            else {
+//                if ( !mi )
+//                    Log.out("ModelInfoCache.requestType REJECTING null object: ", Log.WARN);
+//                //else
+//                    //Log.out("ModelInfoCache.requestType REJECTING  " + mi.owner + " !=" + $mme.modelGuid + "  guid: " + mi.guid + "  desc: " + mi.description, Log.INFO);
+//            }
+//        }
+
+        var iterator:FilterIterator = new FilterIterator( _modelInfo, filterOwned );
+        var mi:ModelInfo;
+        while (iterator.hasNext()) {
+            mi = iterator.next() as ModelInfo;
+            if ( mi ) {
                 ModelInfoEvent.create( ModelBaseEvent.RESULT_RANGE, $mme.series, mi.guid, mi );
-            }
-            else {
-                if ( !mi )
-                    Log.out("ModelInfoCache.requestType REJECTING null object: ", Log.WARN);
-                //else
-                    //Log.out("ModelInfoCache.requestType REJECTING  " + mi.owner + " !=" + $mme.modelGuid + "  guid: " + mi.guid + "  desc: " + mi.description, Log.INFO);
-            }
+            } else
+                Log.out("ModelInfoCache.requestType REJECTING null object: ", Log.WARN);
+        }
+
+        function filterOwned( item:ModelInfo ): Boolean {
+            return item.owner == $mme.modelGuid;
         }
     }
-	
+
+    static private function getMI( $guid:String ):ModelInfo {
+        return _modelInfo.itemFor($guid) as ModelInfo;
+    }
+
 	static private function request( $mie:ModelInfoEvent ):void {
 		if ( null == $mie || null == $mie.modelGuid ) { // Validator
 			Log.out( "ModelInfoCache.request requested event or guid is NULL: ", Log.ERROR );
 			ModelInfoEvent.create( ModelBaseEvent.EXISTS_ERROR, ( $mie ? $mie.series: -1 ), "MISSING", null );
 		} else {
 			//Log.out( "ModelInfoCache.modelInfoRequest guid: " + $mie.modelGuid, Log.INFO );
-			var mi:ModelInfo = _modelInfo[$mie.modelGuid];
+			var mi:ModelInfo = getMI($mie.modelGuid);
 			if (null == mi) {
 				if (_block.has($mie.modelGuid))
 					return;
@@ -117,10 +138,10 @@ public class ModelInfoCache
 	}
 
 	static private function deleteHandler( $mie:ModelInfoEvent ):void {
-		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
+		var mi:ModelInfo = getMI($mie.modelGuid);
 		if ( null != mi ) {
 			mi.release();
-			_modelInfo[$mie.modelGuid] = null; 
+			_modelInfo.removeKey($mie.modelGuid);
 			// TODO need to clean up eventually
 			mi = null;
 			PersistenceEvent.create( PersistenceEvent.DELETE_REQUEST, $mie.series, ModelInfo.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid, null );
@@ -132,7 +153,7 @@ public class ModelInfoCache
 		// first delete any children
 		// Should always be an entry in the modelInfo table, since a request for it went out first.
 		// And this was called only after the request returned.
-		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
+		var mi:ModelInfo = getMI($mie.modelGuid);
 		if ( mi ) {
 			for each ( var childii:Object in mi.dbo.children ) {
 				if ( childii && childii.modelGuid ) {
@@ -157,12 +178,12 @@ public class ModelInfoCache
 			Log.out("ModelInfoCache.update - event or guid is NULL: ", Log.ERROR);
 			ModelInfoEvent.create(ModelBaseEvent.EXISTS_ERROR, ( $mie ? $mie.series : -1 ), "MISSING", null);
 		} else {
-			var mi:ModelInfo = _modelInfo[$mie.modelGuid];
+			var mi:ModelInfo = getMI($mie.modelGuid);
 			if ( null ==  mi ) {
 				Log.out( "ModelInfoCache.update trying update NULL metadata or guid, adding instead", Log.WARN );
 				add( 0, $mie.modelInfo );
 			} else {
-				_modelInfo[$mie.modelGuid] = $mie.modelInfo;
+                _modelInfo.add($mie.modelGuid, $mie.modelInfo );
 			}
 		}
 	}
@@ -171,18 +192,18 @@ public class ModelInfoCache
 		var guidArray:Array = $ode.modelGuid.split( ":" );
 		var oldGuid:String = guidArray[0];
 		var newGuid:String = guidArray[1];
-		var modelInfoExisting:ModelInfo = _modelInfo[oldGuid];
+		var modelInfoExisting:ModelInfo = getMI(oldGuid);
 		if ( null == modelInfoExisting ) {
 			Log.out( "ModelInfoCache.updateGuid - guid not found: " + oldGuid, Log.ERROR );
 		}
 		else {
-			_modelInfo[oldGuid] = null;
-			_modelInfo[newGuid] = modelInfoExisting;
+            _modelInfo.removeKey( oldGuid );
+            _modelInfo.add( newGuid, modelInfoExisting );
 		}
 	}
 
     static private function reassignToStore( $mie:ModelInfoEvent ):void {
-        var mi:ModelInfo = _modelInfo[$mie.modelGuid];
+        var mi:ModelInfo = getMI($mie.modelGuid);
         if ( mi ) {
             mi.owner = Network.storeId;
             mi.save();
@@ -190,25 +211,42 @@ public class ModelInfoCache
     }
 
     static private function reassignToPublic( $mie:ModelInfoEvent ):void {
-        var mi:ModelInfo = _modelInfo[$mie.modelGuid];
+        var mi:ModelInfo = getMI($mie.modelGuid);
         if ( mi ) {
             mi.owner = Network.PUBLIC;
             mi.save();
         }
     }
 
-    static private function save(e:ModelInfoEvent):void {
-        for each ( var modelInfo:ModelInfo in _modelInfo )
-            if ( modelInfo && modelInfo.changed )
-                modelInfo.save();
+//    static private function save(e:ModelInfoEvent):void {
+//        for each ( var modelInfo:ModelInfo in _modelInfo )
+//            if ( modelInfo && modelInfo.changed )
+//                modelInfo.save();
+//    }
+
+    static private function save( $mie:ModelInfoEvent ):void {
+        var iterator:FilterIterator = new FilterIterator( _modelInfo, filter );
+        var mi:ModelInfo;
+        while (iterator.hasNext()) {
+            mi = iterator.next() as ModelInfo;
+            if ( mi ) {
+                trace("ModelInfo.saving " + mi.guid);
+                mi.save();
+            }
+        }
+
+        function filter( $item :ModelInfo ): Boolean {
+            return $item.changed && !$item.doNotPersist;
+        }
     }
+
 
     static private function checkIfExists( $mie:ModelInfoEvent ):void {
         if ( null == $mie || null == $mie.modelGuid ) { // Validator
             Log.out( "ModelInfoCache.checkIfExists requested event or guid is NULL: ", Log.ERROR );
             ModelInfoEvent.create( ModelBaseEvent.EXISTS_ERROR, ( $mie ? $mie.series: -1 ), "MISSING", null );
         } else {
-            var mi:ModelInfo = _modelInfo[$mie.modelGuid];
+            var mi:ModelInfo = getMI($mie.modelGuid);
             if (null != mi)
                 ModelInfoEvent.create( ModelBaseEvent.EXISTS, $mie.series, $mie.modelGuid, mi);
             else
@@ -225,9 +263,9 @@ public class ModelInfoCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	static private function add( $series:int, $mi:ModelInfo ):void {
 		// check to make sure is not already there
-		if ( null ==  _modelInfo[$mi.guid] ) {
+		if ( null ==  getMI( $mi.guid ) ) {
 			//Log.out( "ModelInfoCache.add modelInfo: " + $mi.toString(), Log.DEBUG );
-			_modelInfo[$mi.guid] = $mi;
+			_modelInfo.add( $mi.guid, $mi );
 			if ( 0 < $series && $series == _currentSeries ) {
                 //Log.out( "ModelInfoCache.add - SERIES FOUND sending RESULT_RANGE", Log.DEBUG );
 				ModelInfoEvent.create(ModelBaseEvent.RESULT_RANGE, $series, $mi.guid, $mi);
@@ -248,7 +286,7 @@ public class ModelInfoCache
 		if ( ModelInfo.BIGDB_TABLE_MODEL_INFO != $pe.table && ModelInfo.MODEL_INFO_EXT != $pe.table )
 			return;
 
-		var mi:ModelInfo = _modelInfo[$pe.guid];
+		var mi:ModelInfo = getMI( $pe.guid );
 		if ( null != mi ) {
             // we already have it, publishing this results in duplicate items being sent to inventory window.
             if ($pe.series == _currentSeries) {
@@ -318,24 +356,41 @@ public class ModelInfoCache
 
     static private var _vectorOfTreeModels:Vector.<ModelInfo> = null;
     static public function getRandomTree():ModelInfo {
-        if ( null == _vectorOfTreeModels )
+        if (null == _vectorOfTreeModels)
             _vectorOfTreeModels = getTrees();
-        if ( 0 == _vectorOfTreeModels.length )
+        if (0 == _vectorOfTreeModels.length)
             return null;
-        var index:int = int( Math.random() ) * _vectorOfTreeModels.length;
+        var index:int = int(Math.random()) * _vectorOfTreeModels.length;
         var mmd:ModelInfo = _vectorOfTreeModels[index];
         return mmd;
 
+//        function getTreesOld():Vector.<ModelInfo> {
+//            var vectorOfTreeModels:Vector.<ModelInfo> = new Vector.<ModelInfo>();
+//            for each(var mmd:ModelInfo in _modelInfo) {
+//                if (mmd && (0 <= mmd.hashTags.indexOf("tree"))) {
+//                    vectorOfTreeModels.push(mmd);
+//                }
+//            }
+//            return vectorOfTreeModels;
+//        }
+
         function getTrees():Vector.<ModelInfo> {
             var vectorOfTreeModels:Vector.<ModelInfo> = new Vector.<ModelInfo>();
-            for each( var mmd:ModelInfo in _modelInfo ){
-                if ( mmd && (0 <= mmd.hashTags.indexOf("tree")) ) {
-                    vectorOfTreeModels.push(mmd);
-                }
+            var iterator:FilterIterator = new FilterIterator(_modelInfo, filterOwned);
+            var mi:ModelInfo;
+            while (iterator.hasNext()) {
+                mi = iterator.next() as ModelInfo;
+                if (mi) {
+                    vectorOfTreeModels.push(mi);
+                } else
+                    Log.out("ModelInfoCache.getRandomTree.getTrees REJECTING null object: ", Log.WARN);
             }
             return vectorOfTreeModels;
+
+            function filterOwned( $item:ModelInfo ):Boolean {
+                return 0 <= $item.hashTags.indexOf("tree");
+            }
         }
     }
-
 }
 }
