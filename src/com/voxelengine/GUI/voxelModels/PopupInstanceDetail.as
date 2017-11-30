@@ -31,8 +31,6 @@ import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
-import org.flashapi.swing.plaf.spas.VVUI;
-
 public class PopupInstanceDetail extends VVPopup {
 
     private static const instance_details:String = "instance_details";
@@ -105,24 +103,22 @@ public class PopupInstanceDetail extends VVPopup {
 
         var lightPanel:VVBox = new VVBox( otherPanel.width, 86 );
         const GRAINS_PER_METER:int = 16;
-		with ( lightPanel ){
-			title = LM( instance_lighting );
-			padding = 5;
-            layout.orientation = LayoutOrientation.VERTICAL;
 
-            var lb:Label = new Label( "0 is full bright, 255 is black", lightPanel.width );
-            addElement( lb );
+		lightPanel.title = LM( instance_lighting );
+		lightPanel.padding = 5;
+		lightPanel.layout.orientation = LayoutOrientation.VERTICAL;
 
-            var lightLevel:VVTextInput = new VVTextInput( String( _vm.instanceInfo.baseLightLevel ), 30 );
-            eventCollector.addEvent( lightLevel, TextEvent.EDITED, function ($e:TextEvent):void { _baseLightLevel = Math.max( Math.min( uint( $e.target.text ), 255 ), 0 ) } );
-            addElement( lightLevel );
+		var lb:Label = new Label( "0 is full bright, 255 is black", lightPanel.width );
+		lightPanel.addElement( lb );
 
-            var applyLight:Button = new Button( "Apply Light", lightPanel.width - 12 );
-            applyLight.addEventListener(UIMouseEvent.CLICK, changeBaseLightLevel );
-            addElement( applyLight );
+		var lightLevel:VVTextInput = new VVTextInput( String( _vm.instanceInfo.baseLightLevel ), 30 );
+		eventCollector.addEvent( lightLevel, TextEvent.EDITED, function ($e:TextEvent):void { _baseLightLevel = Math.max( Math.min( uint( $e.target.text ), 255 ), 0 ) } );
+		lightPanel.addElement( lightLevel );
 
+		var applyLight:Button = new Button( "Apply Light", lightPanel.width - 12 );
+		applyLight.addEventListener(UIMouseEvent.CLICK, changeBaseLightLevel );
+		lightPanel.addElement( applyLight );
 
-		}
         otherPanel.addElement( lightPanel );
 
         if ( $vm.modelInfo.oxelPersistence && $vm.modelInfo.oxelPersistence.oxelCount )
