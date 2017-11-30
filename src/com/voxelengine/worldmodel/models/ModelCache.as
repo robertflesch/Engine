@@ -180,7 +180,7 @@ public class ModelCache
 				if ( null == _instanceByGuid[vm.instanceInfo.instanceGuid] ) {
 					_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;
 					_instances.push(vm);
-                    ModelEvent.create( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.instanceGuid );
+                    ModelEvent.create( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.instanceGuid, vm.instanceInfo.positionGet, vm.instanceInfo.rotationGet, null, vm );
 				}
 				else
 					Log.out( "ModelCache.add - Trying to add the same MODEL AND INSTANCE for a second time", Log.ERROR );

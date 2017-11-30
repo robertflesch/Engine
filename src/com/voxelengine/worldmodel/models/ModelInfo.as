@@ -124,8 +124,10 @@ public class ModelInfo extends PersistenceObject
 
 	private var 		_oxelPersistence:OxelPersistence;
 	public function get oxelPersistence():OxelPersistence  	{ return _oxelPersistence; }
-	public function set oxelPersistence($oxel:OxelPersistence ):void { _oxelPersistence = $oxel; }
-
+	public function set oxelPersistence( $op:OxelPersistence ):void {
+		_oxelPersistence = $op;
+        bound = $op.bound;
+	}
 
     private var			_owningModel:VoxelModel;
 	public function get owningModel():VoxelModel 			{ return _owningModel; }

@@ -72,8 +72,10 @@ public class PanelModelsListFromRegion extends PanelBase
 
     static private function checkLastSelectedForModelDeletion( $mie:ModelInfoEvent ):void {
         var vm:VoxelModel = getLastSelectedModel();
-		if ( vm && vm.modelInfo && ( vm.modelInfo.guid  == $mie.modelGuid ) )
-			setLastSelectedModel( null );
+		if ( vm )
+			if ( vm.instanceInfo )
+				if ( vm.instanceInfo.modelGuid  == $mie.modelGuid )
+					setLastSelectedModel( null );
 	}
 
 	public function PanelModelsListFromRegion($parent:ContainerModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number, $level:int )	{

@@ -38,7 +38,7 @@ public class ModelEvent extends Event {
 	public function get instanceGuid():String { return _instanceGuid; }
 	public function get vm():VoxelModel { return _vm }
 	
-	public function ModelEvent( $type:String, $instanceGuid:String, $position:Vector3D = null, $rotation:Vector3D = null, $parentInstanceGuid:String = "", $vm:VoxelModel = null, $bubbles:Boolean = true, $cancellable:Boolean = false ) {
+	public function ModelEvent( $type:String, $instanceGuid:String, $position:Vector3D = null, $rotation:Vector3D = null, $parentInstanceGuid:String = null, $vm:VoxelModel = null, $bubbles:Boolean = true, $cancellable:Boolean = false ) {
 		super( $type, $bubbles, $cancellable );
 		_instanceGuid = $instanceGuid;
 		_rotation = $rotation;

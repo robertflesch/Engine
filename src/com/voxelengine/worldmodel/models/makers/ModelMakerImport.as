@@ -6,6 +6,10 @@
    Unauthorized reproduction, translation, or display is prohibited.
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers {
+import com.voxelengine.events.ModelLoadingEvent;
+import com.voxelengine.events.RegionEvent;
+import com.voxelengine.worldmodel.Region;
+
 import flash.display.BitmapData;
 import flash.geom.Matrix;
 
@@ -131,6 +135,37 @@ public class ModelMakerImport extends ModelMakerBase {
 		}
 	}
 
+	// Need to override the base method since we need to assign the new model guid at this point.
+    override protected function oxelPersistenceComplete($ode:OxelDataEvent):void {
+        if ($ode.modelGuid == modelInfo.guid) {
+            removeODEListeners();
+			// do this before assigning new guids so that the OP guid gets updated
+            modelInfo.oxelPersistence = $ode.oxelPersistence;
+            if (!Globals.isGuid(modelInfo.guid)) {
+                var newGuid:String = Globals.getUID();
+                Log.out("ModelMakerImport.oxelPersistenceComplete setting guids to " + newGuid);
+
+                modelInfo.guid = newGuid;
+                ii.modelGuid = newGuid;
+            }
+			// can NOT call the super on this since the guid changed!
+			//super.oxelPersistenceComplete( $ode );
+
+            //Log.out( "ModelMakerBase.oxelPersistenceComplete MINE    guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid + " type: " + $ode.type , Log.WARN );
+
+            // This is before quads have been built
+            if ( ii.baseLightLevel )
+                modelInfo.oxelPersistence.baseLightLevel( ii.baseLightLevel, false );
+            // This puts the object into the model cache which will then add the rendering tasks needed.
+            _vm.calculateCenter();
+            _vm.complete = true;
+            if ( addToRegionWhenComplete )
+                RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vm );
+            markComplete( true );
+        }
+    }
+
+
 	private var waitForChildren:Boolean;
 	private function completeMake():void {
 		//Log.out("ModelMakerImport.completeMake: " + ii.toString());
@@ -166,7 +201,6 @@ public class ModelMakerImport extends ModelMakerBase {
                 markComplete( true );
             }
 		}
-
 	}
 
 	override protected function oxelBuildComplete($ode:OxelDataEvent):void {
@@ -211,29 +245,9 @@ public class ModelMakerImport extends ModelMakerBase {
 	}
 
 	private function importComplete():void {
-		if ( !Globals.isGuid( modelInfo.guid ) ) {
-			var newGuid:String = Globals.getUID();
-			Log.out( "ModelMakerImport.markComplete setting guids to " + newGuid );
-
-			modelInfo.guid 		= newGuid;
-			ii.modelGuid 		= newGuid;
-		}
-
 		modelInfo.brandChildren();
 
-        placeModelIfPositionZero()
-//		if ( !ii.controllingModel && modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount )
-//			placeCompletedModel();
-//		else {
-//            var hasControllingModel:Boolean = ( null != ii.controllingModel );
-//            var hasOxelPersistence:Boolean = ( null != modelInfo.oxelPersistence );
-//            var oxelCount:int =  modelInfo.oxelPersistence.oxelCount;
-//            Log.out("ModelMakerImport - placing model at default location because "
-//					+ " hasControllingModel: " + hasControllingModel
-//					+ " hasOxelPersistence: " + hasOxelPersistence
-//                    + " oxelCount: " + oxelCount, Log.WARN);
-//        }
-
+        placeModelIfPositionZero();
 		// This works for simple models, but not for deep hierarchies
 		var bmpd:BitmapData = Renderer.renderer.modelShot( _vm );
 		_vm.modelInfo.thumbnail = drawScaled( bmpd, 128, 128 );

@@ -6,10 +6,9 @@ authorship protected under United States Copyright Act.
 Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
+
 import flash.display.DisplayObject;
 import flash.events.Event;
-import flash.geom.Matrix3D;
-import flash.geom.Vector3D;
 import flash.net.FileReference;
 import flash.net.FileFilter;
 
@@ -39,14 +38,16 @@ import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.worldmodel.models.ModelCacheUtils;
+import com.voxelengine.events.ModelEvent;
+
+import com.voxelengine.server.Network;
+
+import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.Role;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 import com.voxelengine.worldmodel.models.types.Player;
-import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.inventory.FunctionRegistry;
 import com.voxelengine.worldmodel.inventory.ObjectAction;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
@@ -98,6 +99,8 @@ public class InventoryPanelModel extends VVContainer
         ModelInfoEvent.addListener( ModelBaseEvent.RESULT_RANGE, resultRangeModelInfoEvent );
         ModelInfoEvent.addListener( ModelInfoEvent.REASSIGN_PUBLIC, reassignPublicModelInfoEvent );
 
+		ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelAdded );
+
 		upperTabsAdd();
 		addItemContainer();
 		var role:Role = Player.player.role;
@@ -126,7 +129,11 @@ public class InventoryPanelModel extends VVContainer
 			//Log.out( "InventoryPanelModel.dndTest msg: " + e );
 		//}		
 	}
-	
+
+    private function onParentModelAdded( $me:ModelEvent):void {
+        addModel( $me.vm.modelInfo );
+    }
+
 	private function upperTabsAdd():void {
 		_barLeft = new TabBar();
 		_barLeft.orientation = ButtonBarOrientation.VERTICAL;
@@ -214,7 +221,7 @@ public class InventoryPanelModel extends VVContainer
     private function resultRangeModelInfoEvent( $mie:ModelInfoEvent ):void {
         //trace( "IPM.resultRangeModelInfoEvent series: " + currentSeries + "  $mie.series: " + $mie.series );
 		if ( $mie.series == currentSeries )
-        	addModel( $mie );
+        	addModel( $mie.modelInfo );
 		else
         	Log.out( "IPM.resultRangeModelInfoEvent $mie.series: (" + $mie.series + ") != _seriesModelMetadataEvent (" + currentSeries + ")" );
     }
@@ -227,15 +234,15 @@ public class InventoryPanelModel extends VVContainer
             box.updateModelInfo( $mie.modelInfo, true );
 	}
 
-    private function addModel( $mie:ModelInfoEvent ):void {
-        var om:ObjectModel = new ObjectModel(null, $mie.modelGuid);
+    private function addModel( $mi:ModelInfo ):void {
+        var om:ObjectModel = new ObjectModel(null, $mi.guid);
         //Log.out( "IPM.addModel guid: " + $mie.modelInfo.guid + "  " + $mie.modelInfo.name + "  hasTags: " + $mie.modelInfo.hashTags + "  found? " + $mie.modelInfo.hashTags.indexOf(cat));
-        om.modelInfo = $mie.modelInfo;
+        om.modelInfo = $mi;
         var cat:String = _category.toLowerCase();
         //Log.out( "IPM.addModel cat: " + cat + "  hasTags: " + $mie.modelInfo.hashTags + "  found? " + $mie.modelInfo.hashTags.indexOf(cat));
         if ( "all" == cat )
             qualifyAndPlaceModel(om);
-        else if ( 0 <= $mie.modelInfo.hashTags.indexOf(cat))
+        else if ( 0 <= $mi.hashTags.indexOf(cat))
             qualifyAndPlaceModel(om);
     }
 

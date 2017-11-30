@@ -7,6 +7,9 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
+import flash.geom.Matrix3D;
+import flash.geom.Vector3D;
+
 import com.voxelengine.Log
 import com.voxelengine.Globals
 import com.voxelengine.events.ModelBaseEvent
@@ -21,9 +24,6 @@ import com.voxelengine.worldmodel.models.*
 import com.voxelengine.worldmodel.models.types.VoxelModel
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 
-import flash.geom.Matrix3D;
-
-import flash.geom.Vector3D;
 
 /**
 	 * ...
@@ -43,7 +43,22 @@ public class ModelMakerBase {
 	static private var _s_importing:Boolean = false;
     static public function get isImporting():Boolean { return _s_importing;}
 
-    static private var _makerCount:int;
+    static private var _s_makerCount:int;
+    public function makerCountGet():int { return _s_makerCount }
+    public function makerCountIncrement():void {
+        _s_makerCount++;
+        if ( 0 == makerCountGet() ) {
+            LoadingImageEvent.create(LoadingImageEvent.CREATE);
+        }
+    }
+    public function makerCountDecrement():void {
+        _s_makerCount-- ;
+        if ( 0 == makerCountGet() ) {
+            LoadingImageEvent.create( LoadingImageEvent.DESTROY );
+            if ( !Region.currentRegion.loaded )
+                RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
+        }
+    }
 
     protected 		var _buildState:String = MAKING;
 
@@ -185,7 +200,7 @@ public class ModelMakerBase {
 			_vm.calculateCenter();
 			_vm.modelInfo.bound = $ode.oxelPersistence.bound;
 			_vm.complete = true;
-			if ( _vm && addToRegionWhenComplete )
+			if ( addToRegionWhenComplete )
 				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vm );
 			markComplete( true );
 		} //else {
@@ -245,49 +260,49 @@ public class ModelMakerBase {
         }
 	}
 
-    protected function placeCompletedModel():void {
-        // Only do this for top level models, so no controllingModel, need controlledModel to get current world position.
-        //if ( !ii.controllingModel && VoxelModel.controlledModel && modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount)
-        if ( !ii.controllingModel && VoxelModel.controlledModel )
-            placeModel();
-        else {
-            var hasControlledModel:Boolean = ( null != VoxelModel.controlledModel );
-            var hasControllingModel:Boolean = ( null != ii.controllingModel );
-            var hasOxelPersistence:Boolean = ( null != modelInfo.oxelPersistence );
-            var oxelCount:int = modelInfo.oxelPersistence.oxelCount;
-            Log.out("ModelMakerBase.placeCompletedModel - placing model at default location because "
-                    + "\n hasControlledModel: " + hasControlledModel
-                    + "\n hasControllingModel: " + hasControllingModel
-                    + "\n hasOxelPersistence: " + hasOxelPersistence
-                    + "\n oxelCount: " + oxelCount, Log.WARN);
-        }
-    }
-
-	private function placeModel():void {
-        var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.grainSize), 16) / 2;
-		if ( modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount ) {
-            var radius1:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 16) / 2;
-            Log.out("ModelMakerBase.placeCompletedModel - radius: " + radius + "  radius1: " + radius1, Log.WARN);
-        } else
-            Log.out("ModelMakerBase.placeCompletedModel - radius: " + radius + "  radius1: NO OxelPersistence to use for radius1", Log.WARN);
-
-        // this gives me corner.
-        const cm:VoxelModel = VoxelModel.controlledModel;
-		var msCamPos:Vector3D = cm.cameraContainer.current.position;
-		var adjCameraPos:Vector3D = cm.modelToWorld(msCamPos);
-
-		var lav:Vector3D = cm.instanceInfo.invModelMatrix.deltaTransformVector(new Vector3D(-(radius + 8), adjCameraPos.y - radius, -radius * 3));
-		var diffPos:Vector3D = cm.wsPositionGet();
-		diffPos = diffPos.add(lav);
-		_vm.instanceInfo.positionSet = diffPos;
-		Log.out ( "ModelMaker.placeModel - placing model at location: " + _vm.instanceInfo.positionGet, Log.WARN );
-        Log.out("ModelMakerBase.placeCompletedModel - placing model at default location because "
-                + "\n msCamPos: " + msCamPos
-                + "\n adjCameraPos: " + adjCameraPos
-                + "\n lav: " + lav
-                + "\n diffPos: " + diffPos, Log.WARN);
-
-    }
+//    protected function placeCompletedModel():void {
+//        // Only do this for top level models, so no controllingModel, need controlledModel to get current world position.
+//        //if ( !ii.controllingModel && VoxelModel.controlledModel && modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount)
+//        if ( !ii.controllingModel && VoxelModel.controlledModel )
+//            placeModel();
+//        else {
+//            var hasControlledModel:Boolean = ( null != VoxelModel.controlledModel );
+//            var hasControllingModel:Boolean = ( null != ii.controllingModel );
+//            var hasOxelPersistence:Boolean = ( null != modelInfo.oxelPersistence );
+//            var oxelCount:int = modelInfo.oxelPersistence.oxelCount;
+//            Log.out("ModelMakerBase.placeCompletedModel - placing model at default location because "
+//                    + "\n hasControlledModel: " + hasControlledModel
+//                    + "\n hasControllingModel: " + hasControllingModel
+//                    + "\n hasOxelPersistence: " + hasOxelPersistence
+//                    + "\n oxelCount: " + oxelCount, Log.WARN);
+//        }
+//    }
+//
+//	private function placeModel():void {
+//        var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.grainSize), 16) / 2;
+//		if ( modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount ) {
+//            var radius1:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 16) / 2;
+//            Log.out("ModelMakerBase.placeCompletedModel - radius: " + radius + "  radius1: " + radius1, Log.WARN);
+//        } else
+//            Log.out("ModelMakerBase.placeCompletedModel - radius: " + radius + "  radius1: NO OxelPersistence to use for radius1", Log.WARN);
+//
+//        // this gives me corner.
+//        const cm:VoxelModel = VoxelModel.controlledModel;
+//		var msCamPos:Vector3D = cm.cameraContainer.current.position;
+//		var adjCameraPos:Vector3D = cm.modelToWorld(msCamPos);
+//
+//		var lav:Vector3D = cm.instanceInfo.invModelMatrix.deltaTransformVector(new Vector3D(-(radius + 8), adjCameraPos.y - radius, -radius * 3));
+//		var diffPos:Vector3D = cm.wsPositionGet();
+//		diffPos = diffPos.add(lav);
+//		_vm.instanceInfo.positionSet = diffPos;
+//		Log.out ( "ModelMaker.placeModel - placing model at location: " + _vm.instanceInfo.positionGet, Log.WARN );
+//        Log.out("ModelMakerBase.placeCompletedModel - placing model at default location because "
+//                + "\n msCamPos: " + msCamPos
+//                + "\n adjCameraPos: " + adjCameraPos
+//                + "\n lav: " + lav
+//                + "\n diffPos: " + diffPos, Log.WARN);
+//
+//    }
 
 	protected function markComplete( $success:Boolean ):void {
 		//Log.out("ModelMakerBase.markComplete - instanceGuid: " + ii.instanceGuid + "  model guid: " + modelInfo.guid + "  success: " + $success, Log.WARN);
@@ -295,6 +310,9 @@ public class ModelMakerBase {
 		if ( $success ) {
 			ohd.fromModel( _vm );
 			ModelLoadingEvent.create( ModelLoadingEvent.MODEL_LOAD_COMPLETE, ohd, _vm );
+            if ( _buildState == IMPORTING ) {
+                ModelLoadingEvent.create( ModelBaseEvent.IMPORT_COMPLETE, ohd, _vm );
+			}
 		}
 		else {
 			ohd.fromGuids( _ii.modelGuid, _parentModelGuid );
@@ -306,21 +324,6 @@ public class ModelMakerBase {
 		_vm = null;
 	}
 
-	public function makerCountGet():int { return _makerCount }
-    public function makerCountIncrement():void {
-        _makerCount++;
-        if ( 0 == makerCountGet() ) {
-            LoadingImageEvent.create(LoadingImageEvent.CREATE);
-        }
-    }
-    public function makerCountDecrement():void {
-        _makerCount-- ;
-        if ( 0 == makerCountGet() ) {
-            LoadingImageEvent.create( LoadingImageEvent.DESTROY );
-            if ( !Region.currentRegion.loaded )
-                RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
-        }
-    }
 //	public function makerCountIncrement():void {
 //		if ( 0 == makerCountGet() && !( _vm is Avatar ) )
 //			LoadingImageEvent.create( LoadingImageEvent.CREATE );
