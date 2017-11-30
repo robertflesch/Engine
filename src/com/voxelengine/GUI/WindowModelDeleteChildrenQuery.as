@@ -18,16 +18,14 @@ import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.models.makers.ModelDestroyer;
 import com.voxelengine.worldmodel.models.ModelInfo;
 
-
-public class WindowModelDeleteChildrenQuery extends VVPopup
-{
+public class WindowModelDeleteChildrenQuery extends VVPopup {
 	private var _cb:CheckBox;
 	private var _modelGuid:String;
 	private var _removeModelFunction:Function;
     private var _modelInfo:ModelInfo;
 	
-	public function WindowModelDeleteChildrenQuery( $modelGuid:String, $removeModelFunction:Function ) {
-		super( LanguageManager.localizedStringGet( "ModelDelete" ) );
+	public function WindowModelDeleteChildrenQuery( $modelGuid:String, $removeModelFunction:Function, $modelName:String ) {
+		super( LanguageManager.localizedStringGet( LD.item_delete ) + " - " + $modelName );
 		_modelGuid = $modelGuid;
 		_removeModelFunction = $removeModelFunction;
 
@@ -60,7 +58,6 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
             }
         }
     }
-
 
 	private function deleteChildrenQuery():void {
         addElement( new Spacer( width, 20 ) );
@@ -107,5 +104,12 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 		new ModelDestroyer( _modelGuid, recursiveDelete );
 		remove();
 	}
+
+    override public function remove():void {
+        _cb = null;
+        _removeModelFunction = null;
+        _modelInfo = null;
+        super.remove();
+    }
 }
 }
