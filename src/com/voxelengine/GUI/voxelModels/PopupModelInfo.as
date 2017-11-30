@@ -40,24 +40,18 @@ public class PopupModelInfo extends VVPopup
     private var _mi:ModelInfo = null;
 
     private static const item_info:String = "item_info";
-    private static const item_name:String = "item_name";
     private static const unnamed_item:String = "unnamed_item";
-    private static const description:String = "description";
     private static const no_description:String = "no_description";
     private static const hashtags:String = "hashtags";
     private static const item_guid:String = "item_guid";
     private static const grain_size:String = "grain_size";
     private static const item_class:String = "item_class";
-    private static const grain:String = "grain";
-    private static const meters:String = "meters";
-    private static const permissions:String = "permissions";
-    private static const advanced:String = "advanced";
     private static const take_new_picture:String = "take_new_picture";
-    private var LM:Function = LanguageManager.localizedStringGet;
+    private static var LM:Function = LanguageManager.localizedStringGet;
 
     public function PopupModelInfo($mi:ModelInfo )
     {
-        super( LanguageManager.localizedStringGet( item_info ) );
+        super( LM( item_info ) );
         autoSize = false;
         autoHeight = true;
         width = WIDTH + 10;
@@ -84,12 +78,12 @@ public class PopupModelInfo extends VVPopup
     private function addMetadata():void {
         //addElement( new ComponentSpacer( WIDTH, 25 ) );
 
-        addElement( new ComponentTextInput( LM( item_name )
+        addElement( new ComponentTextInput( LM( LD.item_name )
                 , function ($e:TextEvent):void { _mi.name = $e.target.text; setChanged(); }
                 , _mi.name ? _mi.name : unnamed_item
                 , WIDTH ) );
 
-        addElement( new ComponentTextArea( LM( description ) + ' '
+        addElement( new ComponentTextArea( LM( LD.description ) + ' '
                 , function ($e:TextEvent):void { _mi.description = $e.target.text; setChanged(); }
                 , _mi.description ? _mi.description : LM( no_description )
                 , WIDTH ) );
@@ -108,7 +102,7 @@ public class PopupModelInfo extends VVPopup
         if ( Globals.isDebug )
             addElement( new ComponentLabel(  LM(item_guid),  _mi.guid, WIDTH ) );
         var panel:Container = new Container(width, 30);
-        panel.addElement( new ComponentLabel( LM(grain_size),  LM(grain) +': ' + String(_mi.grainSize) + " - " + Math.pow( 2, _mi.grainSize )/32 + ' ' +  LM(meters), (WIDTH/2-2) ) );
+        panel.addElement( new ComponentLabel( LM(grain_size),  LM( LD.grain) +': ' + String(_mi.grainSize) + " - " + Math.pow( 2, _mi.grainSize )/32 + ' ' +  LM(LD.meters), (WIDTH/2-2) ) );
         panel.addElement( new ComponentLabel( LM(item_class),  _mi.modelClass, (WIDTH/2-2) ) );
         addElement( panel );
         addAdvanced();
@@ -128,7 +122,7 @@ public class PopupModelInfo extends VVPopup
     private function addPermissions():void {
         var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
         ebco.rootObject = _mi.permissions;
-        ebco.title = ' ' + LM(permissions) + ' ';
+        ebco.title = ' ' + LM( LD.permissions ) + ' ';
         ebco.paddingTop = 7;
         ebco.width = WIDTH;
         addElement( new PanelPermissionModel( null, ebco ) );
@@ -137,7 +131,7 @@ public class PopupModelInfo extends VVPopup
     private function addAdvanced():void {
         var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
         ebco.rootObject = _mi;
-        ebco.title = ' ' + LM(advanced) + ' ';
+        ebco.title = ' ' + LM( LD.advanced ) + ' ';
         ebco.paddingTop = 7;
         ebco.width = WIDTH;
         addElement( new PanelAdvancedModel( null, ebco ) );

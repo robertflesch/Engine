@@ -516,7 +516,7 @@ public class ModelInfo extends PersistenceObject
 		if ( $me.vm && $me.vm.instanceInfo.controllingModel && $me.vm.instanceInfo.controllingModel.modelInfo.guid == guid ) {
 			countOfChildrenToBeLoaded = countOfChildrenToBeLoaded - 1;
             childCount = childCount + 1;
-			Log.out( "ModelInfo.onChildAdded - MY CHILD - parent guid: " + guid + "  childGuid: " + $me.vm.modelInfo.guid + "  children remaining: " + _countOfChildrenToBeLoaded, Log.WARN );
+			//Log.out( "ModelInfo.onChildAdded - MY CHILD - parent guid: " + guid + "  childGuid: " + $me.vm.modelInfo.guid + "  children remaining: " + _countOfChildrenToBeLoaded, Log.WARN );
             checkChildLoadingCountForZero( $me.vm, $me.vm.modelInfo.guid );
 		}
 		//else {

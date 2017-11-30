@@ -54,7 +54,7 @@ package com.voxelengine.GUI.panels
 		// Override if additional clean up is needed
         override public function remove():void {
 			super.remove();
-			Log.out( "PanelBase.close for: " + this, Log.WARN );
+			//Log.out( "PanelBase.close for: " + this, Log.WARN );
 		}
 	}
 }

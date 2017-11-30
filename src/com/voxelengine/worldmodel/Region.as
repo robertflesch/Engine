@@ -262,7 +262,7 @@ public class Region extends PersistenceObject {
 		// The null owningModel check makes it to we dont save local loaded regions to persistence
 		if ( null != owner && Globals.isGuid( guid ) ) {
 			if (changed) {
-				Log.out( "RegionManager.save saving region name: " + name, Log.WARN );
+				//Log.out( "RegionManager.save saving region name: " + name, Log.WARN );
 				return super.save( $validateGuid );
 			}
 		}
