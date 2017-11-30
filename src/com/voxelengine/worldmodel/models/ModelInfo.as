@@ -52,8 +52,8 @@ public class ModelInfo extends PersistenceObject
     static public const MODEL_INFO_EXT:String = ".mjson";
     static public const BIGDB_TABLE_MODEL_INFO:String = "modelInfo";
     static public const BIGDB_TABLE_MODEL_INFO_INDEX_OWNER:String = "owner";
-    static public const BIGDB_TABLE_MODEL_INFO_INDEX_CREATOR:String = "creator";
-	private const DEFAULT_BOUND:int                       = 10;
+    //static public const BIGDB_TABLE_MODEL_INFO_INDEX_CREATOR:String = "creator";
+    static private const DEFAULT_BOUND:int                   = 10;
 
     public function get name():String  						{ return dbo.name; }
     public function set name($val:String):void  			{ dbo.name = $val; changed = true; }
@@ -126,7 +126,8 @@ public class ModelInfo extends PersistenceObject
 	public function get oxelPersistence():OxelPersistence  	{ return _oxelPersistence; }
 	public function set oxelPersistence( $op:OxelPersistence ):void {
 		_oxelPersistence = $op;
-        bound = $op.bound;
+		if ( $op )
+        	bound = $op.bound;
 	}
 
     private var			_owningModel:VoxelModel;
@@ -306,19 +307,6 @@ public class ModelInfo extends PersistenceObject
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// start oxelPersistence (oxel) operations
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public function loadFromBiomeData():void {
-		var layer1:LayerInfo = biomes.layers[0];
-		if ( "LoadModelFromIVM" == layer1.functionName ) {
-			guid = layer1.data;
-			//Log.out( "ModelInfo.loadFromBiomeData - trying to load from local file with alternate name - altGuid: " + _altGuid, Log.DEBUG );
-			OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, guid, null, ModelBaseEvent.USE_FILE_SYSTEM );
-		}
-		else {
-			//Log.out( "ModelInfo.loadFromBiomeData - building bio from layer oxelPersistence", Log.DEBUG );
-			biomes.addToTaskControllerUsingNewStyle( guid );
-		}
-	}
 
 	public function boimeHas():Boolean {
 		return  ( _biomes && _biomes.layers && 0 < _biomes.layers.length );
@@ -694,7 +682,7 @@ public class ModelInfo extends PersistenceObject
 		return null
 	}
 
-	public function childModelFind(guid:String, $recursive:Boolean = true ):VoxelModel	{
+	public function childModelFind(guid:String ):VoxelModel	{
 		for each (var child:VoxelModel in childVoxelModels) {
 			if (child.instanceInfo.instanceGuid == guid)
 				return child;

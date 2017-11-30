@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.ModelBaseEvent;
+
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.utils.Dictionary;
@@ -45,11 +47,10 @@ public class ModelCache
 	public function get modelsDynamic():Vector.<VoxelModel> { return _instancesDynamic; }
 	
 	public function ModelCache() {
-        ModelInfoEvent.addListener( ModelInfoEvent.REASSIGN_PUBLIC, reassignPublicModelInfoEvent );
+        ModelInfoEvent.addListener( ModelBaseEvent.DELETE, modelDeletedGlobally );
 	}
 
-
-    private function reassignPublicModelInfoEvent($mie:ModelInfoEvent):void {
+    private function modelDeletedGlobally( $mie:ModelInfoEvent ): void {
         for ( var i:int = 0; i < _instances.length; i++ ) {
             var vm:VoxelModel = _instances[i];
             if ( vm )
@@ -57,6 +58,15 @@ public class ModelCache
                     vm.dead = true;
         }
     }
+
+//    private function reassignPublicModelInfoEvent($mie:ModelInfoEvent):void {
+//        for ( var i:int = 0; i < _instances.length; i++ ) {
+//            var vm:VoxelModel = _instances[i];
+//            if ( vm )
+//                if ( $mie.modelGuid == vm.modelInfo.guid )
+//                    vm.dead = true;
+//        }
+//    }
 
 	public function requestModelInfoByModelGuid( $modelGuid:String ):ModelInfo {
 		for ( var i:int = 0; i < _instances.length; i++ ) {
@@ -128,7 +138,7 @@ public class ModelCache
 			vm.dead = true;
 		}
 
-        ModelInfoEvent.removeListener( ModelInfoEvent.REASSIGN_PUBLIC, 	reassignPublicModelInfoEvent );
+        ModelInfoEvent.removeListener( ModelBaseEvent.DELETE, modelDeletedGlobally );
 	}
 
 	public function add( vm:VoxelModel ):void {

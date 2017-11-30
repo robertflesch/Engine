@@ -44,14 +44,14 @@ public class ModelMakerBase {
     static public function get isImporting():Boolean { return _s_importing;}
 
     static private var _s_makerCount:int;
-    public function makerCountGet():int { return _s_makerCount }
-    public function makerCountIncrement():void {
+    static public function makerCountGet():int { return _s_makerCount }
+    static public function makerCountIncrement():void {
         _s_makerCount++;
         if ( 0 == makerCountGet() ) {
             LoadingImageEvent.create(LoadingImageEvent.CREATE);
         }
     }
-    public function makerCountDecrement():void {
+    static public function makerCountDecrement():void {
         _s_makerCount-- ;
         if ( 0 == makerCountGet() ) {
             LoadingImageEvent.create( LoadingImageEvent.DESTROY );
@@ -243,21 +243,23 @@ public class ModelMakerBase {
             cameraMatrix.prependRotation(-cmRotation.x, Vector3D.X_AXIS);
 
             var endPoint:Vector3D = ModelCacheUtils.viewVector(ModelCacheUtils.FRONT);
-            endPoint.scaleBy(size * 1.5);
+            endPoint.scaleBy(size * 1.1);
             var viewVector:Vector3D = cameraMatrix.deltaTransformVector(endPoint);
             viewVector = viewVector.add(cm.instanceInfo.positionGet);
             viewVector.setTo(viewVector.x - size / 2, viewVector.y - size / 2, viewVector.z - size / 2);
             ii.positionSet = viewVector;
-            Log.out( "ModelMakerBase.placeModelIfNotZero would set position to: " + viewVector );
+//            Log.out( "ModelMakerBase.placeModelIfNotZero sets position to: " + viewVector );
 
-        } else {
-            var hasControlledModel:Boolean = ( null != VoxelModel.controlledModel );
-            var hasControllingModel:Boolean = ( null == ii.controllingModel );
-            Log.out("ModelMakerBase.placeCompletedModel - placing model at default location because "
-                    + "\n hasControlledModel: " + hasControlledModel
-                    + "\n hasControllingModel: " + hasControllingModel
-                    + "\n ii.positionGet: " + ii.positionGet, Log.WARN);
         }
+//		else
+//		{
+//            var hasControlledModel:Boolean = ( null != VoxelModel.controlledModel );
+//            var hasControllingModel:Boolean = ( null == ii.controllingModel );
+//            Log.out("ModelMakerBase.placeCompletedModel - placing model at default location because "
+//                    + "\n hasControlledModel: " + hasControlledModel
+//                    + "\n hasControllingModel: " + hasControllingModel
+//                    + "\n ii.positionGet: " + ii.positionGet, Log.WARN);
+//        }
 	}
 
 //    protected function placeCompletedModel():void {

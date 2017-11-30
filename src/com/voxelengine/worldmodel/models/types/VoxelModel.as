@@ -62,7 +62,8 @@ public class VoxelModel {
 	private static var _s_controlledModel:VoxelModel = null;
 	public static function get controlledModel():VoxelModel { return _s_controlledModel; }
 	public static function set controlledModel( val:VoxelModel ):void { _s_controlledModel = val; }
-	
+
+    private static var _s_selectedModelInitialized:Boolean;
 	private static var _s_selectedModel:VoxelModel = null;
 	public static function get selectedModel():VoxelModel { return _s_selectedModel; }
 	//public static function set selectedModel( $val:VoxelModel ):void { _s_selectedModel = $val; }
@@ -70,7 +71,7 @@ public class VoxelModel {
 		if ( _s_selectedModel == $val )
 			return;
 		//Log.out( "VoxelModel.selectedModel: " + ( $val ? $val.toString() : "null") , Log.DEBUG );
-		// unselect the old model
+		// un-select the old model
 		if ( _s_selectedModel ) {
 			_s_selectedModel.selected = false;
             _s_selectedModel.save();
@@ -86,6 +87,15 @@ public class VoxelModel {
 		}
 
 	}
+
+    static private function checkLastSelectedForModelDeletion( $mie:ModelInfoEvent ):void {
+        var vm:VoxelModel = selectedModel;
+        if ( vm )
+            if ( vm.instanceInfo )
+                if ( vm.instanceInfo.modelGuid  == $mie.modelGuid )
+                    selectedModel = null;
+    }
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	// This is a reference to the data which is store in the modelInfoCache
@@ -143,6 +153,11 @@ public class VoxelModel {
 		_instanceInfo = $ii;
 		_instanceInfo.owner = this; // This tells the instanceInfo that this voxel model is its owningModel.
 		_cameraContainer = new CameraContainer( this );
+        if ( false == _s_selectedModelInitialized ) {
+            _s_selectedModelInitialized = true;
+            ModelInfoEvent.addListener(ModelBaseEvent.DELETE, checkLastSelectedForModelDeletion );
+        }
+
 	}
 	
 	public function init( $mi:ModelInfo, $buildState:String = ModelMakerBase.MAKING ):void {

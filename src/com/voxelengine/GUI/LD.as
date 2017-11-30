@@ -13,6 +13,7 @@ public class LD {
     public static const item_name:String            = "item_name";
     public static const item_no_name:String         = "item_no_name";
     public static const item_guid:String            = "item_guid";
+    public static const item_delete:String          = "item_delete";
     public static const parent_item_guid:String     = "parent_item_guid";
 
     public static const description:String          = "description";

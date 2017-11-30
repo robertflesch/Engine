@@ -230,7 +230,6 @@ public class ModelMakerImport extends ModelMakerBase {
 		if ( true == $success ) {
 			if ( !waitForChildren )
 				importComplete();
-
 		} else {
 			if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" )
 				Log.out( "ModelMakerImport.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.ERROR );
@@ -248,29 +247,32 @@ public class ModelMakerImport extends ModelMakerBase {
 		modelInfo.brandChildren();
 
         placeModelIfPositionZero();
-		// This works for simple models, but not for deep hierarchies
-		var bmpd:BitmapData = Renderer.renderer.modelShot( _vm );
-		_vm.modelInfo.thumbnail = drawScaled( bmpd, 128, 128 );
 
-		ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
+        OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, readyForModelShot );
+
 		_vm.complete = true;
+	}
 
-		modelInfo.changed = true;
-		_vm.save();
+	private function readyForModelShot( $ode:OxelDataEvent ):void {
+        if ( modelInfo &&  $ode.modelGuid == modelInfo.guid ) {
+            OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, readyForModelShot);
+            // This works for simple models, but not for deep hierarchies
+            var bmpd:BitmapData = Renderer.renderer.modelShot( _vm );
+            _vm.modelInfo.thumbnail = drawScaled( bmpd, 128, 128 );
+            ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
+            modelInfo.changed = true;
+            _vm.save();
+            Log.out("ModelMakerImport.readyForModelShot - MAKER COMPLETE - needed info found: " + modelInfo.name );
+            super.markComplete(true);
+        }
 
-		Log.out("ModelMakerImport.quadsComplete - needed info found: " + modelInfo.description );
-		// The function Chunk.quadsBuildPartialComplete publishes these event in this order
-		// OxelDataEvent.create(OxelDataEvent.OXEL_BUILD_COMPLETE, 0, _guid, _op);
-		// So we dont want to do this until OXEL_BUILD_COMPLETE is complete
-		// super.markComplete(true);
-
-		function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
-			var m:Matrix = new Matrix();
-			m.scale(destWidth/obj.width, destHeight/obj.height);
-			var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
-			bmpd.draw(obj, m);
-			return bmpd;
-		}
+        function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
+            var m:Matrix = new Matrix();
+            m.scale(destWidth/obj.width, destHeight/obj.height);
+            var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
+            bmpd.draw(obj, m);
+            return bmpd;
+        }
 	}
 }
 }

@@ -1,5 +1,3 @@
-textAlign
-textFormat
 
 VoxelVerse todo
 
@@ -41,7 +39,7 @@ DONE - Do modify check on model
 
 
 
-
+https://www.bloomberg.com/news/articles/2017-11-27/video-startup-can-t-outspend-youtube-so-it-created-a-new-currency-to-pay-creators
 
 
 ! 12.1.16 need to add clipVelocity and speedMultiplier to rest of the animations, and to the setState, so that they are not hard coded.

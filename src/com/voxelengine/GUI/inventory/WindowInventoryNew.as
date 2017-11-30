@@ -84,7 +84,13 @@ import org.flashapi.swing.*
 		public function WindowInventoryNew( $startingTab:String, $label:String, $parentModel:VoxelModel, $showTabs:Boolean = true )
 		{
 			if ( Globals.isDebug )
-					$label += " - " + Network.userId;
+				$label += " - " + Network.userId;
+
+            if ( WindowInventoryNew._s_hackSupportClick )
+                $label += " click item to add it to world";
+            else
+                $label += " drag item to tool bar or manage items";
+
 			super( $label );
 			_showTabs = $showTabs;
             _parentModel = $parentModel;

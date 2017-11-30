@@ -518,7 +518,7 @@ public class InventoryPanelModel extends VVContainer
                 ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, checkModelInfoPermissions);
                 var role:Role = Player.player.role;
                 if ($mi.modelInfo.owner == Network.PUBLIC && role.modelPublicDelete) {
-                    new WindowModelDeleteChildrenQuery(droppedItem.modelGuid, removeModel);
+                    new WindowModelDeleteChildrenQuery(droppedItem.modelGuid, removeModel, $mi.modelInfo.name );
                 }
                 else if ($mi.modelInfo.owner == Network.userId && role.modelPrivateDelete) {
                     new AssignModelAndChildrenToPublicOwnership( droppedItem.modelGuid, true );
