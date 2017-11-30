@@ -7,7 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-import com.voxelengine.GUI.panels.PanelModels;
+import com.voxelengine.GUI.panels.PanelModelsListFromRegion;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.LoadingEvent;
@@ -81,7 +81,7 @@ public class RegionManager
 		if ( Region.currentRegion ) {
             Region.currentRegion.unload();
             VoxelModel.selectedModel = null;
-            PanelModels.setLastSelectedModel( null );
+            PanelModelsListFromRegion.setLastSelectedModel( null );
 			// TODO Anything else?
         }
         var region:Region = regionGet( $re.guid );

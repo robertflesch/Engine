@@ -7,8 +7,6 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
-import com.voxelengine.Log
-import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelBaseEvent
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.worldmodel.models.InstanceInfo
@@ -52,11 +50,10 @@ public class ModelMaker extends ModelMakerBase {
 	}
 
 	override protected function markComplete( $success:Boolean ):void {
-		if ( addToCount ) {
+		if ( addToCount )
 			makerCountDecrement();
-//			if (0 == makerCountGet())
-//				WindowSplashEvent.create(WindowSplashEvent.ANNIHILATE);
-		}
+
+        placeModelIfPositionZero();
 
 		// do this last as it nulls everything.
 		super.markComplete( $success );

@@ -160,18 +160,8 @@ public class ModelMakerClone extends ModelMakerBase {
             Log.out("ModelMakerClone.quadsComplete - needed info found: " + modelInfo.description );
             ModelEvent.create( ModelEvent.CLONE_COMPLETE, modelInfo.guid, null, null, "", _vm );
 
-            // Only do this for top level models, need ControlledModel to get offset.
-            if ( null == ii.controllingModel && VoxelModel.controlledModel ) {
-                var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.grainSize), 16)/2;
-                // this gives me corner.
-                var msCamPos:Vector3D = VoxelModel.controlledModel.cameraContainer.current.position;
-                var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld(msCamPos);
-
-                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector(new Vector3D(-(radius + 8), adjCameraPos.y - radius, -radius * 3));
-                var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet();
-                diffPos = diffPos.add(lav);
-                _vm.instanceInfo.positionSet = diffPos;
-            }
+            //placeCompletedModel();
+            placeModelIfPositionZero();
 
             var bmpd:BitmapData = Renderer.renderer.modelShot( _vm );
             _vm.modelInfo.thumbnail = drawScaled(bmpd, 128, 128);

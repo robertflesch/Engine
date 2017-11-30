@@ -19,6 +19,11 @@ import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.*
 import com.voxelengine.worldmodel.models.types.VoxelModel
+import com.voxelengine.worldmodel.oxel.GrainCursor;
+
+import flash.geom.Matrix3D;
+
+import flash.geom.Vector3D;
 
 /**
 	 * ...
@@ -208,6 +213,81 @@ public class ModelMakerBase {
 
 	// OxelPersistence
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	protected function placeModelIfPositionZero():void {
+		if (  null == ii.controllingModel && VoxelModel.controlledModel && 0 == ii.positionGet.length ) {
+            // Only do this for top level models.
+            var size:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.bound), 32);
+            // this give me edge,  really want center.
+            var cm:VoxelModel = VoxelModel.controlledModel;
+            var cmRotation:Vector3D = cm.cameraContainer.current.rotation;
+            var cameraMatrix:Matrix3D = new Matrix3D();
+            cameraMatrix.identity();
+            cameraMatrix.prependRotation(-cmRotation.z, Vector3D.Z_AXIS);
+            cameraMatrix.prependRotation(-cmRotation.y, Vector3D.Y_AXIS);
+            cameraMatrix.prependRotation(-cmRotation.x, Vector3D.X_AXIS);
+
+            var endPoint:Vector3D = ModelCacheUtils.viewVector(ModelCacheUtils.FRONT);
+            endPoint.scaleBy(size * 1.5);
+            var viewVector:Vector3D = cameraMatrix.deltaTransformVector(endPoint);
+            viewVector = viewVector.add(cm.instanceInfo.positionGet);
+            viewVector.setTo(viewVector.x - size / 2, viewVector.y - size / 2, viewVector.z - size / 2);
+            ii.positionSet = viewVector;
+            Log.out( "ModelMakerBase.placeModelIfNotZero would set position to: " + viewVector );
+
+        } else {
+            var hasControlledModel:Boolean = ( null != VoxelModel.controlledModel );
+            var hasControllingModel:Boolean = ( null == ii.controllingModel );
+            Log.out("ModelMakerBase.placeCompletedModel - placing model at default location because "
+                    + "\n hasControlledModel: " + hasControlledModel
+                    + "\n hasControllingModel: " + hasControllingModel
+                    + "\n ii.positionGet: " + ii.positionGet, Log.WARN);
+        }
+	}
+
+    protected function placeCompletedModel():void {
+        // Only do this for top level models, so no controllingModel, need controlledModel to get current world position.
+        //if ( !ii.controllingModel && VoxelModel.controlledModel && modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount)
+        if ( !ii.controllingModel && VoxelModel.controlledModel )
+            placeModel();
+        else {
+            var hasControlledModel:Boolean = ( null != VoxelModel.controlledModel );
+            var hasControllingModel:Boolean = ( null != ii.controllingModel );
+            var hasOxelPersistence:Boolean = ( null != modelInfo.oxelPersistence );
+            var oxelCount:int = modelInfo.oxelPersistence.oxelCount;
+            Log.out("ModelMakerBase.placeCompletedModel - placing model at default location because "
+                    + "\n hasControlledModel: " + hasControlledModel
+                    + "\n hasControllingModel: " + hasControllingModel
+                    + "\n hasOxelPersistence: " + hasOxelPersistence
+                    + "\n oxelCount: " + oxelCount, Log.WARN);
+        }
+    }
+
+	private function placeModel():void {
+        var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.grainSize), 16) / 2;
+		if ( modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount ) {
+            var radius1:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 16) / 2;
+            Log.out("ModelMakerBase.placeCompletedModel - radius: " + radius + "  radius1: " + radius1, Log.WARN);
+        } else
+            Log.out("ModelMakerBase.placeCompletedModel - radius: " + radius + "  radius1: NO OxelPersistence to use for radius1", Log.WARN);
+
+        // this gives me corner.
+        const cm:VoxelModel = VoxelModel.controlledModel;
+		var msCamPos:Vector3D = cm.cameraContainer.current.position;
+		var adjCameraPos:Vector3D = cm.modelToWorld(msCamPos);
+
+		var lav:Vector3D = cm.instanceInfo.invModelMatrix.deltaTransformVector(new Vector3D(-(radius + 8), adjCameraPos.y - radius, -radius * 3));
+		var diffPos:Vector3D = cm.wsPositionGet();
+		diffPos = diffPos.add(lav);
+		_vm.instanceInfo.positionSet = diffPos;
+		Log.out ( "ModelMaker.placeModel - placing model at location: " + _vm.instanceInfo.positionGet, Log.WARN );
+        Log.out("ModelMakerBase.placeCompletedModel - placing model at default location because "
+                + "\n msCamPos: " + msCamPos
+                + "\n adjCameraPos: " + adjCameraPos
+                + "\n lav: " + lav
+                + "\n diffPos: " + diffPos, Log.WARN);
+
+    }
 
 	protected function markComplete( $success:Boolean ):void {
 		//Log.out("ModelMakerBase.markComplete - instanceGuid: " + ii.instanceGuid + "  model guid: " + modelInfo.guid + "  success: " + $success, Log.WARN);

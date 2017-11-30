@@ -5,14 +5,9 @@
    authorship protected under United States Copyright Act.
    Unauthorized reproduction, translation, or display is prohibited.
  ==============================================================================*/
-package com.voxelengine.worldmodel.models.makers
-{
-
-
+package com.voxelengine.worldmodel.models.makers {
 import flash.display.BitmapData;
 import flash.geom.Matrix;
-
-import flash.geom.Vector3D;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -25,8 +20,6 @@ import com.voxelengine.server.Network;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.animation.AnimationCache;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.oxel.GrainCursor;
 
 	/**
 	 * ...
@@ -228,21 +221,18 @@ public class ModelMakerImport extends ModelMakerBase {
 
 		modelInfo.brandChildren();
 
-		if ( !ii.controllingModel && modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount ) {
-			// Only do this for top level models.
-			var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 16)/2;
-			// this gives me corner.
-			const cm:VoxelModel = VoxelModel.controlledModel;
-			if ( cm ) {
-                var msCamPos:Vector3D = cm.cameraContainer.current.position;
-                var adjCameraPos:Vector3D = cm.modelToWorld(msCamPos);
-
-                var lav:Vector3D = cm.instanceInfo.invModelMatrix.deltaTransformVector(new Vector3D(-(radius + 8), adjCameraPos.y - radius, -radius * 3));
-                var diffPos:Vector3D = cm.wsPositionGet();
-                diffPos = diffPos.add(lav);
-                _vm.instanceInfo.positionSet = diffPos;
-            }
-		}
+        placeModelIfPositionZero()
+//		if ( !ii.controllingModel && modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount )
+//			placeCompletedModel();
+//		else {
+//            var hasControllingModel:Boolean = ( null != ii.controllingModel );
+//            var hasOxelPersistence:Boolean = ( null != modelInfo.oxelPersistence );
+//            var oxelCount:int =  modelInfo.oxelPersistence.oxelCount;
+//            Log.out("ModelMakerImport - placing model at default location because "
+//					+ " hasControllingModel: " + hasControllingModel
+//					+ " hasOxelPersistence: " + hasOxelPersistence
+//                    + " oxelCount: " + oxelCount, Log.WARN);
+//        }
 
 		// This works for simple models, but not for deep hierarchies
 		var bmpd:BitmapData = Renderer.renderer.modelShot( _vm );
@@ -268,8 +258,6 @@ public class ModelMakerImport extends ModelMakerBase {
 			return bmpd;
 		}
 	}
-
-
 }
 }
 

@@ -33,7 +33,7 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 
 // all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
-public class PanelModels extends PanelBase
+public class PanelModelsListFromRegion extends PanelBase
 {
     private static const add_an_item_to_region:String = "add_an_item_to_region";
     private static const add_a_child_to_parent:String = "add_a_child_to_parent";
@@ -71,12 +71,12 @@ public class PanelModels extends PanelBase
 	private function get myParent():ContainerModelDetails { return (_parent as ContainerModelDetails); }
 
     static private function checkLastSelectedForModelDeletion( $mie:ModelInfoEvent ):void {
-        var vm:VoxelModel = getLastSelectedModel()
+        var vm:VoxelModel = getLastSelectedModel();
 		if ( vm && vm.modelInfo && ( vm.modelInfo.guid  == $mie.modelGuid ) )
 			setLastSelectedModel( null );
 	}
 
-	public function PanelModels($parent:ContainerModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number, $level:int )	{
+	public function PanelModelsListFromRegion($parent:ContainerModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number, $level:int )	{
 		super( $parent, $widthParam, $heightParam );
 		if ( false == _s_lastSelectedModelInitialized ) {
             _s_lastSelectedModelInitialized = true;
@@ -89,7 +89,7 @@ public class PanelModels extends PanelBase
 		autoHeight = false;
 		layout = new AbsoluteLayout();
 
-		//Log.out( 'PanelModels - list box width: width: ' + width + '  padding: ' + pbPadding, Log.WARN );
+		//Log.out( 'PanelModelsListFromRegion - list box width: width: ' + width + '  padding: ' + pbPadding, Log.WARN );
 		_listModels = new ListBox( width - 10, $elementHeight, $heightParam );
 		_listModels.x = 5;
 //		_listModels.dragEnabled = true;
@@ -186,7 +186,7 @@ public class PanelModels extends PanelBase
 	}
 	
 	public function populateModels( $source:Function, $parentModel:VoxelModel ):int	{
-		//Log.out( 'PanelModels.populateModels - parentModel:' + $parentModel, Log.WARN )
+		//Log.out( 'PanelModelsListFromRegion.populateModels - parentModel:' + $parentModel, Log.WARN )
 		_dictionarySource = $source;
 		_parentModel = $parentModel;
 		if ( _listModels )
@@ -270,7 +270,7 @@ public class PanelModels extends PanelBase
 		const btnWidth:int = width - 10;
 		var container:Container;
 
-		//Log.out( 'PanelModels.buttonsCreate' );
+		//Log.out( 'PanelModelsListFromRegion.buttonsCreate' );
 		container = new Container( width, 10 );
 		//container.layout.orientation = LayoutOrientation.VERTICAL;
 		container.layout = new AbsoluteLayout();
@@ -312,7 +312,7 @@ public class PanelModels extends PanelBase
 		_detailButton.x = 5;
 		_detailButton.width = btnWidth;
 		_detailButton.enabled = false;
-		_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, function ($e:UIMouseEvent):void { new PopupInstanceDetail( PanelModels.getLastSelectedModel() ); } );
+		_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, function ($e:UIMouseEvent):void { new PopupInstanceDetail( PanelModelsListFromRegion.getLastSelectedModel() ); } );
 		container.addElement( _detailButton );
 
 		if ( Globals.isDebug ) {
@@ -359,7 +359,7 @@ public class PanelModels extends PanelBase
 			}
 
 			function deleteElement():void {
-				Log.out( 'PanelModels.deleteModel - ' + VoxelModel.selectedModel.toString(), Log.WARN );
+				Log.out( 'PanelModelsListFromRegion.deleteModel - ' + VoxelModel.selectedModel.toString(), Log.WARN );
 				ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved );
 				if ( VoxelModel.selectedModel.instanceInfo.associatedGrain && VoxelModel.selectedModel.instanceInfo.controllingModel ) {
 					VoxelModel.selectedModel.instanceInfo.controllingModel.write( VoxelModel.selectedModel.instanceInfo.associatedGrain, TypeInfo.AIR );
@@ -410,19 +410,19 @@ public class PanelModels extends PanelBase
 	private function selectModel(event:ListEvent):void {
 		if (event.target.data) {
 			var instanceGuid:String = event.target.data.instanceGuid;
-			Log.out('PanelModels.selectModel instanceGuid: ' + instanceGuid + '  modelGuid: ' + event.target.data.modelGuid );
+			Log.out('PanelModelsListFromRegion.selectModel instanceGuid: ' + instanceGuid + '  modelGuid: ' + event.target.data.modelGuid );
 			displayModelData( instanceGuid );
 			_addButton.label = LM( add_a_child_to_item );
 		}
         else if ( _parentModel ) {
-            Log.out('PanelModels.selectModel has NO target data');
+            Log.out('PanelModelsListFromRegion.selectModel has NO target data');
             buttonsDisable();
             setSelectedModel( null );
             UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, null, _level);
             _addButton.label = LM( add_a_child_to_parent );
         }
 		else {
-			Log.out('PanelModels.selectModel has NO target data');
+			Log.out('PanelModelsListFromRegion.selectModel has NO target data');
 			buttonsDisable();
 			setSelectedModel( null );
 			UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, null, _level);
@@ -443,7 +443,7 @@ public class PanelModels extends PanelBase
 			vm = _parentModel.childFindInstanceGuid( $instanceGuid );
 		if ( vm ) {
             setLastSelectedModel(vm);
-            Log.out('PanelModels.displayModelData vm: ' + vm);
+            Log.out('PanelModelsListFromRegion.displayModelData vm: ' + vm);
         }
 		if ( vm ) {
 			setSelectedModel( vm );

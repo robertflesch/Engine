@@ -30,7 +30,7 @@ public class ContainerModelDetails extends PanelBase
 	static private const HEIGHT_LIST_DEFAULT:int = 250;
 
 	private var _parentModel:VoxelModel;
-	private var _listModels:PanelModels;
+	private var _listModels:PanelModelsListFromRegion;
 	private var _listAnimations:PanelAnimations;
 	private var _listScripts:PanelModelScripts;
 	private var _listAmmo:PanelModelAmmo;
@@ -129,7 +129,7 @@ public class ContainerModelDetails extends PanelBase
 	
 	private function modelPanelAdd():void {
 		if ( null == _listModels ) {
-			_listModels = new PanelModels( this, WIDTH_DEFAULT, 15, HEIGHT_LIST_DEFAULT, _level );
+			_listModels = new PanelModelsListFromRegion( this, WIDTH_DEFAULT, 15, HEIGHT_LIST_DEFAULT, _level );
 			addElement( _listModels );
 		}
 	}

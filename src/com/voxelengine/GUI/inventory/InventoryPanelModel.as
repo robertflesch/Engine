@@ -6,13 +6,6 @@ authorship protected under United States Copyright Act.
 Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
-
-
-import com.voxelengine.GUI.inventory.BoxInventory;
-import com.voxelengine.GUI.panels.PanelModels;
-import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.worldmodel.models.AssignModelAndChildrenToPublicOwnership;
-
 import flash.display.DisplayObject;
 import flash.events.Event;
 import flash.geom.Matrix3D;
@@ -39,11 +32,13 @@ import com.voxelengine.GUI.crafting.BoxCharacterSlot;
 import com.voxelengine.GUI.voxelModels.PopupModelInfo;
 import com.voxelengine.GUI.WindowModelDeleteChildrenQuery;
 import com.voxelengine.GUI.WindowPictureImport;
+import com.voxelengine.GUI.panels.PanelModelsListFromRegion;
 
 import com.voxelengine.events.CharacterSlotEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.Role;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
@@ -51,13 +46,14 @@ import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.inventory.FunctionRegistry;
 import com.voxelengine.worldmodel.inventory.ObjectAction;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
 import com.voxelengine.worldmodel.inventory.ObjectModel;
+import com.voxelengine.worldmodel.models.AssignModelAndChildrenToPublicOwnership;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.models.InstanceInfo;
 
 public class InventoryPanelModel extends VVContainer
 {
@@ -256,7 +252,7 @@ public class InventoryPanelModel extends VVContainer
 		if ( ObjectInfo.OBJECTINFO_MODEL == $oi.objectType ) {
 			var om:ObjectModel = $oi as ObjectModel;
 			// don't show CURRENT child models
-            var pm:VoxelModel = PanelModels.getLastSelectedModel();
+            var pm:VoxelModel = PanelModelsListFromRegion.getLastSelectedModel();
 			if ( pm ){
                 var bound:int = pm.modelInfo.oxelPersistence.bound;
                 if ( null != om.modelInfo.childOf && "" != om.modelInfo.childOf ) {
@@ -311,8 +307,6 @@ public class InventoryPanelModel extends VVContainer
 		return null
 	}
 
-    static private var _cameraMatrix:Matrix3D = new Matrix3D();
-
 	static private function instantiateModel( e:UIMouseEvent ):void {
 		if ( e.target.objectInfo is ObjectAction ) {
 			var oa:ObjectAction = e.target.objectInfo as ObjectAction;
@@ -337,29 +331,8 @@ public class InventoryPanelModel extends VVContainer
                 WindowInventoryNew.parentModel.modelInfo.changed = true;
             }
 			else {
-				// Only do this for top level models.
-				var size:int = Math.max( GrainCursor.get_the_g0_edge_for_grain(om.modelInfo.bound), 32 );
-				// this give me edge,  really want center.
-                var cmRotation:Vector3D;
-				////////////////////////
-                if ( VoxelModel.controlledModel )
-                    cmRotation = VoxelModel.controlledModel.cameraContainer.current.rotation;
-                else
-                    cmRotation = new Vector3D();
-                _cameraMatrix.identity();
-                _cameraMatrix.prependRotation( -cmRotation.z, Vector3D.Z_AXIS );
-                _cameraMatrix.prependRotation( -cmRotation.y, Vector3D.Y_AXIS );
-                _cameraMatrix.prependRotation( -cmRotation.x, Vector3D.X_AXIS );
-                var endPoint:Vector3D = ModelCacheUtils.viewVector(ModelCacheUtils.FRONT);
-                endPoint.scaleBy( size * 1.5 );
-                var viewVector:Vector3D = _cameraMatrix.deltaTransformVector( endPoint );
-                viewVector = viewVector.add( VoxelModel.controlledModel.instanceInfo.positionGet );
-                viewVector.setTo( viewVector.x - size/2, viewVector.y - size/2, viewVector.z - size/2);
-                ii.positionSet = viewVector;
 				new ModelMaker( ii );
 			}
-
-
 		}
 	}
 
