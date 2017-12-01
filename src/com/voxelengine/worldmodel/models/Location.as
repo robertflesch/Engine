@@ -334,28 +334,17 @@ public class Location
 
 		// Save original or current positions? would seem like current
 		// why was I using original?
-		if ( useOrigPosition )
-			obj.location 			= vector3DToObject( _positionOrig );
-		else
-			obj.location 			= vector3DToObject( _position );
-
-//Log.out( "Location.toObject _positionOrig: " + _positionOrig + "  _position: " + _position, Log.WARN )			
-		if ( 0 < _rotationOrig.length ) {
-			if ( useOrigPosition )
-				obj.rotation = vector3DToObject(_rotationOrig);
-			else
-				obj.rotation = vector3DToObject(_rotation);
-		}
-
-		if ( 0 < centerNotScaled.length )
-			obj.center 		= vector3DIntToObject( centerNotScaled );
-
-		if ( 3 != _scaleOrig.lengthSquared ) {
-			if ( useOrigPosition )
-				obj.scale = vector3DToObject(_scaleOrig );
-			else
-				obj.scale = vector3DToObject(_scale);
-		}
+		if ( useOrigPosition ) {
+            obj.location = vector3DToObject(_positionOrig);
+            obj.rotation = vector3DToObject(_rotationOrig);
+            obj.scale = vector3DToObject(_scaleOrig );
+        }
+		else {
+            obj.location = vector3DToObject(_position);
+            obj.rotation = vector3DToObject(_rotation);
+            obj.scale = vector3DToObject(_scale);
+        }
+		obj.center 		= vector3DIntToObject( centerNotScaled );
 
 		return obj
 	}
