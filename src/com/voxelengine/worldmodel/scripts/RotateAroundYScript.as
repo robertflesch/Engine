@@ -20,12 +20,13 @@ public class RotateAroundYScript extends Script
         fromObject( $params );
     }
 
-    override public function init():void {
+    override public function init( $instanceGuid:String ):void {
+        super.init( $instanceGuid );
         addRotation();
     }
 
     private function addRotation():void {
-        TransformEvent.addListener( TransformEvent.ENDED, transformEnded );
+        //TransformEvent.addListener( TransformEvent.ENDED, transformEnded );
         vm.instanceInfo.addTransform( 0, _rotationRate, 0, -1, ModelTransform.ROTATION_REPEATING, ROTATE_AROUND_Y_SCRIPT );
     }
 

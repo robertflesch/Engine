@@ -8,7 +8,9 @@
 package com.voxelengine.worldmodel.scripts
 {
 	import com.voxelengine.Log;
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.events.InstanceInfoEvent;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 import flash.utils.getQualifiedClassName;
 
@@ -32,7 +34,9 @@ import flash.utils.getQualifiedClassName;
 
 		public function Script( $params:Object ){ }
 
-		public function init():void {}
+		public function init( $instanceGuid:String ):void {
+            instanceGuid = $instanceGuid;
+		}
 		
 		public function dispose():void { 
 			_vm = null; 
@@ -51,8 +55,10 @@ import flash.utils.getQualifiedClassName;
 		public function fromString( $params:String ):void {
 			try {
 				var obj:Object = JSON.parse($params);
-				if (obj)
-					fromObject(obj);
+				if (obj) {
+                    fromObject(obj);
+					InstanceInfoEvent.create( ModelBaseEvent.CHANGED, instanceGuid, null );
+                }
 			} catch (e:Error) {
 				Log.out( "This object: " + getCurrentClassName(this) + " had an error when parsing is params in fromString params: " + $params, Log.WARN );
 			}

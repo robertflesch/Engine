@@ -23,7 +23,8 @@ public class RotateScript extends Script
         fromObject( $params );
     }
 
-    override public function init():void {
+    override public function init( $instanceGuid:String ):void {
+        super.init( $instanceGuid );
         addRotation();
     }
 

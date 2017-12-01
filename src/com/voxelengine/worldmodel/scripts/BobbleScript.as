@@ -29,7 +29,8 @@ public class BobbleScript extends Script
         fromObject( $params )
     }
 
-    override public function init():void {
+    override public function init( $instanceGuid:String ):void {
+        super.init( $instanceGuid );
         _originalPos = vm.instanceInfo.positionGet.clone();
         addBobble();
     }

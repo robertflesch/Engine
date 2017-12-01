@@ -300,7 +300,7 @@ public class InstanceInfo extends Location	{
 			//script.event( OxelEvent.CREATE );
 			// Only person using this is the AutoControlObjectScript
 			if ( owner )
-				script.init();
+				script.init( instanceGuid );
 		}
 		if ( owner && owner.complete )
 			Region.currentRegion.changed = true;

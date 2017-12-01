@@ -7,7 +7,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.InstanceInfoEvent;
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.worldmodel.Region;
 
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
@@ -43,11 +45,22 @@ public class ModelCache
 		return list;
 	}
 
+
+    private function instanceInfoChanged( $iie:InstanceInfoEvent ):void {
+		var vm:VoxelModel = instanceGet( $iie.instanceGuid );
+		if ( vm ) {
+            vm.instanceInfo.changed = true;
+			Region.currentRegion.changed = true;
+        }
+    }
+
+
 	public function modelsGet():Vector.<VoxelModel> { return _instances; }
 	public function get modelsDynamic():Vector.<VoxelModel> { return _instancesDynamic; }
 	
 	public function ModelCache() {
         ModelInfoEvent.addListener( ModelBaseEvent.DELETE, modelDeletedGlobally );
+        InstanceInfoEvent.addListener( ModelBaseEvent.CHANGED, instanceInfoChanged );
 	}
 
     private function modelDeletedGlobally( $mie:ModelInfoEvent ): void {
@@ -139,6 +152,7 @@ public class ModelCache
 		}
 
         ModelInfoEvent.removeListener( ModelBaseEvent.DELETE, modelDeletedGlobally );
+        InstanceInfoEvent.removeListener( ModelBaseEvent.CHANGED, instanceInfoChanged );
 	}
 
 	public function add( vm:VoxelModel ):void {

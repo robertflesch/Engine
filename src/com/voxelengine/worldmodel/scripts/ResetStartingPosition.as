@@ -14,7 +14,8 @@ public class ResetStartingPosition extends Script
     public function ResetStartingPosition(   $params:Object  ) {
         super($params);
     }
-    override public function init():void {
+    override public function init( $instanceGuid:String ):void {
+        super.init( $instanceGuid );
         vm.instanceInfo.useOrigPosition = true;
     }
 }

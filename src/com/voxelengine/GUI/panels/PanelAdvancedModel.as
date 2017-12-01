@@ -75,7 +75,7 @@ public class PanelAdvancedModel extends ExpandableBox
         var role:Role = Player.player.role;
         if ( _mi.owner != Network.PUBLIC ) {
             if (role.modelApprove) {
-                var copyButton:Button = new Button("Make copy available to public", WIDTH, 24);
+                var copyButton:Button = new Button("Change ownership to public", WIDTH, 24);
                 copyButton.addEventListener(MouseEvent.CLICK, copyAndGiveToPublic);
                 _itemBox.addElement(copyButton);
             }

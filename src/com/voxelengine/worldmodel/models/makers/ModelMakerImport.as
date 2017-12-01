@@ -6,6 +6,7 @@
    Unauthorized reproduction, translation, or display is prohibited.
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers {
+import com.voxelengine.events.LoadingImageEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.Region;
@@ -39,6 +40,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	public function ModelMakerImport( $ii:InstanceInfo, $prompt:Boolean = true ) {
 		// This should never happen in a release version, so dont worry about setting it to false when done
 		_prompt = $prompt;
+        LoadingImageEvent.create( LoadingImageEvent.CREATE );
 		super( $ii, IMPORTING );
 		Log.out( "ModelMakerImport - ii: " + ii.toString(), Log.DEBUG );
 		// First request the modelInfo
@@ -245,11 +247,8 @@ public class ModelMakerImport extends ModelMakerBase {
 
 	private function importComplete():void {
 		modelInfo.brandChildren();
-
         placeModelIfPositionZero();
-
         OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, readyForModelShot );
-
 		_vm.complete = true;
 	}
 
@@ -264,6 +263,7 @@ public class ModelMakerImport extends ModelMakerBase {
             _vm.save();
             Log.out("ModelMakerImport.readyForModelShot - MAKER COMPLETE - needed info found: " + modelInfo.name );
             super.markComplete(true);
+            LoadingImageEvent.create( LoadingImageEvent.ANNIHILATE );
         }
 
         function drawScaledAndCropped($bmp:BitmapData, destWidth:int, destHeight:int ):BitmapData {

@@ -10,6 +10,8 @@ package com.voxelengine.GUI {
 
 import com.voxelengine.GUI.components.VVTextInput;
 import com.voxelengine.Globals;
+import com.voxelengine.Log;
+import com.voxelengine.events.LoadingImageEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.OxelDataEvent;
@@ -34,6 +36,7 @@ import flash.display.BitmapData;
 import flash.display.Loader;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
+import flash.events.SecurityErrorEvent;
 import flash.geom.Matrix;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
@@ -44,6 +47,7 @@ import flash.net.URLRequest;
 import org.flashapi.swing.button.RadioButtonGroup;
 import org.flashapi.swing.constants.LayoutOrientation;
 import org.flashapi.swing.constants.TextAlign;
+import org.flashapi.swing.cursor.WaitCursor;
 import org.flashapi.swing.databinding.DataProvider;
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.ButtonsGroupEvent;
@@ -110,22 +114,21 @@ public class WindowPictureImport extends VVPopup {
         addElement( new Spacer( width, 10 ) );
 
         var values:Vector.<String> = new Vector.<String>();
-        values.push("1");
         values.push("2");
         values.push("4");
         values.push("8");
         var data:Vector.<int> = new Vector.<int>();
-        data.push(4);
         data.push(5);
         data.push(6);
         data.push(7);
 
         _ccbl = new ComponentComboBoxWithLabel( "Size in meters"
                                               , pictureSize
-                                              , values[0]
+                                              , "2"
                                               , values
                                               , data
                                               , width );
+        PictureImportProperties.grain = data[1];
         addElement( _ccbl );
 
         addElement( new Spacer( width, 10 ) );
@@ -239,10 +242,14 @@ public class WindowPictureImport extends VVPopup {
     private function pictureSize( $le:ListEvent ):void {
         var li:ListItem = $le.target.getItemAt( $le.target.selectedIndex );
         PictureImportProperties.grain = li.data;
-        trace("picture GRAIN: " + PictureImportProperties.grain);
-        var size:int = GrainCursor.get_the_g0_size_for_grain( PictureImportProperties.grain );
+        resizePicture();
+    }
+
+    private function resizePicture():void {
+        var g:int = PictureImportProperties.grain;
+        var size:int = GrainCursor.get_the_g0_size_for_grain( g );
         if ( null == PictureImportProperties.finalBitmapData )
-                return;
+            return;
         var correctSize:BitmapData = VVBox.drawScaled( PictureImportProperties.finalBitmapData, size, size, PictureImportProperties.hasTransparency );
         _container.backgroundTexture = VVBox.drawScaled( correctSize, _container.width, _container.height, PictureImportProperties.hasTransparency );
     }
@@ -257,37 +264,59 @@ public class WindowPictureImport extends VVPopup {
         var urlLoader:URLLoader = new URLLoader();
         urlLoader.dataFormat = URLLoaderDataFormat.BINARY;
         _loading = true;
+        var loader:Loader = new Loader();
         urlLoader.addEventListener(Event.COMPLETE, urlLoader_complete);
         urlLoader.addEventListener(IOErrorEvent.IO_ERROR, urlLoader_error);
         urlLoader.load(urlRequest);
 
+        ///////////////////////////////////////
         function urlLoader_complete($event:Event):void {
             urlLoader.removeEventListener(Event.COMPLETE, urlLoader_complete);
             urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, urlLoader_error);
             _loading = false;
-            var loader:Loader = new Loader();
             // Event.INIT is needed to handle async aspect of loader
             loader.contentLoaderInfo.addEventListener(Event.INIT, function(e:Event):void {
                 var bmpData:BitmapData = new BitmapData(e.target.width,e.target.height);
                 bmpData.draw(loader,null,null);
                 _container.addPicture( bmpData );
+                resizePicture();
             });
             loader.addEventListener(IOErrorEvent.IO_ERROR, unknownType);
+            loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onSecurityErrorEvent);
             loader.loadBytes($event.target.data);
         }
 
         function urlLoader_error(evt:IOErrorEvent):void {
+            urlLoader.removeEventListener(Event.COMPLETE, urlLoader_complete);
+            urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, urlLoader_error);
             _loading = false;
-            trace("file obviously not found");
+            (new Alert( "Unable to load that picture." )).display();
         }
+        ///////////////////////////////////////
 
         function unknownType(evt:IOErrorEvent):void {
             _loading = false;
+            removeListeners();
             (new Alert( "Unknown file format (try again sometimes helps)" )).display();
+        }
+
+        function onSecurityErrorEvent(securityError:SecurityErrorEvent):void {
+            _loading = false;
+            removeListeners();
+            Log.out( "WindowPictureImport - securityError: " + securityError.toString());
+            (new Alert( "Security Error message: " + securityError.toString() )).display();
+        }
+
+        function removeListeners():void {
+            loader.removeEventListener(IOErrorEvent.IO_ERROR, unknownType);
+            loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onSecurityErrorEvent);
         }
     }
 
     private function createHandler( $me:UIMouseEvent ):void {
+
+        LoadingImageEvent.create( LoadingImageEvent.CREATE );
+
         if ( !PictureImportProperties.finalBitmapData ){
             (new Alert( LanguageManager.localizedStringGet( "No Image selected" ) )).display();
             return;
@@ -383,17 +412,6 @@ public class WindowPictureImport extends VVPopup {
         var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( $op.guid );
         if ( vm ){
             if ($op && $op.oxel && $op.oxel.gc.bound) {
-//                // Only do this for top level models.
-//                var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain($op.oxel.gc.bound), 16)/2;
-//                // this gives me corner.
-//                var msCamPos:Vector3D = VoxelModel.controlledModel.cameraContainer.current.position;
-//                var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld( msCamPos );
-//
-//                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector( new Vector3D( radius + 8, adjCameraPos.y-radius, -radius * 1.25 ) );
-//                var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet();
-//                diffPos = diffPos.add(lav);
-//                vm.instanceInfo.positionSet = diffPos;
-                //////////////////
                 var size:int = Math.max(GrainCursor.get_the_g0_edge_for_grain($op.oxel.gc.bound), 32);
                 // this give me edge,  really want center.
                 var cm:VoxelModel = VoxelModel.controlledModel;
@@ -405,13 +423,11 @@ public class WindowPictureImport extends VVPopup {
                 cameraMatrix.prependRotation(-cmRotation.x, Vector3D.X_AXIS);
 
                 var endPoint:Vector3D = ModelCacheUtils.viewVector(ModelCacheUtils.FRONT);
-                endPoint.scaleBy(size * 1.1);
+                endPoint.scaleBy(size * 0.55);
                 var viewVector:Vector3D = cameraMatrix.deltaTransformVector(endPoint);
                 viewVector = viewVector.add(cm.instanceInfo.positionGet);
-                viewVector.setTo(viewVector.x - size / 2, viewVector.y - size / 2, viewVector.z - size / 2);
+                viewVector.setTo(viewVector.x - size / 2, (viewVector.y - size / 2)+16, viewVector.z - size / 2);
                 vm.instanceInfo.positionSet = viewVector;
-
-                //////////////////
                 vm.instanceInfo.rotationSetComp( 0, 90, 0 );
 //                vm.modelInfo.hashTags = "#architecture#window#stained";
 
@@ -424,6 +440,9 @@ public class WindowPictureImport extends VVPopup {
                     var bmpd:BitmapData = Renderer.renderer.modelShot( vm );
                     vm.modelInfo.thumbnail = drawScaledAndCropped(bmpd, 128, 128);
                     ModelInfoEvent.create(ModelBaseEvent.CHANGED, 0, vm.modelInfo.guid, vm.modelInfo);
+
+                    Region.currentRegion.save();
+                    LoadingImageEvent.create( LoadingImageEvent.ANNIHILATE );
                 }
             }
 

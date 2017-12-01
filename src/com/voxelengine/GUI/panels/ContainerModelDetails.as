@@ -84,10 +84,12 @@ public class ContainerModelDetails extends PanelBase
 			//Log.out("PanelModelDetails.selectedModelChanged - selectedModel: " + selectedModel + " e.parentVM: " + e.voxelModel + "  _parentModel: " + _parentModel, Log.WARN);
 			childPanelRemove();
 			removeListsAndButtons();
-			if ( selectedModel && 0 < selectedModel.modelInfo.childCount ) {
-				//Log.out("PanelModelDetails.selectedModelChanged - selectedModel.metadata.name: " + selectedModel.metadata.name, Log.WARN );
-				childPanelAdd( selectedModel );
-				addListsAndButtons( selectedModel );
+			if ( selectedModel ) {
+                addListsAndButtons( selectedModel );
+				if ( 0 < selectedModel.modelInfo.childCount ) {
+                    //Log.out("PanelModelDetails.selectedModelChanged - selectedModel.metadata.name: " + selectedModel.metadata.name, Log.WARN );
+                    childPanelAdd(selectedModel);
+                }
 			}
 		}
 		height = height_calculated;

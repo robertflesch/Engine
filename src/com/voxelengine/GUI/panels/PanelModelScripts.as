@@ -28,18 +28,16 @@ public class PanelModelScripts extends PanelBase
 {
     private var _listScripts:			    ListBox;
     private var _selectedScript:			Script;
-    private var _addButton:					Button;
     private var _deleteButton:				Button;
     private var _detailButton:				Button;
-    private var _currentY:                  int;
 
     public function PanelModelScripts($parent:ContainerModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number )
     {
         super( $parent, $widthParam, $heightParam );
         autoHeight = false;
         layout = new AbsoluteLayout();
-        _currentY = 5;
-        var ha:Label = new Label( "Has these Scripts", width );
+        var _currentY:int = 5;
+        var ha:Label = new Label( "Has these Spells", width );
         ha.textAlign = TextAlign.CENTER;
         ha.y = _currentY;
         addElement( ha );
@@ -52,6 +50,7 @@ public class PanelModelScripts extends PanelBase
 
         const btnWidth:int = width - 10;
 
+        var _addButton:					Button;
         _addButton = new Button( LanguageManager.localizedStringGet( "Script_Add" )  );
         _addButton.y = _currentY = _currentY + _listScripts.height + 10;
         _addButton.x = 5;
@@ -159,7 +158,7 @@ public class PanelModelScripts extends PanelBase
 
     ///////////////////////////////////////////////////////////////////////
 
-    private function noScriptSelected():void {
+    static private function noScriptSelected():void {
         (new Alert( LanguageManager.localizedStringGet( "No_Script_Selected" ) )).display();
     }
 
