@@ -20,6 +20,7 @@ import com.voxelengine.utils.ColorUtils;
 import com.voxelengine.utils.StringUtils;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.OxelPersistence;
 import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -34,6 +35,7 @@ import flash.display.Loader;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.geom.Matrix;
+import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
 import flash.net.URLLoader;
 import flash.net.URLLoaderDataFormat;
@@ -295,8 +297,10 @@ public class WindowPictureImport extends VVPopup {
             return;
         }
         var model:Object = GenerateCube.script( PictureImportProperties.grain, TypeInfo.AIR, true );
-        model.name = StringUtils.getFileNameFromString(PictureImportProperties.url ); //"Picture Import";
+        model.name = StringUtils.getFileNameFromString( PictureImportProperties.url ); //"Picture Import";
         model.description = PictureImportProperties.url;
+        model.hashTags = "#architecture#window#stained";
+
         var ii:InstanceInfo = new InstanceInfo();
         ii.modelGuid = Globals.getUID();
         addListeners();
@@ -379,18 +383,37 @@ public class WindowPictureImport extends VVPopup {
         var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( $op.guid );
         if ( vm ){
             if ($op && $op.oxel && $op.oxel.gc.bound) {
-                // Only do this for top level models.
-                var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain($op.oxel.gc.bound), 16)/2;
-                // this gives me corner.
-                var msCamPos:Vector3D = VoxelModel.controlledModel.cameraContainer.current.position;
-                var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld( msCamPos );
+//                // Only do this for top level models.
+//                var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain($op.oxel.gc.bound), 16)/2;
+//                // this gives me corner.
+//                var msCamPos:Vector3D = VoxelModel.controlledModel.cameraContainer.current.position;
+//                var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld( msCamPos );
+//
+//                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector( new Vector3D( radius + 8, adjCameraPos.y-radius, -radius * 1.25 ) );
+//                var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet();
+//                diffPos = diffPos.add(lav);
+//                vm.instanceInfo.positionSet = diffPos;
+                //////////////////
+                var size:int = Math.max(GrainCursor.get_the_g0_edge_for_grain($op.oxel.gc.bound), 32);
+                // this give me edge,  really want center.
+                var cm:VoxelModel = VoxelModel.controlledModel;
+                var cmRotation:Vector3D = cm.cameraContainer.current.rotation;
+                var cameraMatrix:Matrix3D = new Matrix3D();
+                cameraMatrix.identity();
+                cameraMatrix.prependRotation(-cmRotation.z, Vector3D.Z_AXIS);
+                cameraMatrix.prependRotation(-cmRotation.y, Vector3D.Y_AXIS);
+                cameraMatrix.prependRotation(-cmRotation.x, Vector3D.X_AXIS);
 
-                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector( new Vector3D( radius + 8, adjCameraPos.y-radius, -radius * 1.25 ) );
-                var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet();
-                diffPos = diffPos.add(lav);
-                vm.instanceInfo.positionSet = diffPos;
+                var endPoint:Vector3D = ModelCacheUtils.viewVector(ModelCacheUtils.FRONT);
+                endPoint.scaleBy(size * 1.1);
+                var viewVector:Vector3D = cameraMatrix.deltaTransformVector(endPoint);
+                viewVector = viewVector.add(cm.instanceInfo.positionGet);
+                viewVector.setTo(viewVector.x - size / 2, viewVector.y - size / 2, viewVector.z - size / 2);
+                vm.instanceInfo.positionSet = viewVector;
+
+                //////////////////
                 vm.instanceInfo.rotationSetComp( 0, 90, 0 );
-                vm.modelInfo.hashTags = "#architecture#window#stained";
+//                vm.modelInfo.hashTags = "#architecture#window#stained";
 
                 OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE,  quadsComplete );
             }
@@ -399,16 +422,20 @@ public class WindowPictureImport extends VVPopup {
                 if (vm.modelInfo.guid == $ode.modelGuid) {
                     OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, quadsComplete);
                     var bmpd:BitmapData = Renderer.renderer.modelShot( vm );
-                    vm.modelInfo.thumbnail = drawScaled(bmpd, 128, 128);
+                    vm.modelInfo.thumbnail = drawScaledAndCropped(bmpd, 128, 128);
                     ModelInfoEvent.create(ModelBaseEvent.CHANGED, 0, vm.modelInfo.guid, vm.modelInfo);
                 }
             }
 
-            function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
+            function drawScaledAndCropped($bmp:BitmapData, destWidth:int, destHeight:int ):BitmapData {
                 var m:Matrix = new Matrix();
-                m.scale(destWidth/obj.width, destHeight/obj.height);
+                m.scale(destHeight/$bmp.height, destHeight/$bmp.height);
+                var scale:Number = $bmp.height/destHeight;
+                var finalWidth:int = $bmp.width/scale;
+                var totalOffest:int = finalWidth - destWidth;
+                m.translate( -totalOffest/2, 0 );
                 var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
-                bmpd.draw(obj, m);
+                bmpd.draw($bmp, m );
                 return bmpd;
             }
         }

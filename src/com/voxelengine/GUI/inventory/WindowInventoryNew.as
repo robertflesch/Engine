@@ -87,9 +87,9 @@ import org.flashapi.swing.*
 				$label += " - " + Network.userId;
 
             if ( WindowInventoryNew._s_hackSupportClick )
-                $label += " click item to add it to world";
+                $label += " - Click item to add it to world";
             else
-                $label += " drag item to tool bar or manage items";
+                $label += " - Drag item to tool bar or manage items";
 
 			super( $label );
 			_showTabs = $showTabs;

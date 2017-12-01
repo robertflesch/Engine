@@ -143,18 +143,24 @@ public class PopupModelInfo extends VVPopup
     private function newPhoto( $me:UIMouseEvent ):void {
         var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _mi.guid );
         var bmpd:BitmapData = Renderer.renderer.modelShot( vm );
-        _mi.thumbnail = drawScaled( bmpd, PHOTO_CAPTURE_WIDTH, PHOTO_HEIGHT );
+        _mi.thumbnail = drawScaledAndCropped( bmpd, PHOTO_CAPTURE_WIDTH, PHOTO_HEIGHT );
         addPhoto();
         ModelInfoEvent.create( ModelBaseEvent.CHANGED, 0, _mi.guid, _mi );
     }
 
-    static private function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
+    private function drawScaledAndCropped($bmp:BitmapData, destWidth:int, destHeight:int ):BitmapData {
         var m:Matrix = new Matrix();
-        m.scale(destWidth/obj.width, destHeight/obj.height);
+        m.scale(destHeight/$bmp.height, destHeight/$bmp.height);
+        var scale:Number = $bmp.height/destHeight;
+        var finalWidth:int = $bmp.width/scale;
+        var totalOffest:int = finalWidth - destWidth;
+        m.translate( -totalOffest/2, 0 );
         var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
-        bmpd.draw(obj, m);
+        bmpd.draw($bmp, m );
         return bmpd;
     }
+
+
     private function addPhoto():void {
         _photoContainer.layout.orientation = LayoutOrientation.VERTICAL;
         _photoContainer.layout.horizontalAlignment = HorizontalAlignment.CENTER;
@@ -167,7 +173,7 @@ public class PopupModelInfo extends VVPopup
         _photoContainer.removeElements();
         var bmd:BitmapData = null;
         if ( _mi.thumbnail )
-            bmd = drawScaled( _mi.thumbnail, PHOTO_WIDTH, PHOTO_HEIGHT );
+            bmd = drawScaledAndCropped( _mi.thumbnail, PHOTO_WIDTH, PHOTO_HEIGHT );
         var pic:Image = new Image( new Bitmap( bmd ), PHOTO_WIDTH, PHOTO_HEIGHT );
         _photoContainer.addElement( pic );
         _photoContainer.addElement( new ComponentSpacer( WIDTH ) );

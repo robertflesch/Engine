@@ -258,7 +258,7 @@ public class ModelMakerImport extends ModelMakerBase {
             OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, readyForModelShot);
             // This works for simple models, but not for deep hierarchies
             var bmpd:BitmapData = Renderer.renderer.modelShot( _vm );
-            _vm.modelInfo.thumbnail = drawScaled( bmpd, 128, 128 );
+            _vm.modelInfo.thumbnail = drawScaledAndCropped( bmpd, 128, 128 );
             ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
             modelInfo.changed = true;
             _vm.save();
@@ -266,13 +266,18 @@ public class ModelMakerImport extends ModelMakerBase {
             super.markComplete(true);
         }
 
-        function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
+        function drawScaledAndCropped($bmp:BitmapData, destWidth:int, destHeight:int ):BitmapData {
             var m:Matrix = new Matrix();
-            m.scale(destWidth/obj.width, destHeight/obj.height);
+            m.scale(destHeight/$bmp.height, destHeight/$bmp.height);
+			var scale:Number = $bmp.height/destHeight;
+			var finalWidth:int = $bmp.width/scale;
+			var totalOffest:int = finalWidth - destWidth;
+            m.translate( -totalOffest/2, 0 );
             var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
-            bmpd.draw(obj, m);
+            bmpd.draw($bmp, m );
             return bmpd;
         }
+
 	}
 }
 }
