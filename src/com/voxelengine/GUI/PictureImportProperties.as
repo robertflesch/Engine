@@ -15,7 +15,9 @@ public class PictureImportProperties {
     static public var blackColor:uint = 0x11;
     static public var hasTransparency:Boolean = false;
     static public var transColor:uint = 0xf0;
-    static public var grain:uint = 5;
+    static private var _grain:uint = 5;
+    static public function get grain():uint { return _grain; }
+    static public function set grain($val:uint):void { _grain = $val; }
     static public var referenceBitmapData:BitmapData = null;
     static public var finalBitmapData:BitmapData = null;
     static public var url:String = "";
